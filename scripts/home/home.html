@@ -1,0 +1,105 @@
+<br>
+<div class="ui grid">
+    <div class="one wide column"></div>
+    <div class="fourteen wide column">
+        <div class="ui grid">
+            <div class="row">
+                <div style="text-align: center">
+                    <h2 class="ui icon header">
+                        <i class="settings icon"></i>
+                        <div class="content">
+                            Imitation Platform
+                            <div class="sub header">Follow instructions to create new task</div>
+                        </div>
+                    </h2>
+                </div>
+            </div>
+        </div>
+        <div class="ui divider"></div>
+        <div ng-show="first">
+            <div class="row">
+                <div style="text-align: center">
+                    <div class="ui segment">
+                        <div class="ui grid">
+                            <div class="row">
+                                <div style="text-align: center">
+                                    <h2>Enter Name of Task</h2>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div style="text-align: center">
+                                    <div class="ui input">
+                                        <input type="text" placeholder="Enter Task Name">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="row"></div>
+            <div style="text-align: right">
+                <button ng-click="showSecond()" class="ui primary right labeled icon button">
+                    <i class="right arrow icon"></i>
+                    Next
+                </button>
+            </div>
+        </div>
+        <!--Second Segment-->
+        <div ng-show="second">
+            <div class="row">
+                <div style="text-align: center">
+                    <div class="ui segment">
+                        <div class="ui grid">
+                            <div class="row">
+                                <div style="text-align: center">
+                                    <h2>Add the SMILE Recording</h2>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="four wide column"></div>
+                                <div class="eight wide column">
+                                    <div style="text-align: center">
+                                        <div>
+                                            <label for="file" class="ui icon button">
+                                                <i class="upload icon"></i>
+                                                Open File
+                                            </label>
+                                            <input type="file" id="hidden-new-file" style="display: none">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="ui grid">
+                    <div class="eight wide column">
+                        <div style="text-align: left">
+                            <button ng-click="showFirst()" class="ui primary left labeled icon button">
+                        <i class="left arrow icon"></i>
+                        Previous
+                    </button>
+                        </div>
+                    </div>
+                    <div class="eight wide column">
+                        <div style="text-align: right">
+                            <button ng-click="showSecond()" class="ui primary right labeled icon button">
+                        <i class="right arrow icon"></i>
+                        Next
+                    </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Grid end -->
+</div>
+</div>
+<div class="one wide column"></div>
+</div>

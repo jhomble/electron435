@@ -19,29 +19,51 @@
                         controller: 'homeController'
                     }
                 );
-                $routeProvider.otherwise({redirectTo: '/'});
+                $routeProvider.otherwise({ redirectTo: '/' });
             }
         ]
     )
-    
-    .controller('homeController', ['$scope', '$window', function($scope, $window) {
-        $scope.first = true;
-        $scope.second = false;
 
-        var reset = function(){
-            $scope.first = false;
-            $scope.second = false;
-        }
-        $scope.showFirst = function(){
-            reset();
-            $scope.first = true;
-        }
+        .directive('inputTask', function () {
+            return {
+                templateUrl: 'scripts/home/inputTask.html'
+            }
+        })
+        .directive('inputSmile', function () {
+            return {
+                templateUrl: 'scripts/home/inputSmile.html'
+            }
+        })
+        .directive('inputCauses', function () {
+            return {
+                templateUrl: 'scripts/home/inputCauses.html'
+            }
+        })
 
-        $scope.showSecond = function(){
-            reset();
-            $scope.second = true;
-        }
-    }])
-    
-    ;
+        .controller('homeController', ['$scope', '$window', function ($scope, $window) {
+            $scope.inputTask = true;
+            $scope.inputSmile = false;
+            $scope.inputCauses = false;
+
+            var reset = function () {
+                $scope.inputTask = false;
+                $scope.inputSmile = false;
+                $scope.inputCauses = false;
+            }
+            $scope.showInputTask = function () {
+                reset();
+                $scope.inputTask = true;
+            }
+
+            $scope.showInputSmile = function () {
+                reset();
+                $scope.inputSmile = true;
+            }
+
+            $scope.showInputCauses = function () {
+                reset();
+                $scope.inputCauses = true;
+            }
+
+        }]);
 })();

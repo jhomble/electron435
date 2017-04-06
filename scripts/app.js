@@ -39,16 +39,23 @@
                 templateUrl: 'scripts/home/inputCauses.html'
             }
         })
+        .directive('builder', function () {
+            return {
+                templateUrl: 'scripts/home/builder.html'
+            }
+        })
 
         .controller('homeController', ['$scope', '$window', function ($scope, $window) {
             $scope.inputTask = true;
             $scope.inputSmile = false;
             $scope.inputCauses = false;
+            $scope.builder = false;
 
             var reset = function () {
                 $scope.inputTask = false;
                 $scope.inputSmile = false;
                 $scope.inputCauses = false;
+                $scope.builder = false;
             }
             $scope.showInputTask = function () {
                 reset();
@@ -65,5 +72,38 @@
                 $scope.inputCauses = true;
             }
 
+            $scope.showBuilder = function(){
+                reset();
+                $scope.builder = true;
+            }
+
+            // For Actions / Causes
+
+            $scope.knowledge = [
+                {
+                    action: "Enter Action", 
+                    causes: [
+                        {
+                            cause: "Enter Cause"
+                        }
+                    ]
+                }
+            ]
+
+            $scope.addAction = function(){
+                var item = {
+                    action: "Enter Action", 
+                    causes: [
+                        {
+                            cause: "Enter Cause"
+                        }
+                    ]
+                }
+                $scope.knowledge.push(item);
+            }
+
+            $scope.addCause = function(index){
+                $scope.knowledge[index].causes.push({cause:"Enter Cause"})
+            }
         }]);
 })();

@@ -11,11 +11,11 @@
                     <div class="sixteen wide column">
                         <button ng-click="addAction()" class="ui green right labeled icon button">
                             <i class="plus icon"></i>
-                            Add
+                            Add Action
                         </button>
                     </div>
                 </div>
-                <div ng-repeat="item in knowledge" class="row" style="text-align: center">
+                <div ng-repeat="item in knowledge" class="row">
                     <div class="six wide column">
                         <div class="ui input">
                             <input type="text" ng-model="item.action">
@@ -29,7 +29,7 @@
                                 </div>
                                 <button ng-click="addCause($parent.$index)" class="ui green right labeled icon button">
                                     <i class="plus icon"></i>
-                                    Add
+                                    Add Cause
                                 </button>
                             </div>
                         </div>

@@ -44,18 +44,34 @@
                 templateUrl: 'scripts/home/builder.html'
             }
         })
+        .directive('relationship', function () {
+            return {
+                templateUrl: 'scripts/home/relationship.html'
+            }
+        })
+        .directive('parameters', function () {
+            return {
+                templateUrl: 'scripts/home/parameters.html'
+            }
+        })
 
         .controller('homeController', ['$scope', '$window', function ($scope, $window) {
+            
+
             $scope.inputTask = true;
             $scope.inputSmile = false;
             $scope.inputCauses = false;
             $scope.builder = false;
+            $scope.relationship = false;
+            $scope.parameters = false;
 
             var reset = function () {
                 $scope.inputTask = false;
                 $scope.inputSmile = false;
                 $scope.inputCauses = false;
                 $scope.builder = false;
+                $scope.relationship = false;
+                $scope.parameters = false;
             }
             $scope.showInputTask = function () {
                 reset();
@@ -77,14 +93,30 @@
                 $scope.builder = true;
             }
 
-            // For Actions / Causes
+            $scope.showRelationship = function(){
+                reset();
+                $scope.relationship = true;
+            }
 
+            $scope.showParameters = function(){
+                reset()
+                $scope.parameters = true;
+            }
+            // For Actions / Causes
+            
             $scope.knowledge = [
                 {
                     action: "Enter Action", 
+                    parameters: [
+                        {
+                            type: "", 
+                            value: ""
+                        }
+                    ],
                     causes: [
                         {
-                            cause: "Enter Cause"
+                            cause: "Enter Cause", 
+                            relationship: "Direct"
                         }
                     ]
                 }
@@ -95,7 +127,8 @@
                     action: "Enter Action", 
                     causes: [
                         {
-                            cause: "Enter Cause"
+                            cause: "Enter Cause", 
+                            relationship: "Direct"
                         }
                     ]
                 }
@@ -103,7 +136,10 @@
             }
 
             $scope.addCause = function(index){
-                $scope.knowledge[index].causes.push({cause:"Enter Cause"})
+                $scope.knowledge[index].causes.push({cause:"Enter Cause", relationship: "Direct"})
+            }
+            $scope.addParameter = function(index){
+                $scope.knowledge[index].parameters.push({type:"", value: ""})
             }
         }]);
 })();

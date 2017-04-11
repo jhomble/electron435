@@ -1,0 +1,81 @@
+<div class="row">
+    <div style="text-align: center">
+        <div class="ui segment">
+            <div class="ui grid">
+                <div class="row">
+                    <div style="text-align: center">
+                        <h2>Define Actions and Causes</h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="six wide column">
+                        <h3>Action</h3>
+                    </div>
+                    <div class="ten wide column">
+                        <div class="ui grid">
+                            <div class="row">
+                                <div class="eight wide column">
+                                    <h3>Relationship</h3>
+                                </div>
+                                <div class="eight wide column">
+                                    <h3>Cause</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div ng-repeat="item in knowledge" class="row">
+                    <div class="six wide column">
+                        <div class="ui input">
+                            <input type="text" readonly="" ng-model="item.action">
+                        </div>
+                    </div>
+                    <div class="ten wide column">
+                        <div class="ui grid">
+                            <div class="row" ng-repeat="cause in item.causes">
+                                <div class="eight wide column">
+                                    <div class="ui simple right selection dropdown" style="position: relative; z-index: 99999">
+                                        <input type="hidden" name="Relationship">
+                                        <i class="dropdown icon"></i>
+                                        <div class="default text">Direct</div>
+                                        <div class="menu">
+                                            <div class="item" data-value="0">Direct</div>
+                                            <div class="item" data-value="1">Conditional</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="eight wide column">
+                                    <div class="ui input">
+                                        <input type="text" readonly="" ng-model="cause.cause">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui divider"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+<div class="row">
+    <div class="ui grid">
+        <div class="eight wide column">
+            <div style="text-align: left">
+                <button ng-click="showBuilder()" class="ui primary right labeled icon button">
+                    <i class="left arrow icon"></i>
+                    Back
+                </button>
+            </div>
+        </div>
+        <div class="eight wide column">
+            <div style="text-align: right">
+                <button ng-click="showParameters()" class="ui primary right labeled icon button">
+                    <i class="right arrow icon"></i>
+                    Next
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

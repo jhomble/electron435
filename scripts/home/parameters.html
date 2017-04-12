@@ -12,7 +12,7 @@
                         <div class="ui grid">
                             <div class="row" >
                                 <div class="ten wide column">
-                                    <h3>Action</h3>
+                                    <h3>Cause</h3>
                                 </div>
                                 <div class="six wide column">
                                     <div class="row">
@@ -38,12 +38,10 @@
                             <div class="row">
                                 <div class="ten wide column">
                                     <div class="ui input">
-                                        <input type="text" readonly="" ng-model="item.action">
+                                        <input type="text" readonly="" ng-model="item.cause">
                                     </div>
-                                    <button ng-click="addParameter($index)" class="ui green right labeled icon button">
-                                        <i class="plus icon"></i>
-                                        Add Parameter
-                                    </button>
+                                    <button ng-click="addParameter($index)" class="ui green button">Add</button>
+                                    <button ng-click="removeParameter($index)" class="ui red button">Remove</button>
                                 </div>
                                 <div class="six wide column">
                                     <div class="row" ng-repeat="param in item.parameters">

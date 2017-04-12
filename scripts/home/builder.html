@@ -4,33 +4,36 @@
             <div class="ui grid">
                 <div class="row">
                     <div style="text-align: center">
-                        <h2>Define Actions and Causes</h2>
+                        <h2>Define Causes and Actions</h2>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="sixteen wide column">
-                        <button ng-click="addAction()" class="ui green right labeled icon button">
+                    <div class="six wide column">
+                        <button ng-click="addCause()" class="ui green right labeled icon button">
                             <i class="plus icon"></i>
-                            Add Action
+                            Add Cause
                         </button>
+                    </div>
+                    <div class="five wide column" style="text-align: center">
+                        <h3>Actions</h3>
                     </div>
                 </div>
                 <div ng-repeat="item in knowledge" class="row">
                     <div class="six wide column">
                         <div class="ui input">
-                            <input type="text" ng-model="item.action">
+                            <input type="text" ng-model="item.cause">
                         </div>
                     </div>
-                    <div class="ten wide column">
-                        <div class="row" ng-repeat="cause in item.causes">
+                    <div class="five wide column" style="text-align: center">
+                        <button ng-click="addAction($index)" class="ui green button">Add</button>
+                        <button ng-click="removeAction($index)" class="ui red icon button">Remove</button>
+                    </div>
+                    <div class="five wide column">
+                        <div class="row" ng-repeat="action in item.actions">
                             <div class="sixteen wide column">
                                 <div class="ui input">
-                                    <input type="text" ng-model="cause.cause">
+                                    <input type="text" ng-model="action.action">
                                 </div>
-                                <button ng-click="addCause($parent.$index)" class="ui green right labeled icon button">
-                                    <i class="plus icon"></i>
-                                    Add Cause
-                                </button>
                             </div>
                         </div>
                     </div>

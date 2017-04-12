@@ -56,7 +56,16 @@
         })
 
         .controller('homeController', ['$scope', '$window', function ($scope, $window) {
-            
+
+            // var jumboHeight = $('.jumbotron').outerHeight();
+            // function parallax() {
+            //     var scrolled = $(window).scrollTop();
+            //     $('.bg').css('height', (jumboHeight - scrolled) + 'px');
+            // }
+
+            // $(window).scroll(function (e) {
+            //     parallax();
+            // });
 
             $scope.inputTask = true;
             $scope.inputSmile = false;
@@ -88,58 +97,57 @@
                 $scope.inputCauses = true;
             }
 
-            $scope.showBuilder = function(){
+            $scope.showBuilder = function () {
                 reset();
                 $scope.builder = true;
             }
 
-            $scope.showRelationship = function(){
+            $scope.showRelationship = function () {
                 reset();
                 $scope.relationship = true;
             }
 
-            $scope.showParameters = function(){
+            $scope.showParameters = function () {
                 reset()
                 $scope.parameters = true;
             }
             // For Actions / Causes
-            
+
             $scope.knowledge = [
                 {
-                    action: "Enter Action", 
-                    parameters: [
-                        {
-                            type: "", 
-                            value: ""
-                        }
-                    ],
-                    causes: [
-                        {
-                            cause: "Enter Cause", 
-                            relationship: "Direct"
-                        }
-                    ]
+                    cause: "Enter Cause",
+                    parameters: [],
+                    actions: []
                 }
             ]
 
-            $scope.addAction = function(){
+            $scope.addCause = function () {
                 var item = {
-                    action: "Enter Action", 
-                    causes: [
-                        {
-                            cause: "Enter Cause", 
-                            relationship: "Direct"
-                        }
-                    ]
+                    cause: "Enter Action",
+                    parameters: [],
+                    actions: []
                 }
                 $scope.knowledge.push(item);
             }
 
-            $scope.addCause = function(index){
-                $scope.knowledge[index].causes.push({cause:"Enter Cause", relationship: "Direct"})
+            $scope.removeCause = function () {
+                $scope.knowledge.pop();
             }
-            $scope.addParameter = function(index){
-                $scope.knowledge[index].parameters.push({type:"", value: ""})
+
+            $scope.addAction = function (index) {
+                $scope.knowledge[index].actions.push({ action: "Enter Action", relationship: "Direct" })
+            }
+
+            $scope.removeAction = function (index) {
+                $scope.knowledge[index].actions.pop()
+            }
+
+            $scope.addParameter = function (index) {
+                $scope.knowledge[index].parameters.push({ type: "", value: "" })
+            }
+            
+            $scope.removeParameter = function (index) {
+                $scope.knowledge[index].parameters.pop()
             }
         }]);
 })();

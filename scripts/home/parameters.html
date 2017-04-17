@@ -10,19 +10,22 @@
                 <div class="row">
                     <div class="sixteen wide column">
                         <div class="ui grid">
-                            <div class="row" >
-                                <div class="ten wide column">
-                                    <h3>Cause</h3>
-                                </div>
-                                <div class="six wide column">
-                                    <div class="row">
-                                        <div class="ui grid">
-                                            <div class="row">
-                                                <div class="eight wide column" style="text-align: center">
-                                                    <h3>Type</h3>
-                                                </div>
-                                                <div class="eight wide column" style="text-align: center">
-                                                    <h3>Value</h3>
+                            <div class="row">
+                                <div class="sixteen wide column">
+                                    <h3>Actions</h3>
+                                    <div class="ui grid">
+                                        <div class="row">
+                                            <div class="ten wide column"></div>
+                                            <div class="six wide column">
+                                                <div class="ui grid">
+                                                    <div class="row">
+                                                        <div class="eight wide column">
+                                                            <h3>Type</h3>
+                                                        </div>
+                                                        <div class="eight wide column">
+                                                            <h3>Value</h3>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -36,25 +39,34 @@
                     <div class="sixteen wide column">
                         <div class="ui grid">
                             <div class="row">
-                                <div class="ten wide column">
-                                    <div class="ui input">
-                                        <input type="text" readonly="" ng-model="item.cause">
-                                    </div>
-                                    <button ng-click="addParameter($index)" class="ui green button">Add</button>
-                                    <button ng-click="removeParameter($index)" class="ui red button">Remove</button>
-                                </div>
-                                <div class="six wide column">
-                                    <div class="row" ng-repeat="param in item.parameters">
+                                <div class="sixteen wide column">
+                                    <h4>Actions for: {{item.cause}}</h4>
+                                    <div ng-repeat="action in item.actions">
                                         <div class="ui grid">
                                             <div class="row">
-                                                <div class="eight wide column">
+                                                <div class="ten wide column">
                                                     <div class="ui input">
-                                                        <input type="text" ng-model="param.type">
+                                                        <input type="text" readonly="" ng-model="action.action">
                                                     </div>
+                                                    <button ng-click="addActionParameter($parent.$index, $index)" class="circular ui green icon button"><i class="icon plus"></i></button>
+                                                    <button ng-click="removeActionParameter($parent.$index, $index)" class="circular ui red icon button"><i class="icon minus"></i></button>
                                                 </div>
-                                                <div class="eight wide column">
-                                                    <div class="ui input">
-                                                        <input type="text" ng-model="item.value">
+                                                <div class="six wide column">
+                                                    <div class="row" ng-repeat="param in action.params">
+                                                        <div class="ui grid">
+                                                            <div class="row">
+                                                                <div class="eight wide column">
+                                                                    <div class="ui input">
+                                                                        <input type="text" ng-model="param.type">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="eight wide column">
+                                                                    <div class="ui input">
+                                                                        <input type="text" ng-model="param.value">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -64,6 +76,7 @@
                             </div>
                         </div>
                     </div>
+                    <div class="ui divider"></div>
                 </div>
             </div>
         </div>

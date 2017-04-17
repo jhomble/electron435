@@ -4,51 +4,31 @@
             <div class="ui grid">
                 <div class="row">
                     <div style="text-align: center" style="text-align: center">
-                        <h2>Define Causes and Actions</h2>
+                        <h2>Define Causal Relationships</h2>
+                        <h5>For each cause, define whether it is direct or conditional based on actions</h5>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="six wide column">
+                    <div class="eight wide column">
                         <h3>Cause</h3>
-                    </div>
-                    <div class="ten wide column">
-                        <div class="ui grid">
-                            <div class="row">
-                                <div class="eight wide column" style="text-align: center">
-                                    <h3>Relationship</h3>
-                                </div>
-                                <div class="eight wide column" style="text-align: center">
-                                    <h3>Action</h3>
-                                </div>
-                            </div>
-                        </div>
+                    </div><div class="eight wide column">
+                        <h3>Relationship</h3>
                     </div>
                 </div>
                 <div ng-repeat="item in knowledge" class="row">
-                    <div class="six wide column">
+                    <div class="eight wide column">
                         <div class="ui input">
                             <input type="text" readonly="" ng-model="item.cause">
                         </div>
                     </div>
-                    <div class="ten wide column">
-                        <div class="ui grid">
-                            <div class="row" ng-repeat="action in item.actions">
-                                <div class="eight wide column">
-                                    <div class="ui simple right selection dropdown" style="position: relative; z-index: 99999">
-                                        <input type="hidden" name="Relationship">
-                                        <i class="dropdown icon"></i>
-                                        <div class="default text">Direct</div>
-                                        <div class="menu">
-                                            <div class="item" data-value="0">Direct</div>
-                                            <div class="item" data-value="1">Conditional</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="eight wide column">
-                                    <div class="ui input">
-                                        <input type="text" readonly="" ng-model="action.action">
-                                    </div>
-                                </div>
+                    <div class="eight wide column">
+                        <div class="ui form">
+                            <div class="ten wide field">
+                                <select>
+                                    <option value="" disabled selected>- Please Choose -</option>
+                                    <option value"1">Direct</option>
+                                    <option value="2">Conditional</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -79,3 +59,26 @@
         </div>
     </div>
 </div>
+
+<!--<div class="ten wide column">
+    <div class="ui grid">
+        <div class="row" ng-repeat="action in item.actions">
+            <div class="eight wide column">
+                <div class="ui simple right selection dropdown" style="position: relative; z-index: 99999">
+                    <input type="hidden" name="Relationship">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Direct</div>
+                    <div class="menu">
+                        <div class="item" data-value="0">Direct</div>
+                        <div class="item" data-value="1">Conditional</div>
+                    </div>
+                </div>
+            </div>
+            <div class="eight wide column">
+                <div class="ui input">
+                    <input type="text" readonly="" ng-model="action.action">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>-->

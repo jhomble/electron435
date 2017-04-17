@@ -1,0 +1,106 @@
+<div class="row">
+    <div style="text-align: center">
+        <div class="ui segment">
+            <div class="ui grid">
+                <div class="row">
+                    <div style="text-align: center">
+                        <h2>Define Causal Parameters</h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="sixteen wide column">
+                        <div class="ui grid">
+                            <div class="row">
+                                <div class="sixteen wide column">
+                                    <h3>Causes</h3>
+                                    <div class="ui grid">
+                                        <div class="row">
+                                            <div class="ten wide column"></div>
+                                            <div class="six wide column">
+                                                <div class="ui grid">
+                                                    <div class="row">
+                                                        <div class="eight wide column">
+                                                            <h3>Action</h3>
+                                                        </div>
+                                                        <div class="eight wide column">
+                                                            <h3>Parameter</h3>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div ng-repeat="item in knowledge" class="row">
+                    <div class="sixteen wide column">
+                        <div class="ui grid">
+                            <div class="row">
+                                <div class="ten wide column">
+                                    <div class="ui input">
+                                        <input type="text" readonly="" ng-model="item.cause">
+                                    </div>
+                                    <button ng-click="addCausalParameter($index)" class="circular ui green icon button"><i class="icon plus"></i></button>
+                                    <button ng-click="removeCausalParameter($index)" class="circular ui red icon button"><i class="icon minus"></i></button>
+                                </div>
+                                <div class="six wide column">
+                                    <div class="row" ng-repeat="param in item.parameters">
+                                        <div class="ui grid">
+                                            <div class="row">
+                                                <div class="eight wide column">
+                                                    <div class="ui form">
+                                                        <div class="field">
+                                                            <select ng-model="param.action" ng-change="setParams($parent.$index, param.action)">
+                                                                <option value="" disabled selected>- Please Choose -</option>
+                                                                <option ng-repeat="action in item.actions">{{action.action}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="eight wide column">
+                                                    <div class="ui form">
+                                                        <div class="field">
+                                                            <select ng-model="param.param">
+                                                                <option value="" disabled selected>- Please Choose -</option>
+                                                                <option ng-repeat="param in causalParamList">{{param.value}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui divider"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+<div class="row">
+    <div class="ui grid">
+        <div class="eight wide column">
+            <div style="text-align: left">
+                <button ng-click="showActionParameters()" class="ui primary right labeled icon button">
+                    <i class="left arrow icon"></i>
+                    Back
+                </button>
+            </div>
+        </div>
+        <div class="eight wide column">
+            <div style="text-align: right">
+                <button ng-click="showCausalParameters()" class="ui primary right labeled icon button">
+                    <i class="right arrow icon"></i>
+                    Next
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

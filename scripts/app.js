@@ -49,9 +49,14 @@
                 templateUrl: 'scripts/home/relationship.html'
             }
         })
-        .directive('parameters', function () {
+        .directive('actionParameters', function () {
             return {
-                templateUrl: 'scripts/home/parameters.html'
+                templateUrl: 'scripts/home/actionParameters.html'
+            }
+        })
+        .directive('causalParameters', function () {
+            return {
+                templateUrl: 'scripts/home/causalParameters.html'
             }
         })
 
@@ -62,7 +67,8 @@
                 $scope.inputCauses = false;
                 $scope.builder = false;
                 $scope.relationship = false;
-                $scope.parameters = false;
+                $scope.actionParameters = false;
+                $scope.causalParameters = false;
 
                 var reset = function () {
                     $scope.inputTask = false;
@@ -70,7 +76,8 @@
                     $scope.inputCauses = false;
                     $scope.builder = false;
                     $scope.relationship = false;
-                    $scope.parameters = false;
+                    $scope.actionParameters = false;
+                    $scope.causalParameters = false;
                 }
                 $scope.showInputTask = function () {
                     reset();
@@ -97,9 +104,14 @@
                     $scope.relationship = true;
                 }
 
-                $scope.showParameters = function () {
+                $scope.showActionParameters = function () {
                     reset()
-                    $scope.parameters = true;
+                    $scope.actionParameters = true;
+                }
+                
+                $scope.showCausalParameters = function () {
+                    reset()
+                    $scope.causalParameters = true;
                 }
                 // For Actions / Causes
 
@@ -134,9 +146,17 @@
                     $scope.knowledge[index].actions.pop()
                 }
 
+                $scope.addCausalParameter = function(index){
+                    $scope.knowledge[index].parameters.push({action: "", param: ""})
+                    console.log($scope.knowledge)
+                }
+
+                $scope.removeCausalParameter = function(index){
+                    $scope.knowledge[index].parameters.pop()
+                }
+
                 $scope.addActionParameter = function (parentIndex, index) {
                     $scope.knowledge[parentIndex].actions[index].params.push({ type: "", value: "" })
-                    console.log($scope.knowledge)
                 }
 
                 $scope.removeActionParameter = function (parentIndex, index) {
@@ -144,7 +164,15 @@
                 }
                 
                 $scope.defaultActions = ['release', 'grab', 'move']
-
+                
+                $scope.setParams = function(parentIndex, item){
+                    var actions = []
+                    $scope.knowledge[parentIndex].actions.forEach(function(x) {
+                        actions.push(x.action);
+                    });
+                    var index = actions.indexOf(item);
+                    $scope.causalParamList = $scope.knowledge[parentIndex].actions[index].params
+                }
             })
 
         }]);

@@ -24,156 +24,175 @@
         ]
     )
 
-        .directive('inputTask', function () {
-            return {
-                templateUrl: 'scripts/home/inputTask.html'
-            }
-        })
-        .directive('inputSmile', function () {
-            return {
-                templateUrl: 'scripts/home/inputSmile.html'
-            }
-        })
-        .directive('inputCauses', function () {
-            return {
-                templateUrl: 'scripts/home/inputCauses.html'
-            }
-        })
-        .directive('builder', function () {
-            return {
-                templateUrl: 'scripts/home/builder.html'
-            }
-        })
-        .directive('relationship', function () {
-            return {
-                templateUrl: 'scripts/home/relationship.html'
-            }
-        })
-        .directive('actionParameters', function () {
-            return {
-                templateUrl: 'scripts/home/actionParameters.html'
-            }
-        })
-        .directive('causalParameters', function () {
-            return {
-                templateUrl: 'scripts/home/causalParameters.html'
-            }
-        })
+    .directive('inputTask', function () {
+        return {
+            templateUrl: 'scripts/home/inputTask.html'
+        }
+    })
+    .directive('inputSmile', function () {
+        return {
+            templateUrl: 'scripts/home/inputSmile.html'
+        }
+    })
+    .directive('inputCauses', function () {
+        return {
+            templateUrl: 'scripts/home/inputCauses.html'
+        }
+    })
+    .directive('builder', function () {
+        return {
+            templateUrl: 'scripts/home/builder.html'
+        }
+    })
+    .directive('relationship', function () {
+        return {
+            templateUrl: 'scripts/home/relationship.html'
+        }
+    })
+    .directive('actionParameters', function () {
+        return {
+            templateUrl: 'scripts/home/actionParameters.html'
+        }
+    })
+    .directive('causalParameters', function () {
+        return {
+            templateUrl: 'scripts/home/causalParameters.html'
+        }
+    })
 
-        .controller('homeController', ['$scope', '$window', function ($scope, $window) {
-            $(document).ready(function () {
-                $scope.inputTask = true;
+    .controller('homeController', ['$scope', '$window', function ($scope, $window) {
+        $(document).ready(function () {
+            $scope.inputTask = true;
+            $scope.inputSmile = false;
+            $scope.inputCauses = false;
+            $scope.builder = false;
+            $scope.relationship = false;
+            $scope.actionParameters = false;
+            $scope.causalParameters = false;
+
+            var reset = function () {
+                $scope.inputTask = false;
                 $scope.inputSmile = false;
                 $scope.inputCauses = false;
                 $scope.builder = false;
                 $scope.relationship = false;
                 $scope.actionParameters = false;
                 $scope.causalParameters = false;
+            }
+            $scope.showInputTask = function () {
+                reset();
+                $scope.inputTask = true;
+            }
 
-                var reset = function () {
-                    $scope.inputTask = false;
-                    $scope.inputSmile = false;
-                    $scope.inputCauses = false;
-                    $scope.builder = false;
-                    $scope.relationship = false;
-                    $scope.actionParameters = false;
-                    $scope.causalParameters = false;
-                }
-                $scope.showInputTask = function () {
-                    reset();
-                    $scope.inputTask = true;
-                }
+            $scope.showInputSmile = function () {
+                reset();
+                $scope.inputSmile = true;
+            }
 
-                $scope.showInputSmile = function () {
-                    reset();
-                    $scope.inputSmile = true;
-                }
+            $scope.showInputCauses = function () {
+                reset();
+                $scope.inputCauses = true;
+            }
 
-                $scope.showInputCauses = function () {
-                    reset();
-                    $scope.inputCauses = true;
-                }
+            $scope.showBuilder = function () {
+                reset();
+                $scope.builder = true;
+            }
 
-                $scope.showBuilder = function () {
-                    reset();
-                    $scope.builder = true;
-                }
+            $scope.showRelationship = function () {
+                reset();
+                $scope.relationship = true;
+            }
 
-                $scope.showRelationship = function () {
-                    reset();
-                    $scope.relationship = true;
-                }
+            $scope.showActionParameters = function () {
+                reset()
+                $scope.actionParameters = true;
+            }
 
-                $scope.showActionParameters = function () {
-                    reset()
-                    $scope.actionParameters = true;
-                }
-                
-                $scope.showCausalParameters = function () {
-                    reset()
-                    $scope.causalParameters = true;
-                }
-                // For Actions / Causes
+            $scope.showCausalParameters = function () {
+                reset()
+                $scope.paramList = [];
+                var temp = [];
+                $scope.causalParameters = true;
+                // console.log($scope.knowledge)
+                $scope.knowledge.forEach(function(item) {
+                    // console.log("item")
+                    // console.log(item)
+                    temp = []
+                    item.actions.forEach(function(action){
+                        // console.log("action")
+                        // console.log(action)
+                        action.params.forEach(function(param){
+                            console.log("param")
+                            console.log(param)
+                            temp.push(action.action + " - " + param.value)
+                        })                        
+                    })
+                    $scope.paramList.push(temp)
+                });
+                console.log($scope.paramList)
 
-                $scope.knowledge = [
-                    {
-                        cause: "Enter Cause",
-                        relationship: {},
-                        parameters: [],
-                        actions: []
-                    }
-                ]
+            }
+            // For Actions / Causes
 
-                $scope.addCause = function () {
-                    var item = {
-                        cause: "Enter Cause",
-                        relationship: {},                        
-                        parameters: [],
-                        actions: []
-                    }
-                    $scope.knowledge.push(item);
+            $scope.knowledge = [
+                {
+                    cause: "Enter Cause",
+                    relationship: {},
+                    parameters: [],
+                    actions: []
                 }
+            ]
 
-                $scope.removeCause = function () {
-                    $scope.knowledge.pop();
+            $scope.addCause = function () {
+                var item = {
+                    cause: "Enter Cause",
+                    relationship: { type: "", condition: "" },
+                    parameters: [],
+                    actions: []
                 }
+                $scope.knowledge.push(item);
+            }
 
-                $scope.addAction = function (index) {
-                    $scope.knowledge[index].actions.push({ action: "Enter Action", params: []})
-                }
+            $scope.removeCause = function () {
+                $scope.knowledge.pop();
+            }
 
-                $scope.removeAction = function (index) {
-                    $scope.knowledge[index].actions.pop()
-                }
+            $scope.addAction = function (index) {
+                $scope.knowledge[index].actions.push({ action: "Enter Action", params: [] })
+            }
 
-                $scope.addCausalParameter = function(index){
-                    $scope.knowledge[index].parameters.push({action: "", param: ""})
-                    console.log($scope.knowledge)
-                }
+            $scope.removeAction = function (index) {
+                $scope.knowledge[index].actions.pop()
+            }
 
-                $scope.removeCausalParameter = function(index){
-                    $scope.knowledge[index].parameters.pop()
-                }
+            $scope.addCausalParameter = function (index) {
+                $scope.knowledge[index].parameters.push({ action: "", param: "" })
+            }
 
-                $scope.addActionParameter = function (parentIndex, index) {
-                    $scope.knowledge[parentIndex].actions[index].params.push({ type: "", value: "" })
-                }
+            $scope.removeCausalParameter = function (index) {
+                $scope.knowledge[index].parameters.pop()
+            }
 
-                $scope.removeActionParameter = function (parentIndex, index) {
-                    $scope.knowledge[parentIndex].actions[index].params.pop()
-                }
-                
-                $scope.defaultActions = ['release', 'grab', 'move']
-                
-                $scope.setParams = function(parentIndex, item){
-                    var actions = []
-                    $scope.knowledge[parentIndex].actions.forEach(function(x) {
-                        actions.push(x.action);
-                    });
-                    var index = actions.indexOf(item);
-                    $scope.causalParamList = $scope.knowledge[parentIndex].actions[index].params
-                }
-            })
+            $scope.addActionParameter = function (parentIndex, index) {
+                $scope.knowledge[parentIndex].actions[index].params.push({ type: "", value: "" })
+            }
 
-        }]);
+            $scope.removeActionParameter = function (parentIndex, index) {
+                $scope.knowledge[parentIndex].actions[index].params.pop()
+            }
+
+            $scope.defaultActions = ['release', 'grab', 'move']
+
+            $scope.setParams = function (parentIndex, item) {
+                var actions = []
+                $scope.knowledge[parentIndex].actions.forEach(function (x) {
+                    actions.push(x.action);
+                });
+                var index = actions.indexOf(item);
+                $scope.causalParamList = $scope.knowledge[parentIndex].actions[index].params
+            }
+        })
+
+    }]);
 })();

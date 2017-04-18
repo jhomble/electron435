@@ -19,12 +19,12 @@
                                             <div class="six wide column">
                                                 <div class="ui grid">
                                                     <div class="row">
-                                                        <div class="eight wide column">
-                                                            <h3>Action</h3>
+                                                        <div class="sixteen wide column">
+                                                            <h3>Select from Action Parameters</h3>
                                                         </div>
-                                                        <div class="eight wide column">
+                                                        <!--<div class="eight wide column">
                                                             <h3>Parameter</h3>
-                                                        </div>
+                                                        </div>-->
                                                     </div>
                                                 </div>
                                             </div>
@@ -50,7 +50,17 @@
                                     <div class="row" ng-repeat="param in item.parameters">
                                         <div class="ui grid">
                                             <div class="row">
-                                                <div class="eight wide column">
+                                                <div class="sixteen wide column">
+                                                    <div class="ui form">
+                                                        <div class="field">
+                                                            <select ng-model="param.action">
+                                                                <option value="" disabled selected>- Please Choose -</option>
+                                                                <option ng-repeat="param in paramList[$parent.$index]">{{param}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!--<div class="eight wide column">
                                                     <div class="ui form">
                                                         <div class="field">
                                                             <select ng-model="param.action" ng-change="setParams($parent.$index, param.action)">
@@ -59,8 +69,8 @@
                                                             </select>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="eight wide column">
+                                                </div>-->
+                                                <!--<div class="eight wide column">
                                                     <div class="ui form">
                                                         <div class="field">
                                                             <select ng-model="param.param">
@@ -69,7 +79,7 @@
                                                             </select>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </div>-->
                                             </div>
                                         </div>
                                     </div>

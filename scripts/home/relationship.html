@@ -23,12 +23,19 @@
                     </div>
                     <div class="eight wide column">
                         <div class="ui form">
-                            <div class="ten wide field">
-                                <select>
-                                    <option value="" disabled selected>- Please Choose -</option>
-                                    <option value"1">Direct</option>
-                                    <option value="2">Conditional</option>
-                                </select>
+                            <div class="two fields">
+                                <div class="field">
+                                    <select ng-model="item.relationship.type">
+                                        <option value="" disabled selected>- Please Choose -</option>
+                                        <option value"1">Direct</option>
+                                        <option value="2">Conditional</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <div class="ui input">
+                                        <input type="text" ng-model="item.relationship.condition" placeholder="Enter Condition">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

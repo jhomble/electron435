@@ -10,10 +10,10 @@ import operator
 
 # Maybe add type, all, Causes, CONT ???
 (LPAREN, RPAREN, COMMA, LBRACK, RBRACK, LCURLY, RCURLY, SEMI,
-	EQUALS, AND, OR, COLON, ID, INTEGER, CAUSES, DOT, QUOTE, 
+	EQUALS, LESSTHAN, GREATERTHAN, LESSEQUAL, GREATEREQUAL, AND, OR, COLON, ID, INTEGER, CAUSES, DOT, QUOTE, 
 	RULES, TYPE, ALL, CONT, IF, EOF) = (
 	'LPAREN', 'RPAREN', 'COMMA', 'LBRACK', 'RBRACK', 'LCURLY',
-	'RCURLY', 'SEMI', 'EQUALS', 'AND', 'OR', 'COLON', 'ID', 
+	'RCURLY', 'SEMI', 'EQUALS', 'LESSTHAN','GREATERTHAN', 'LESSEQUAL', 'GREATEREQUAL', 'AND', 'OR', 'COLON', 'ID', 
 	'INTEGER', 'CAUSES', 'DOT', 'QUOTE', 'RULES', 'TYPE', 
 	'ALL', 'CONT', 'IF', 'EOF'
 )
@@ -143,7 +143,25 @@ class Lexer(object):
 
 			if self.current_char == '=':
 				self.advance()
-				return Token(EQUALS, '=')			
+				return Token(EQUALS, '=')
+
+			if self.current_char == '<' and self.peek() != '=':
+				self.advance()
+				return Token(LESSTHAN,'<')
+
+			if self.current_char == '>' and self.peek() != '=':
+				self.advance()
+				return Token(GREATERTHAN, '>')
+
+			if self.current_char == '>' and self.peek() == '=':
+				self.advance()
+				self.advance()
+				return Token(GREATEREQUAL,'>=')
+
+			if self.current_char == '<' and self.peek() == '=':
+				self.advance()
+				self.advance()
+				return Token(LESSEQUAL, '<=')
 
 			if self.current_char == '{':
 				self.advance()
@@ -207,8 +225,9 @@ class Literal(AST):
 		self.name = name
 
 class Boolean(AST):
-	def __init__(self, e1, e2):
+	def __init__(self, e1, op, e2):
 		self.e1 = e1
+		self.token = self.op = op
 		self.e2 = e2
 
 class BoolExpr(AST):
@@ -406,10 +425,25 @@ class Parser(object):
 	def boolean(self):
 		# boolean -> expr EQUALS expr
 		node1 = self.expr()
-		self.eat(EQUALS)
+		if self.current_token.type == EQUALS :
+			token = self.current_token
+			self.eat(EQUALS)
+		elif self.current_token.type == LESSTHAN :
+			token = self.current_token
+			self.eat(LESSTHAN)
+		elif self.current_token.type == GREATERTHAN :
+			token = self.current_token
+			self.eat(GREATERTHAN)
+		elif self.current_token.type == GREATEREQUAL :
+			token = self.current_token
+			self.eat(GREATEREQUAL)
+		elif self.current_token.type == LESSEQUAL :
+			token = self.current_token
+			self.eat(LESSEQUAL)
+
 		node2 = self.expr()
 
-		root = Boolean(e1=node1, e2=node2)
+		root = Boolean(e1=node1, op=token, e2=node2)
 
 		return root
 
@@ -522,7 +556,16 @@ class Interpreter(NodeVisitor):
 		return str(node.name)
 
 	def visit_Boolean(self, node):
-		return self.visit(node.e1), self.visit(node.e2)
+		if node.op.type == EQUALS :
+			return self.visit(node.e1), "==", self.visit(node.e2)
+		elif node.op.type == LESSTHAN :
+			return self.visit(node.e1), "<", self.visit(node.e2)
+		elif node.op.type == GREATERTHAN :
+			return self.visit(node.e1), ">", self.visit(node.e2)
+		elif node.op.type == GREATEREQUAL :
+			return self.visit(node.e1), ">=", self.visit(node.e2)
+		elif node.op.type == LESSEQUAL :
+			return self.visit(node.e1), "<=", self.visit(node.e2)
 
 	def visit_BoolExpr(self, node):
 		if node.op.type == AND:

@@ -272,7 +272,7 @@ class Var(AST):
 		self.token = token
 		self.value = token.value
 
-class NoOp(AST):
+class NoCond(AST):
 	pass
 
 class Parser(object):
@@ -524,7 +524,7 @@ class Parser(object):
 		return root
 
 	def empty(self):
-		return NoOp()
+		return NoCond()
 
 	def parse(self):
 		node = self.program()
@@ -642,12 +642,38 @@ class Interpreter(NodeVisitor):
 
 		return (if_stmt, gadd)
 
+	def visit_NoCond(self,node):
+		return None
+
 	def visit_Cond(self, node):
 		return self.visit(node.boolean)
+
+	def compile_bool(self, cond):
+		expr1 = cond[0]
+		comp = cond[1]
+		expr2 = cond[2]
+
+		if comp == '==':
+			'TODO: Compile boolean expr'
+		else:
+			raise Exception('\''+str(comp)+'\' currently not supported')
+
+		return ''
 
 	def visit_Stmt(self, node):
 		if_stmt, gadd = self.visit(node.caus)
 		cond = self.visit(node.cond)
+
+		comps = ['==', '<', '>', '<=', '>=']
+
+		if cond:
+			if cond[1] in comps:
+				print('Single: '+str(cond))
+				print self.compile_bool(cond)
+			else:
+				print('Multiple: '+str(cond))
+
+
 		return ''
 
 	def visit_Stmts(self, node):

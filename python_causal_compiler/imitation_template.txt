@@ -1,0 +1,15 @@
+import sys
+sys.path.extend(['./copct-master','./dananau-pyhop-195ab6320571'])
+
+from load_facility_demo import load_demo
+from facility_domain import causes, M
+import copct
+import pyhop
+import math
+
+# states: same hash-based representation as load_facility_demo:
+# state.objs[object_id] = [object_type, x, y, z, angle]
+def deep_copy(state):
+    new_state = pyhop.State(state.__name__)
+    new_state.objs = {obj_id: list(state.objs[obj_id]) for obj_id in state.objs}
+    return new_state

@@ -288,11 +288,11 @@ class Parser(object):
 	def eat(self, token_type):
 		if self.current_token.type == token_type:
 			# DEBUGGING
-			print self.current_token
+			print(self.current_token)
 			self.current_token = self.lexer.get_next_token()
 		else:
 			# DEBUGGING
-			print "Token Type: ", token_type			
+			print("Token Type: ", token_type)			
 			self.error()
 
 	def program(self):
@@ -330,7 +330,7 @@ class Parser(object):
 	def cond(self):
 		# cond -> IF LPAREN boolsAnd RPAREN COLON
 		#		  | empty		    
-		print "COND"
+		print("COND")
 		if self.current_token.type == IF:
 			self.eat(IF)
 			self.eat(LPAREN)
@@ -346,7 +346,7 @@ class Parser(object):
 
 	def caus(self):
 		# caus -> act CAUSES acts
-		print "CAUS"
+		print("CAUS")
 		node1 = self.act()
 		self.eat(CAUSES)
 		node2 = self.acts()
@@ -358,7 +358,7 @@ class Parser(object):
 	def acts(self):
 		# acts ->   act COMMA acts
 		#	 	  | act
-		print "ACTS"
+		print("ACTS")
 		node = self.act()
 
 		root = Acts()
@@ -373,7 +373,7 @@ class Parser(object):
 
 	def act(self):
 		# act -> var LPAREN args RPAREN
-		print "ACT"
+		print("ACT")
 		node1 = self.var()
 		self.eat(LPAREN)
 		node2 = self.args()
@@ -487,7 +487,7 @@ class Parser(object):
 		#             | integer
 		#             | integer DOT integer    (This is a float)
 		#			  | DOT integer            (This is a float)
-		print "VAR"
+		print("VAR")
 		if self.current_token.type == INTEGER:
 			node1 = self.integer()
 			if self.current_token.type == DOT:
@@ -669,7 +669,7 @@ class Interpreter(NodeVisitor):
 		if cond:
 			if cond[1] in comps:
 				print('Single: '+str(cond))
-				print self.compile_bool(cond)
+				print(self.compile_bool(cond))
 			else:
 				print('Multiple: '+str(cond))
 
@@ -713,14 +713,42 @@ class Interpreter(NodeVisitor):
 		tree = self.parser.parse()
 		return self.visit(tree)
 
+def make_facility_domain(interpreter):
+	facility_domain_py = open("facility_domain.py", "w")
+
+	# This block should just be all the text requisite for the file not including cause stuff
+	# TODO: Make sure the template is right
+	template = open("facility_domain_template.txt", "r").read()
+	# Actually compile input
+	result = interpreter.interpret()
+
+	facility_domain_py.write("%s\n%s" % (template, result))
+	facility_domain_py.close()
+	return result
+
+def make_imitation(interpreter):
+	facility_domain_py = open("imitation.py", "w")
+
+	# This block should just be all the text requisite for the file not including cause stuff
+	# TODO: Make sure the template is right
+	template = open("imitation_template.txt", "r").read()
+	# Actually compile input
+
+	# TODO: Use the compiler for imitation, not the same one as facility domain!
+	result = interpreter.interpret()
+
+	facility_domain_py.write("%s\n%s" % (template, result))
+	facility_domain_py.close()
+	return result
+
 def main():
 	text = open(sys.argv[1], 'r').read()
 
 	lexer = Lexer(text)
 	parser = Parser(lexer)
 	interpreter = Interpreter(parser)
-	result = interpreter.interpret()
-	print result
+	facility_domain_result = make_facility_domain(interpreter)
+	imitation_result = make_imitation(interpreter)
 
 def indexof(list, obj):
 	try:

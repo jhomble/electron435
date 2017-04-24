@@ -19,11 +19,8 @@
                                             <div class="six wide column">
                                                 <div class="ui grid">
                                                     <div class="row">
-                                                        <div class="eight wide column">
-                                                            <h3>Type</h3>
-                                                        </div>
-                                                        <div class="eight wide column">
-                                                            <h3>Value</h3>
+                                                        <div class="sixteen wide column">
+                                                            <h3>Parameter Name</h3>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -55,12 +52,12 @@
                                                     <div class="row" ng-repeat="param in action.params">
                                                         <div class="ui grid">
                                                             <div class="row">
-                                                                <div class="eight wide column">
+                                                                <!--<div class="eight wide column">
                                                                     <div class="ui input">
                                                                         <input type="text" ng-model="param.type">
                                                                     </div>
-                                                                </div>
-                                                                <div class="eight wide column">
+                                                                </div>-->
+                                                                <div class="sixteen wide column">
                                                                     <div class="ui input">
                                                                         <input type="text" ng-model="param.value">
                                                                     </div>
@@ -87,7 +84,7 @@
     <div class="ui grid">
         <div class="eight wide column">
             <div style="text-align: left">
-                <button ng-click="showRelationship()" class="ui primary right labeled icon button">
+                <button ng-click="showRelationship()" class="ui primary left labeled icon button">
                     <i class="left arrow icon"></i>
                     Back
                 </button>

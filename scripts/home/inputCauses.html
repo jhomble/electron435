@@ -28,11 +28,15 @@
                     <div class="four wide column"></div>
                     <div class="eight wide column">
                         <div style="text-align: center">
-                            <label for="file" class="ui icon button">
-                                <i class="upload icon"></i>
-                                Open File
-                            </label>
-                            <input type="file" style="display: none">
+                            <div style="text-align: center">
+                                <label class="ui icon button">
+                                    <i class="upload icon"></i>
+                                    Open File <input type="file" hidden ng-model-instant id="fileToUpload" multiple onchange="angular.element(this).scope().setFiles(this)">
+                                </label>
+                            </div>
+                            <div style="text-align: center">
+                                <h4 ng-model="knowledgeFileName"></h4>
+                            </div>
                         </div>
                     </div>
                 </div>                
@@ -46,16 +50,16 @@
         <div class="eight wide column">
             <div style="text-align: left">
                 <button ng-click="showInputSmile()" class="ui primary left labeled icon button">
-            <i class="left arrow icon"></i>
-            Previous
+                <i class="left arrow icon"></i>
+            Back
         </button>
             </div>
         </div>
         <div class="eight wide column">
             <div style="text-align: right">
-                <button ng-click="showInputCauses()" class="ui primary right labeled icon button">
+                <button ng-show="knowledgeAdded" ng-click="showInputCauses()" class="ui primary right labeled icon button">
             <i class="right arrow icon"></i>
-            Next
+            Next With File Input
         </button>
             </div>
         </div>

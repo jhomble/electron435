@@ -59,6 +59,11 @@
             templateUrl: 'scripts/home/causalParameters.html'
         }
     })
+    .directive('preview', function () {
+        return {
+            templateUrl: 'scripts/home/preview.html'
+        }
+    })
 
     .controller('homeController', ['$scope', '$window', function ($scope, $window) {
         $(document).ready(function () {
@@ -70,6 +75,9 @@
             $scope.actionParameters = false;
             $scope.causalParameters = false;
 
+
+            $scope.knowledgeAdded = false;
+
             var reset = function () {
                 $scope.inputTask = false;
                 $scope.inputSmile = false;
@@ -78,6 +86,7 @@
                 $scope.relationship = false;
                 $scope.actionParameters = false;
                 $scope.causalParameters = false;
+                $scope.preview = false;
             }
             $scope.showInputTask = function () {
                 reset();
@@ -109,44 +118,118 @@
                 $scope.actionParameters = true;
             }
 
+            $scope.showPreview = function(){
+                reset()
+                $scope.preview = true;
+            }
+
+            function unique(list) {
+                var result = [];
+                $.each(list, function(i, e) {
+                    if ($.inArray(e, result) == -1) result.push(e);
+                });
+                return result;
+            }
+
             $scope.showCausalParameters = function () {
                 reset()
                 $scope.paramList = [];
                 var temp = [];
                 $scope.causalParameters = true;
-                // console.log($scope.knowledge)
                 $scope.knowledge.forEach(function(item) {
-                    // console.log("item")
-                    // console.log(item)
                     temp = []
                     item.actions.forEach(function(action){
-                        // console.log("action")
-                        // console.log(action)
                         action.params.forEach(function(param){
-                            console.log("param")
-                            console.log(param)
-                            temp.push(action.action + " - " + param.value)
+                            //temp.push(action.action + " - " + param.value)
+                            temp.push(param.value)    
                         })                        
                     })
+                    temp = unique(temp)
                     $scope.paramList.push(temp)
                 });
-                console.log($scope.paramList)
-
             }
+
             // For Actions / Causes
+
+            //ex
+            // knowledge = [
+            //     {
+            //         cause: "moveTo", 
+            //         relationship: {
+            //             type: "Direct",
+            //             condition: ""
+            //         },
+            //         parameters: ["obj", "dest", "dx", "dy", "dz", "da"], 
+            //         actions: [
+            //             {
+            //                 action: "grasp", 
+            //                 params: ["obj"]
+            //             },
+            //             {
+            //                 action: "release",
+            //                 params: ["obj", "dest", "dx", "dy", "dz", "da"]
+            //             }
+            //         ]
+                    
+            //     },
+            //     {
+            //         cause: "stack", 
+            //         relationship: {
+            //             type: "Conditional",
+            //             condition: "TYPE(obj1) = block"
+            //         },
+            //         parameters: ["dest", "dx", "dy", "dz", "da", "obj"], 
+            //         actions: [
+            //             {
+            //                 action: "moveTo", 
+            //                 params: ["obj", "dest", "dx", "dy", "dz", "da"]
+            //             },
+            //         ]
+            //     },
+            // ]
 
             $scope.knowledge = [
                 {
                     cause: "Enter Cause",
-                    relationship: {},
+                    relationship: {
+                        type: "",
+                        condition: ""
+                    },
                     parameters: [],
                     actions: []
                 }
             ]
 
+            $scope.buildString = function(){
+                var final = "RULES { "
+                $scope.knowledge.forEach(function(cause) {
+                    if(cause.relationship.type === "Conditional"){
+                        final = final + "if(" + cause.relationship.condition + "):"
+                    }
+                    final = final + cause.cause + "("
+                    cause.parameters.forEach(function(param) {
+                       final = final + param.param + "," 
+                    });
+                    final = final.slice(0,-1)
+                    final = final + ") := "
+                    cause.actions.forEach(function(action) {
+                        final = final + action.action + "("
+                        action.params.forEach(function(param) {
+                            final = final +  param.value + ","
+                        });
+                        final = final.slice(0,-1)
+                        final = final + "),"
+                    });
+                    final = final.slice(0,-1)
+                    final = final + ";"
+                });
+                final = final + " }"
+                console.log(final)
+            }
+
             $scope.addCause = function () {
                 var item = {
-                    cause: "Enter Cause",
+                     cause: "Enter Cause",
                     relationship: { type: "", condition: "" },
                     parameters: [],
                     actions: []
@@ -193,6 +276,28 @@
                 $scope.causalParamList = $scope.knowledge[parentIndex].actions[index].params
             }
         })
+
+        $scope.setFiles = function(element){
+            console.log("asd")
+            console.log(element)
+            console.log('files:', element.files);
+            $scope.knowledgeAdded = true
+            var file = element.files[0]
+            $scope.knowledgeFileName = file.name
+            console.log($scope.knowledgeFileName)
+
+        }
+
+        $scope.thingsYouCanDo = [
+            {
+                name: "grasp",
+                params: ["obj"]
+            },
+            {
+                name: "release",
+                params: ["obj", "dest", "dx", "dy", "dz", "da"]
+            }
+        ]
 
     }]);
 })();

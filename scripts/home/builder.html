@@ -17,11 +17,11 @@
                 </div>
                 <div class="row">
                     <div class="six wide column">
-                        <button ng-click="addCause()" class="ui green button">
-                            Add
+                        <button ng-click="addCause()" class="circular ui green icon button"><i class="icon plus"></i>
+                            
                         </button>
-                        <button ng-click="removeCause()" class="ui red button">
-                            Remove
+                        <button ng-click="removeCause()" class="circular ui red icon button"><i class="icon minus"></i>
+                            
                         </button>
                     </div>
                 </div>
@@ -32,8 +32,8 @@
                         </div>
                     </div>
                     <div class="five wide column" style="text-align: center">
-                        <button ng-click="addAction($index)" class="ui green button">Add</button>
-                        <button ng-click="removeAction($index)" class="ui red icon button">Remove</button>
+                        <button ng-click="addAction($index)" class="circular ui green icon button"><i class="icon plus"></i></button>
+                        <button ng-click="removeAction($index)" class="circular ui red icon button"><i class="icon minus"></i></button>
                     </div>
                     <div class="five wide column">
                         <div class="row" ng-repeat="action in item.actions">
@@ -54,7 +54,7 @@
     <div class="ui grid">
         <div class="eight wide column">
             <div style="text-align: left">
-                <button ng-click="showInputCauses()" class="ui primary right labeled icon button">
+                <button ng-click="showInputCauses()" class="ui primary left labeled icon button">
                     <i class="left arrow icon"></i>
                     Back
                 </button>

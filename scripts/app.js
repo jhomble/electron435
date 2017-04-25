@@ -276,6 +276,17 @@
                 $scope.causalParamList = $scope.knowledge[parentIndex].actions[index].params
             }
         })
+        
+        $scope.smileRecordings = function(element){
+            console.log("asd")
+            console.log(element)
+            console.log('files:', element.files);
+            $scope.knowledgeAdded = true
+            var file = element.files[0]
+            $scope.knowledgeFileName = file.name
+            console.log($scope.knowledgeFileName)
+
+        }
 
         $scope.setFiles = function(element){
             console.log("asd")

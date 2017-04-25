@@ -553,7 +553,7 @@ class Facility_Domain_Compiler(NodeVisitor):
 		self.parser = parser
 
 	def visit_Literal(self, node):
-		return 'LITERAL', str(node.name)
+		return 'LITERAL', str(self.visit(node.name))
 
 	def visit_Boolean(self, node):
 		if node.op.type == EQUALS :
@@ -590,6 +590,16 @@ class Facility_Domain_Compiler(NodeVisitor):
 
 		return acts
 
+	def create_Action_Arg_Index_Reference_Dict(self, acts):
+		arg_index_dict = {}
+
+		for i in range(0, len(acts)):
+			for j in range(0, len(acts[i][1])):
+				if acts[i][1][j][:4] != 'CONT':
+					arg_index_dict[acts[i][1][j]] = str(i),str(j)
+
+		return arg_index_dict 
+
 	def visit_Caus(self, node):
 		acts = self.visit(node.acts)
 		act = self.visit(node.act)
@@ -602,45 +612,28 @@ class Facility_Domain_Compiler(NodeVisitor):
 
 		intention_Args = act[1]
 
-		arg_indices = []
-
-		for arg in intention_Args:
-			if arg[:4] != 'CONT':
-				for i in range(0, len(acts)):
-					j = indexof(acts[i][1], arg)
-					if j >= 0:
-						arg_indices.append((i,j))
-						break
-			else:
-				if len(arg_indices) == 0:
-					raise Exception('Cont used improperly!\n')
-				arg_indices.append(arg)
-
-		if len(arg_indices) != len(intention_Args):
-			raise Exception('Args improperly compiled!')
+		arg_indices = self.create_Action_Arg_Index_Reference_Dict(acts)
 
 		args = ''
 
-		for a in range(0, len(arg_indices)):
-			index = arg_indices[a]
-			if index[:4] != 'CONT':
-				i = str(index[0])
-				j = str(index[1])
-				if (a == len(arg_indices)-1):
+		for a in range(0, len(intention_Args)):
+			arg = intention_Args[a] 
+			if arg_indices.has_key(arg):
+				i,j = arg_indices[arg]
+				if (a == len(intention_Args)-1):
 					args += '(arguments['+i+']['+j+'], )' 
 				else:
 					args += '(arguments['+i+']['+j+'], )+' 
+			elif arg[:4] == 'CONT':
+					prev_arg = intention_Args[a-1]
+					i,j = arg_indices[prev_arg]
+					args = args[:len(args)-(18+len(i)+len(j))] + 'arguments['+i+']['+j+':]'
 			else:
-				prev_index = arg_indices[a-1]
-				i = str(prev_index[0])
-				j = str(prev_index[1]+1)
-				args += 'arguments['+i+']['+j+':]'
-
-		args += ')'
+				raise Exception('Could not find argument: ', arg)
 
 		gadd = 'g.add((states[0],\''+act[0]+'\','+args+'))\n'
 
-		return (if_stmt, gadd)
+		return (if_stmt, gadd, arg_indices)
 
 	def visit_NoCond(self,node):
 		return None
@@ -648,7 +641,7 @@ class Facility_Domain_Compiler(NodeVisitor):
 	def visit_Cond(self, node):
 		return self.visit(node.boolean)
 
-	def compile_bool(self, cond):
+	def compile_bool(self, cond, arg_indices):
 		body = ''
 		if_stmt = ''
 
@@ -661,41 +654,92 @@ class Facility_Domain_Compiler(NodeVisitor):
 		if comp == '==':
 			if expr1[0] == 'ALL':
 				print('ALL')
-
+				body += 'all_'+expr1[1]+' = [obj_id for (obj_id, obj_type,_,_,_,_)'
+				body += ' in states[0] if obj_type == \''+expr1[1]+'\']\n'
+				args = ''
+				for a in range(0, len(expr2)):
+					arg = expr2[a]
+					if arg[:4] == 'CONT':
+						prev_arg = expr2[a-1]
+						i,j = arg_indices[prev_arg]
+						args = args[:len(args)-(18+len(i)+len(j))] + 'arguments['+i+']['+j+':]'
+					else:
+						i,j = arg_indices[arg]
+						if (a == len(expr2) - 1):
+							args += '(arguments['+i+']['+j+'], )'
+						else:
+							args += '(arguments['+i+']['+j+'], )+'
+				if_stmt += 'if set(all_'+expr1[1]+') == set('+args+'):\n'
 			elif expr1[0] == 'TYPE':
 				print('TYPE')
 				var_name = str(expr1[1])
-				body += var_name+'_type = lookup_type('+var_name+', states[0])\n'
+				i,j = arg_indices[var_name]
+				var_get = 'arguments['+i+']'+'['+j+']'
+				body += var_name+'_type = lookup_type('+var_get+', states[0])\n'
 				if_stmt += 'if '+var_name+'_type == \''+str(expr2)+'\':\n'
 			else:
-				'Var1 = Var2 or Var1 = Literal'
+				var1 = ''
+				var2 = ''
+				if expr1[0] == 'LITERAL':
+					var1 = '\''+str(expr1[1])+'\''
+				else:
+					i,j = arg_indices[expr1]
+					var1 = 'arguments['+i+']['+j+']'
+
+				if expr2[0] == 'LITERAL':
+					var2 = '\''+str(expr2[1])+'\''
+				else:
+					i,j = arg_indices[expr2]
+					var2 = 'arguments['+i+']['+j+']'
+				if_stmt += 'if '+var1+' == '+var2+':\n'
 		else:
 			raise Exception('\''+str(comp)+'\' currently not supported')
 
 		return body, if_stmt
 
 	def visit_Stmt(self, node):
-		if_stmt, gadd = self.visit(node.caus)
+		if_stmt, gadd, arg_indices = self.visit(node.caus)
 		cond = self.visit(node.cond)
 
 		comps = ['==', '<', '>', '<=', '>=']
 
+		if_stmt2 = ''
+		body = ''
+
+		tab = '    '
+
 		if cond:
 			if cond[1] in comps:
 				print('Single: '+str(cond))
-				print(self.compile_bool(cond))
+				body, if_stmt2 = self.compile_bool(cond, arg_indices)
+				if body != '':
+					body = 2*tab + body
 			else:
 				print('Multiple: '+str(cond))
+				op = 'if'
 				for i in range(0, len(cond)):
 					if cond[i] == '&&':
-						'TODO: Mess with indenting'
+						op = 'and'
 					elif cond[i] == '||':
-						'TODO: Mess with indenting'
+						op = 'or'
 					else:
-						print(self.compile_bool(cond[i]))
+						body2, if_stmt2_2 = self.compile_bool(cond[i], arg_indices)
+						if body2 != '':
+							body += 2*tab+body2
+						if_stmt2 = if_stmt2.replace(':\n',' ')+if_stmt2_2.replace('if', op)
 
 
-		return ''
+		print 'BODY: ', body
+		print if_stmt2
+
+		gadd_tabs = 3*tab
+		if_stmt2_tabs = 2*tab
+
+		if if_stmt2 == '':
+			if_stmt2_tabs = ''
+			gadd_tabs = 2*tab
+
+		return tab + if_stmt + body + if_stmt2_tabs + if_stmt2 + gadd_tabs + gadd
 
 	def visit_Stmts(self, node):
 		result = ''
@@ -744,7 +788,7 @@ class Imitation_Compiler(NodeVisitor):
 		self.parser = parser
 
 	def visit_Literal(self, node):
-		return 'LITERAL', str(node.name)
+		return 'LITERAL', str(self.visit(node.name))
 
 	def visit_Boolean(self, node):
 		if node.op.type == EQUALS :
@@ -781,6 +825,15 @@ class Imitation_Compiler(NodeVisitor):
 
 		return acts
 
+	def create_Action_Arg_Index_Reference_Dict(acts):
+		arg_index_dict = {}
+
+		for i in range(0, len(acts)):
+			for j in range(0, len(acts[i])):
+				arg_index_dict[acts[i][1][j]] = i,j
+
+		return arg_index_dict 
+
 	def visit_Caus(self, node):
 		acts = self.visit(node.acts)
 		act = self.visit(node.act)
@@ -793,43 +846,58 @@ class Imitation_Compiler(NodeVisitor):
 
 		intention_Args = act[1]
 
-		arg_indices = []
+		arg_indices = create_Action_Arg_Index_Reference_Dict(acts)
 
-		for arg in intention_Args:
-			if arg[:4] != 'CONT':
-				for i in range(0, len(acts)):
-					j = indexof(acts[i][1], arg)
-					if j >= 0:
-						arg_indices.append((i,j))
-						break
-			else:
-				if len(arg_indices) == 0:
-					raise Exception('Cont used improperly!\n')
-				arg_indices.append(arg)
+		# arg_indices = []
 
-		if len(arg_indices) != len(intention_Args):
-			raise Exception('Args improperly compiled!')
+		# for arg in intention_Args:
+		# 	if arg[:4] != 'CONT':
+		# 		for i in range(0, len(acts)):
+		# 			j = indexof(acts[i][1], arg)
+		# 			if j >= 0:
+		# 				arg_indices[arg] = (i,j)
+		# 				break
+		# 	else:
+		# 		if len(arg_indices) == 0:
+		# 			raise Exception('Cont used improperly!\n')
+		# 		arg_indices[arg] = arg
 
-		args = ''
+		# if len(arg_indices) != len(intention_Args):
+		# 	raise Exception('Args improperly compiled!')
 
-		for a in range(0, len(arg_indices)):
-			index = arg_indices[a]
-			if index[:4] != 'CONT':
-				i = str(index[0])
-				j = str(index[1])
-				if (a == len(arg_indices)-1):
-					args += '(arguments['+i+']['+j+'], )' 
+		# args = ''
+
+		# for a in range(0, len(arg_indices)):
+		# 	index = arg_indices[a]
+		# 	if index[:4] != 'CONT':
+		# 		i = str(index[0])
+		# 		j = str(index[1])
+		# 		if (a == len(arg_indices)-1):
+		# 			args += '(arguments['+i+']['+j+'], )' 
+		# 		else:
+		# 			args += '(arguments['+i+']['+j+'], )+' 
+		# 	else:
+		# 		prev_index = arg_indices[a-1]
+		# 		i = str(prev_index[0])
+		# 		j = str(prev_index[1]+1)
+		# 		args += 'arguments['+i+']['+j+':]'
+
+		# args += ')'
+
+		for i in range(0, len(intention_Args)):
+			arg = intention_Args[i] 
+			if arg_indices.hasKey(arg):
+				if len(arg_indices[arg]) == 2:
+					i,j = arg_indices[arg]
+					if (a == len(arg_indices)-1):
+						args += '(arguments['+i+']['+j+'], )' 
+					else:
+						args += '(arguments['+i+']['+j+'], )+' 
 				else:
-					args += '(arguments['+i+']['+j+'], )+' 
-			else:
-				prev_index = arg_indices[a-1]
-				i = str(prev_index[0])
-				j = str(prev_index[1]+1)
-				args += 'arguments['+i+']['+j+':]'
-
-		args += ')'
-
+					'TODO: HANDLE CONT'
 		gadd = 'g.add((states[0],\''+act[0]+'\','+args+'))\n'
+
+		print('ARGS: ', args)
 
 		return (if_stmt, gadd)
 
@@ -934,7 +1002,9 @@ def make_facility_domain(interpreter):
 	# Actually compile input
 	result = interpreter.interpret()
 
-	facility_domain_py.write("%s\n%s" % (template, result))
+	inserted = template.replace('\t# INSERT CAUSES HERE', result)
+
+	facility_domain_py.write(inserted)
 	facility_domain_py.close()
 	return result
 

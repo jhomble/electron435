@@ -1,3 +1,10 @@
+## @package pyexample
+#  
+#  The following is a Compiler for the custom Causal Language specific
+#  to the Imitation domain.
+#
+#  Here is an example of the input language.
+
 import sys
 import functools
 import operator
@@ -601,25 +608,39 @@ class Facility_Domain_Compiler(NodeVisitor):
 		return arg_index_dict 
 
 	def visit_Caus(self, node):
+		# acts = the right-side of the causal statement. Represent
+		#		 the actions that cause the 'intention' 
+		# act  = the left-side of the causal statement. Represents
+		#		 the 'intention' caused by the actions
 		acts = self.visit(node.acts)
 		act = self.visit(node.act)
 
+		# defines fold-left function
 		foldl = lambda func, acc, xs: functools.reduce(func, xs, acc)
 
+		# isolates and formats the names of the acts in order to be
+		# used in the if statement
 		act_names = foldl(operator.add, '', map(lambda x: '\''+x[0]+'\',', acts))
 
+		# if_stmt = initial if statement that differentiates causal
+		#			rules
 		if_stmt = 'if actions == (' + act_names + '):\n'		
 
 		intention_Args = act[1]
 
+		# arg_indices = creates a dictionary where each key is an 
+		#				action from one of the acts and the value
+		#				is the i,j indices in the 2d arguments array
 		arg_indices = self.create_Action_Arg_Index_Reference_Dict(acts)
 
 		args = ''
 
+		# iterate through all the arguments to the intention
 		for a in range(0, len(intention_Args)):
 			arg = intention_Args[a] 
 			if arg_indices.has_key(arg):
 				i,j = arg_indices[arg]
+				# Don't add + to last argument string
 				if (a == len(intention_Args)-1):
 					args += '(arguments['+i+']['+j+'], )' 
 				else:
@@ -642,42 +663,56 @@ class Facility_Domain_Compiler(NodeVisitor):
 		return self.visit(node.boolean)
 
 	def compile_bool(self, cond, arg_indices):
+		# body     = Additional things added to the body of if_stmt.
+		#			 This could include calls to lookup_type or
+		#			 defining local variables
+		# if_stmt  = Handles conditional relationship rules. For
+		#			 example, this if statement would include
+		#   		 checking the type of an object		
 		body = ''
 		if_stmt = ''
 
-		print('COND: ', str(cond))
-
+		# expr1 = left side of comparison. Could be a variable,
+		# 		  literal, or keyword phrase like TYPE(obj)
+		# comp  = comparison operator (should be '==')
+		# expr2 = right side of comparison. Could be a variable,
+		#		  literal, or keyword phrase like ALL(type)
 		expr1 = cond[0]
 		comp = cond[1]
 		expr2 = cond[2]
 
 		if comp == '==':
 			if expr1[0] == 'ALL':
-				print('ALL')
+				# make the body statement develop a list of all objects of type
+				# expr1[1] in the current state (state[0])
 				body += 'all_'+expr1[1]+' = [obj_id for (obj_id, obj_type,_,_,_,_)'
 				body += ' in states[0] if obj_type == \''+expr1[1]+'\']\n'
+				# find argument indices for the left-side of the comparison so
+				# that they can be appropriately referenced in the if_stmt
 				args = ''
 				for a in range(0, len(expr2)):
 					arg = expr2[a]
+					# Handle the special case of Keyword CONT
 					if arg[:4] == 'CONT':
 						prev_arg = expr2[a-1]
 						i,j = arg_indices[prev_arg]
 						args = args[:len(args)-(18+len(i)+len(j))] + 'arguments['+i+']['+j+':]'
 					else:
 						i,j = arg_indices[arg]
+						# don't add + sign if it is the last argument
 						if (a == len(expr2) - 1):
 							args += '(arguments['+i+']['+j+'], )'
 						else:
 							args += '(arguments['+i+']['+j+'], )+'
 				if_stmt += 'if set(all_'+expr1[1]+') == set('+args+'):\n'
 			elif expr1[0] == 'TYPE':
-				print('TYPE')
 				var_name = str(expr1[1])
 				i,j = arg_indices[var_name]
 				var_get = 'arguments['+i+']'+'['+j+']'
 				body += var_name+'_type = lookup_type('+var_get+', states[0])\n'
 				if_stmt += 'if '+var_name+'_type == \''+str(expr2)+'\':\n'
 			else:
+				# var1 and var2 could be either variables or literals
 				var1 = ''
 				var2 = ''
 				if expr1[0] == 'LITERAL':
@@ -698,47 +733,82 @@ class Facility_Domain_Compiler(NodeVisitor):
 		return body, if_stmt
 
 	def visit_Stmt(self, node):
+		# if_stmt 	  = initial if statement string that differentiates
+		#				which rule is being applied
+		# gadd    	  = g.add statement string that adds the result of the 
+		#				rule to the final set
+		# arg_indices = dictionary containing the i,j indices in the 2d
+		#				arguments array for each of the arguments of the
+		#				actions
 		if_stmt, gadd, arg_indices = self.visit(node.caus)
+
+		# cond = tuple representing the conditions under which the rule
+		#		 holds. See visit_BoolExpr for more insight into the 
+		#		 formatting here
 		cond = self.visit(node.cond)
 
+		# List of accepted comparative operators in Causal Language
 		comps = ['==', '<', '>', '<=', '>=']
 
+		# body     = Additional things added to the body of if_stmt.
+		#			 This could include calls to lookup_type or
+		#			 defining local variables
+		# if_stmt2 = Handles conditional relationship rules. For
+		#			 example, this if statement would include
+		#   		 checking the type of an object
 		if_stmt2 = ''
 		body = ''
 
+		# Defined to represent a tab in Python (four spaces)
 		tab = '    '
 
+		# Only evaluate conditional statements if there are any
 		if cond:
+			# if cond[1] is one of the comparative operators than we
+			# know there is only one boolean statement (no && or ||)
 			if cond[1] in comps:
-				print('Single: '+str(cond))
 				body, if_stmt2 = self.compile_bool(cond, arg_indices)
+				# Only add in tabs for body if there is a body
 				if body != '':
 					body = 2*tab + body
 			else:
-				print('Multiple: '+str(cond))
+				# op  = the previous operand (either && or ||). It 
+				#  		starts as 'if' for convenience sake as you'll
+				#		see in the code below
 				op = 'if'
+				# Go through each boolean statement
 				for i in range(0, len(cond)):
+					# change the operand appropriately to reflect which op it is
 					if cond[i] == '&&':
 						op = 'and'
 					elif cond[i] == '||':
 						op = 'or'
 					else:
 						body2, if_stmt2_2 = self.compile_bool(cond[i], arg_indices)
+						# Only add in tabs if the new addition to body 
+						# is not empty
 						if body2 != '':
 							body += 2*tab+body2
+						# Replace the ending colon and newline character with a
+						# space for the previous if statement. Replace the 'if'
+						# from the new if statement with the appropriate operand
+						# (either 'and' or 'or'). Doing this allows us to have 
+						# the whole conditional on one line, avoiding tabbing issues 
 						if_stmt2 = if_stmt2.replace(':\n',' ')+if_stmt2_2.replace('if', op)
 
 
-		print 'BODY: ', body
-		print if_stmt2
-
+		# tabs required before the g.add and second if statements
+		# respectively
 		gadd_tabs = 3*tab
 		if_stmt2_tabs = 2*tab
 
+		# Change the tabbing if there is no conditional
 		if if_stmt2 == '':
 			if_stmt2_tabs = ''
 			gadd_tabs = 2*tab
 
+		# Return appropriately tabbed string of single if statement block
+		# from the causes() function in facility_domain.py
 		return tab + if_stmt + body + if_stmt2_tabs + if_stmt2 + gadd_tabs + gadd
 
 	def visit_Stmts(self, node):

@@ -31,11 +31,11 @@
                             <div style="text-align: center">
                                 <label class="ui icon button">
                                     <i class="upload icon"></i>
-                                    Open File <input type="file" hidden ng-model-instant id="fileToUpload" onchange="angular.element(this).scope().setFiles(this)">
+                                    Open File <input type="file" hidden ng-model-instant id="fileToUpload" onchange="angular.element(this).scope().addKnowledge(this)">
                                 </label>
                             </div>
                             <div style="text-align: center">
-                                <h4 ng-model="knowledgeFileName"></h4>
+                                <h4 ng-bind="knowledgeFileName"></h4>
                             </div>
                         </div>
                     </div>

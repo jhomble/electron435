@@ -278,17 +278,18 @@
         })
         
         $scope.smileRecordings = function(element){
-            console.log("asd")
-            console.log(element)
-            console.log('files:', element.files);
-            $scope.knowledgeAdded = true
-            var file = element.files[0]
-            $scope.knowledgeFileName = file.name
-            console.log($scope.knowledgeFileName)
+            $scope.recordings = []
+            var myFiles = element.files
+            var i = 0;
+            for(i; i < myFiles.length; i++){
+                $scope.recordings.push(myFiles[i].name)
+            }
+            console.log($scope.recordings)
+            $scope.$apply()
 
         }
 
-        $scope.setFiles = function(element){
+        $scope.addKnowledge = function(element){
             console.log("asd")
             console.log(element)
             console.log('files:', element.files);
@@ -296,6 +297,7 @@
             var file = element.files[0]
             $scope.knowledgeFileName = file.name
             console.log($scope.knowledgeFileName)
+            $scope.$apply()
 
         }
 

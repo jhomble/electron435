@@ -16,6 +16,9 @@
                                     <i class="upload icon"></i>
                                     Open File <input type="file" hidden ng-model-instant id="fileToUpload" multiple onchange="angular.element(this).scope().smileRecordings(this)">
                                 </label>
+                                <div ng-repeat="file in recordings">
+                                    <h4 ng-bind="file"></h4>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -535,7 +535,7 @@ class Parser(object):
 		return node
 
 ################################################################
-#	Interpreter
+#	Facility_Domain Compiler
 ################################################################
 
 class NodeVisitor(object):
@@ -547,13 +547,13 @@ class NodeVisitor(object):
 	def generic_visit(self, node):
 		raise Exception('No visit_{} method'.format(type(node).__name__))
 
-class Interpreter(NodeVisitor):
+class Facility_Domain_Compiler(NodeVisitor):
 
 	def __init__(self, parser):
 		self.parser = parser
 
 	def visit_Literal(self, node):
-		return str(node.name)
+		return 'LITERAL', str(node.name)
 
 	def visit_Boolean(self, node):
 		if node.op.type == EQUALS :
@@ -649,16 +649,30 @@ class Interpreter(NodeVisitor):
 		return self.visit(node.boolean)
 
 	def compile_bool(self, cond):
+		body = ''
+		if_stmt = ''
+
+		print('COND: ', str(cond))
+
 		expr1 = cond[0]
 		comp = cond[1]
 		expr2 = cond[2]
 
 		if comp == '==':
-			'TODO: Compile boolean expr'
+			if expr1[0] == 'ALL':
+				print('ALL')
+
+			elif expr1[0] == 'TYPE':
+				print('TYPE')
+				var_name = str(expr1[1])
+				body += var_name+'_type = lookup_type('+var_name+', states[0])\n'
+				if_stmt += 'if '+var_name+'_type == \''+str(expr2)+'\':\n'
+			else:
+				'Var1 = Var2 or Var1 = Literal'
 		else:
 			raise Exception('\''+str(comp)+'\' currently not supported')
 
-		return ''
+		return body, if_stmt
 
 	def visit_Stmt(self, node):
 		if_stmt, gadd = self.visit(node.caus)
@@ -672,6 +686,204 @@ class Interpreter(NodeVisitor):
 				print(self.compile_bool(cond))
 			else:
 				print('Multiple: '+str(cond))
+				for i in range(0, len(cond)):
+					if cond[i] == '&&':
+						'TODO: Mess with indenting'
+					elif cond[i] == '||':
+						'TODO: Mess with indenting'
+					else:
+						print(self.compile_bool(cond[i]))
+
+
+		return ''
+
+	def visit_Stmts(self, node):
+		result = ''
+		for child in node.children:
+			result += self.visit(child)
+
+		return result
+
+	def visit_Var(self, node):
+		return str(node.value)
+
+	def visit_Digit(self, node):
+		return str(node.value)
+
+	def visit_Int(self, node):
+		result = ''
+
+		for digit in node.digits:
+			result += self.visit(digit)
+
+		return result
+
+	def visit_Flt(self, node):
+		return self.visit(node.left) + '.' + self.visit(node.right)
+
+	def visit_All(self, node):
+		return ALL, self.visit(node.arg)
+
+	def visit_Type(self, node):
+		return TYPE, self.visit(node.arg)		
+
+	def visit_NoOp(self, node):
+		return ''
+
+	def interpret(self):
+		tree = self.parser.parse()
+		return self.visit(tree)
+
+################################################################
+#	Imitation Compiler
+################################################################
+
+class Imitation_Compiler(NodeVisitor):
+
+	def __init__(self, parser):
+		self.parser = parser
+
+	def visit_Literal(self, node):
+		return 'LITERAL', str(node.name)
+
+	def visit_Boolean(self, node):
+		if node.op.type == EQUALS :
+			return self.visit(node.e1), "==", self.visit(node.e2)
+		elif node.op.type == LESSTHAN :
+			return self.visit(node.e1), "<", self.visit(node.e2)
+		elif node.op.type == GREATERTHAN :
+			return self.visit(node.e1), ">", self.visit(node.e2)
+		elif node.op.type == GREATEREQUAL :
+			return self.visit(node.e1), ">=", self.visit(node.e2)
+		elif node.op.type == LESSEQUAL :
+			return self.visit(node.e1), "<=", self.visit(node.e2)
+
+	def visit_BoolExpr(self, node):
+		if node.op.type == AND:
+			return self.visit(node.left), "&&", self.visit(node.right)
+		elif node.op.type == OR:
+			return self.visit(node.left) , "||", self.visit(node.right)
+
+	def visit_Args(self, node):
+		args = []
+		for child in node.children:
+			args.append(self.visit(child))
+
+		return args
+
+	def visit_Act(self, node):
+		return (self.visit(node.var), self.visit(node.args))
+
+	def visit_Acts(self, node):
+		acts = []
+		for child in node.children:
+			acts.append(self.visit(child))
+
+		return acts
+
+	def visit_Caus(self, node):
+		acts = self.visit(node.acts)
+		act = self.visit(node.act)
+
+		foldl = lambda func, acc, xs: functools.reduce(func, xs, acc)
+
+		act_names = foldl(operator.add, '', map(lambda x: '\''+x[0]+'\',', acts))
+
+		if_stmt = 'if actions == (' + act_names + '):\n'		
+
+		intention_Args = act[1]
+
+		arg_indices = []
+
+		for arg in intention_Args:
+			if arg[:4] != 'CONT':
+				for i in range(0, len(acts)):
+					j = indexof(acts[i][1], arg)
+					if j >= 0:
+						arg_indices.append((i,j))
+						break
+			else:
+				if len(arg_indices) == 0:
+					raise Exception('Cont used improperly!\n')
+				arg_indices.append(arg)
+
+		if len(arg_indices) != len(intention_Args):
+			raise Exception('Args improperly compiled!')
+
+		args = ''
+
+		for a in range(0, len(arg_indices)):
+			index = arg_indices[a]
+			if index[:4] != 'CONT':
+				i = str(index[0])
+				j = str(index[1])
+				if (a == len(arg_indices)-1):
+					args += '(arguments['+i+']['+j+'], )' 
+				else:
+					args += '(arguments['+i+']['+j+'], )+' 
+			else:
+				prev_index = arg_indices[a-1]
+				i = str(prev_index[0])
+				j = str(prev_index[1]+1)
+				args += 'arguments['+i+']['+j+':]'
+
+		args += ')'
+
+		gadd = 'g.add((states[0],\''+act[0]+'\','+args+'))\n'
+
+		return (if_stmt, gadd)
+
+	def visit_NoCond(self,node):
+		return None
+
+	def visit_Cond(self, node):
+		return self.visit(node.boolean)
+
+	def compile_bool(self, cond):
+		body = ''
+		if_stmt = ''
+
+		print('COND: ', str(cond))
+
+		expr1 = cond[0]
+		comp = cond[1]
+		expr2 = cond[2]
+
+		if comp == '==':
+			if expr1[0] == 'ALL':
+				print('ALL')
+
+			elif expr1[0] == 'TYPE':
+				print('TYPE')
+				var_name = str(expr1[1])
+				body += var_name+'_type = lookup_type('+var_name+', states[0])\n'
+				if_stmt += 'if '+var_name+'_type == \''+str(expr2)+'\':\n'
+			else:
+				'Var1 = Var2 or Var1 = Literal'
+		else:
+			raise Exception('\''+str(comp)+'\' currently not supported')
+
+		return body, if_stmt
+
+	def visit_Stmt(self, node):
+		if_stmt, gadd = self.visit(node.caus)
+		cond = self.visit(node.cond)
+
+		comps = ['==', '<', '>', '<=', '>=']
+
+		if cond:
+			if cond[1] in comps:
+				print('Single: '+str(cond))
+				print(self.compile_bool(cond))
+			else:
+				print('Multiple: '+str(cond))
+				for i in range(0, len(cond)):
+					if cond[i] == '&&':
+						'TODO: Mess with indenting'
+					elif cond[i] == '||':
+						'TODO: Mess with indenting'
+					else:
+						print(self.compile_bool(cond[i]))
 
 
 		return ''
@@ -746,9 +958,9 @@ def main():
 
 	lexer = Lexer(text)
 	parser = Parser(lexer)
-	interpreter = Interpreter(parser)
-	facility_domain_result = make_facility_domain(interpreter)
-	imitation_result = make_imitation(interpreter)
+	facility_interpreter = Facility_Domain_Compiler(parser)
+	facility_domain_result = make_facility_domain(facility_interpreter)
+	#imitation_result = make_imitation(interpreter)
 
 def indexof(list, obj):
 	try:

@@ -1229,6 +1229,9 @@ class Imitation_Compiler(NodeVisitor):
 		#  Dictionary of methods where key is method name and
 		#  value is a 3-tuple (list of arguments, cond, returns)
 		self.methods_dict = {}
+		## @var intention
+		#  Current intention for access from conditional check
+		self.intention = None
 
 	## Visit Literal
 	#
@@ -1363,10 +1366,21 @@ class Imitation_Compiler(NodeVisitor):
 
 		# Check if method has already been defined
 		if self.methods_dict.has_key(act_name):
-			args, _, _ = self.methods_dict[act_name]
+			args, conds, rets = self.methods_dict[act_name]
 			# Check if you have to change parameters (add final *)
 			if len(intention_Args) > len(args):
 				'TODO: Handle adjustment of args'
+				prev_arg = ''				
+				for a in range(0, len(intention_Args)):
+					arg = intention_Args[a]
+					if arg[:4] == 'CONT':
+						index = a - int(arg[4:])
+						prev_arg = args[index]
+						prev_arg = '*' + prev_arg
+				adjusted_args = args
+				adjusted_args[index] = prev_arg
+				self.methods_dict[act_name] = (adjusted_args, conds, rets)
+
 			self.methods_dict[act_name][2].append(ret)
 		else:
 			self.methods_dict[act_name] = (intention_Args, [], [ret])
@@ -1389,16 +1403,48 @@ class Imitation_Compiler(NodeVisitor):
 
 		comps = ['==', '<', '>', '<=', '>=']
 
+		if_stmt = ''
+		body = ''
+
+		# holds variable equivalences as determined through
+		# conditionals written in custom language
+		var_equiv = {}
+
 		# Only evaluate conditional if there are any
 		if boolean:
 			# if boolean[1] is one of the comparative operators than we
 			# know there is only one boolean statement (no && or ||)
 			if boolean[1] in comps:
 				'TODO: Single boolean statement'
-				body, if_stmt = self.compile_bool(boolean)
-				result += body + if_stmt
+				body, if_stmt, var_equiv = self.compile_bool(boolean, var_equiv)
 			else:
-				'TODO: Multiple boolean statements'
+				# op  = the previous operand (either && or ||). It 
+				#  		starts as 'if' for convenience sake as you'll
+				#		see in the code below
+				op = 'if'
+				# Go through each boolean statement
+				for i in range(0, len(boolean)):
+					# change the operand appropriately to reflect which op it is
+					if boolean[i] == '&&':
+						op = 'and'
+					elif boolean[i] == '||':
+						op = 'or'
+					else:
+						body2, if_stmt2, var_equiv = self.compile_bool(boolean[i], var_equiv)
+						# Only add in tabs if the new addition to body 
+						# is not empty
+						if body2 != '':
+							body += body2
+						# Replace the ending colon and newline character with a
+						# space for the previous if statement. Replace the 'if'
+						# from the new if statement with the appropriate operand
+						# (either 'and' or 'or'). Doing this allows us to have 
+						# the whole conditional on one line, avoiding tabbing issues
+						if if_stmt2 != '': 
+							if_stmt = if_stmt.replace(':\n',' ')+if_stmt2.replace('if', op)
+
+
+		result += body + if_stmt
 
 		return result
 
@@ -1409,7 +1455,7 @@ class Imitation_Compiler(NodeVisitor):
 	# conditional.
 	#
 	# @rtype: (String, String)
-	def compile_bool(self, cond):
+	def compile_bool(self, cond, var_equiv):
 		# body     = Additional things added to the body of if_stmt.
 		#			 This could include calls to lookup_type or
 		#			 defining local variables
@@ -1428,19 +1474,38 @@ class Imitation_Compiler(NodeVisitor):
 		comp = cond[1]
 		expr2 = cond[2]
 
+		intention_Args = self.methods_dict[self.intention][0]
+
 		if comp == '==':
 			if expr1[0] == 'ALL':
 				'TODO: Compile All keyword'
 			elif expr1[0] == 'TYPE':
+				var_name = expr1[1]
+				if var_name not in intention_Args:
+					var_name = expr1[1] + '_TEMP'
 				if_stmt += 'if state.objs['+expr1[1]+'][0] == \''
 				if_stmt += expr2+'\':\n'
 				'TODO: Compile TYPE keyword'
 			else:
 				'TODO: Compile literal/var comparison'
+				# var1 and var2 could be either variables or literals
+				var1 = ''
+				var2 = ''
+				if expr1[0] == 'LITERAL':
+					var1 = '\''+str(expr1[1])+'\''
+				else:
+					i,j = arg_indices[expr1]
+					var1 = 'arguments['+i+']['+j+']'
+
+				if expr2[0] == 'LITERAL':
+					var2 = '\''+str(expr2[1])+'\''
+				else:
+					i,j = arg_indices[expr2]
+					var2 = 'arguments['+i+']['+j+']'
 		else:
 			raise Exception('\''+str(comp)+'\' currently not supported')
 
-		return body, if_stmt
+		return body, if_stmt, var_equiv
 
 	## Visit Statement
 	#
@@ -1456,6 +1521,8 @@ class Imitation_Compiler(NodeVisitor):
 		#				arguments array for each of the arguments of the
 		#				actions
 		intention = self.visit(node.caus)
+
+		self.intention = intention
 
 		# cond = tuple representing the conditions under which the rule
 		#		 holds. See visit_BoolExpr for more insight into the 
@@ -1500,7 +1567,7 @@ class Imitation_Compiler(NodeVisitor):
 				ret = rets[i]
 				cond = conds[i]
 				if cond:
-					result += cond
+					result += tab + cond + tab
 				result += tab + ret
 			result += pyhop_stmt
 

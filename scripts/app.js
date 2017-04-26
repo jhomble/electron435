@@ -131,6 +131,14 @@
                 return result;
             }
 
+            $scope.buildPathString = function(){
+                $scope.pathString = ""
+                $scope.recordings.forEach(function(x) {
+                    $scope.pathString = $scope.pathString + x.path + "," 
+                });
+                $scope.pathString.slice(0,-1);
+            }
+
             $scope.showCausalParameters = function () {
                 reset()
                 $scope.paramList = [];
@@ -150,43 +158,6 @@
             }
 
             // For Actions / Causes
-
-            //ex
-            // knowledge = [
-            //     {
-            //         cause: "moveTo", 
-            //         relationship: {
-            //             type: "Direct",
-            //             condition: ""
-            //         },
-            //         parameters: ["obj", "dest", "dx", "dy", "dz", "da"], 
-            //         actions: [
-            //             {
-            //                 action: "grasp", 
-            //                 params: ["obj"]
-            //             },
-            //             {
-            //                 action: "release",
-            //                 params: ["obj", "dest", "dx", "dy", "dz", "da"]
-            //             }
-            //         ]
-                    
-            //     },
-            //     {
-            //         cause: "stack", 
-            //         relationship: {
-            //             type: "Conditional",
-            //             condition: "TYPE(obj1) = block"
-            //         },
-            //         parameters: ["dest", "dx", "dy", "dz", "da", "obj"], 
-            //         actions: [
-            //             {
-            //                 action: "moveTo", 
-            //                 params: ["obj", "dest", "dx", "dy", "dz", "da"]
-            //             },
-            //         ]
-            //     },
-            // ]
 
             $scope.knowledge = [
                 {
@@ -297,17 +268,6 @@
             $scope.$apply()
 
         }
-
-        $scope.thingsYouCanDo = [
-            {
-                name: "grasp",
-                params: ["obj"]
-            },
-            {
-                name: "release",
-                params: ["obj", "dest", "dx", "dy", "dz", "da"]
-            }
-        ]
 
     }]);
 })();

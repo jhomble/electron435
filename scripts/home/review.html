@@ -27,7 +27,8 @@
                     <div class="eight wide column">
                         <div>
                             <div style="text-align: center">
-                                <button class="ui green button" ng-click="go()" ng-show="run">RUN!</button>
+                                <button ng-class="goClass" ng-click="go()" ng-show="run">RUN!</button>
+                                <h4 ng-bind="error"></h4>
                             </div>
                         </div>
                     </div>

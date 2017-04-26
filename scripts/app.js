@@ -84,6 +84,9 @@
 
             $scope.knowledgeAdded = false;
             $scope.run = false
+            $scope.recordings = []
+            $scope.goClass = "ui green button"
+            $scope.error = ""
 
             $scope.inputBuilder = true;
 
@@ -135,6 +138,8 @@
 
             $scope.showReview = function(){
                 reset()
+                $scope.goClass = "ui green button"
+                $scope.error = ""
                 $scope.review = true;
             }
 
@@ -293,6 +298,18 @@
         }
 
         $scope.go = function(){
+            $scope.goClass = "ui green button"
+            $scope.error = ""
+            if($scope.recordings.length == 0){
+                $scope.goClass = "ui red button"
+                $scope.error = "No SMILE Recordings"
+                return;
+            }
+            $scope.buildPathString();
+            console.log($scope.pathString)
+            var spawn = require("child_process").spawn;
+            var test = "hi,kyle,7777";//this will be a command line argument for whatever python scripts it wants to run
+            var process = spawn('python',["command_line.py",test]);
             if($scope.inputBuilder){
                 //use string from builder
             }else {

@@ -2,167 +2,18 @@
     <div style="text-align: center">
         <div class="ui segment">
             <div class="ui grid">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <canvas id="canvas" width="800" height="800"></canvas>
-  
-  <style> ::selection { background: white; /* WebKit/Blink Browsers */ } </style>
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+                <canvas id="canvas" width="800" height="800"></canvas>
 
-  <script type="text/javascript">
-    window.onload=function(){
-      /* TODO fix JSON parsing */
-      /*var data0 = '{ "cause": "moveTo", "relationship": { "type": "Direct", "condition": "" }, "parameters": [ "obj", "dest", "dx", "dy", "dz", "da" ], "actions": [ { "action": "grasp", "params": [ "obj" ] }, { "action": "release", "params": [ "obj", "dest", "dx", "dy", "dz", "da" ] } ] }';
-      var data1 = '{ "cause": "stack", "relationship": { "type": "Conditional", "condition": "TYPE(obj1) = block" }, "parameters": [ "dest", "dx", "dy", "dz", "da", "obj" ], "actions": [ { "action": "moveTo", "params": [ "obj", "dest", "dx", "dy", "dz", "da" ] } ] }';
-      var json0 = JSON.parse(data0);
-      var json1 = JSON.parse(data1);*/ 
+                <style> ::selection { background: white; /* WebKit/Blink Browsers */ } </style>
 
-      var canvas=document.getElementById("canvas");
-      var ctx=canvas.getContext("2d");
-      var cw=canvas.width;
-      var ch=canvas.height;
-      ctx.font='10px verdana';
-      var shapes=[];
-
-
-      function reOffset(){
-        var BB=canvas.getBoundingClientRect();
-        offsetX=BB.left;
-        offsetY=BB.top;        
-      }
-      var offsetX,offsetY;
-      reOffset();
-      window.onscroll=function(e){ reOffset(); }
-      window.onresize=function(e){ reOffset(); }
-
-      /* TODO re-add JSON algorithm for shapes */
-      //var params = json0["parameters"];
-      var box1={
-        name:'stack',
-        param: 'obj,dest,dx,dy,dz,da',
-        color:'blue', 
-        drawcolor:'blue',
-        points:[{x:325,y:50},{x:400,y:50},{x:400,y:125},{x:325,y:125}]
-      };
-      var arrow1={
-        name:'',
-        param: '',
-        color:'blue',
-        drawcolor:'blue', 
-        points:[{x:350,y:150},{x:375,y:150},{x:375,y:175},{x:350,y:175}]
-      };
-      var arrow2={
-        name:'',
-        param: '',
-        color:'blue', 
-        drawcolor:'blue', 
-        points:[{x:340,y:175},{x:385,y:175},{x:362,y:200}]
-      };
-      var box2={
-        name:'moveTo',
-        param: 'obj,dest,dx,dy,dz,da',
-        color:'blue', 
-        drawcolor:'blue', 
-        points:[{x:325,y:225},{x:400,y:225},{x:400,y:300},{x:325,y:300}]
-      };
-      var box3={
-        name:'grasp',
-        param: 'obj',
-        color:'blue',
-        drawcolor:'blue', 
-        points:[{x:475,y:400},{x:550,y:400},{x:550,y:475},{x:475,y:475}]
-      };
-      var box4={
-        name:'release',
-        param: 'obj,dest,dx,dy,dz,da',
-        color:'blue', 
-        drawcolor:'blue', 
-        points:[{x:175,y:400},{x:250,y:400},{x:250,y:475},{x:175,y:475}]
-      };
-      var arrow3={
-        name:'',
-        param: '',
-        color:'blue', 
-        drawcolor:'blue', 
-        points:[{x:350,y:325},{x:375,y:325},{x:375,y:450},{x:350,y:450}]
-      };
-      var arrow4={
-        name:'',
-        param: '',
-        color:'blue', 
-        drawcolor:'blue', 
-        points:[{x:325,y:450},{x:400,y:450},{x:400,y:425},{x:325,y:425}]
-      };
-      var arrow5={
-        name:'',
-        param: '',
-        color:'blue', 
-        drawcolor:'blue', 
-        points:[{x:400,y:460},{x:400,y:415},{x:425,y:437}]
-      };
-      var arrow6={
-        name:'',
-        param: '',
-        color:'blue', 
-        drawcolor:'blue', 
-        points:[{x:325,y:460},{x:325,y:415},{x:300,y:437}]
-      };      
-      shapes.push(box1,arrow1,arrow2,box2,box3,box4,arrow3,arrow4,arrow5,arrow6);
-
-      $("#canvas").mousemove(function(e){handleMouseMove(e);});
-
-      drawAll();
-
-      /* TODO make pretty */
-      function drawAll(){
-        for(var i=0;i<shapes.length;i++){
-          var s=shapes[i];
-          buildShape(s.points);
-          ctx.fillStyle=s.drawcolor;
-          ctx.fill();
-          ctx.strokeStyle = 'blue';
-          ctx.stroke();
-          if(s.color!==s.drawcolor){
-            ctx.fillStyle='black';
-            ctx.fillText(s.param,s.points[0].x-10,s.points[0].y-10);
-          } else {
-            ctx.font = '10pt Calibri';
-            ctx.fillStyle = 'white';
-            ctx.fillText(s.name,s.points[0].x+20, s.points[0].y+40);
-          }
-        }
-      }
-
-      function buildShape(s){
-        ctx.beginPath();
-        ctx.moveTo(s[0].x,s[0].y);
-        for(var i=1;i<s.length;i++){
-          ctx.lineTo(s[i].x,s[i].y);
-        }
-        ctx.closePath();
-      }
-
-      function handleMouseMove(e){
-        e.preventDefault();
-        e.stopPropagation();
-
-        mouseX=parseInt(e.clientX-offsetX);
-        mouseY=parseInt(e.clientY-offsetY);
-
-        ctx.clearRect(0,0,cw,ch);
-
-        for(var i=0;i<shapes.length;i++){
-          var s=shapes[i];
-
-          buildShape(s.points);
-          if(ctx.isPointInPath(mouseX,mouseY)){
-            s.drawcolor='red';
-          }else{
-            s.drawcolor=s.color;
-          }
-        }
-        drawAll();
-      }
-    }
-  </script>
+                <script type="text/javascript">
+                    window.onload=function(){
+                        var canvas=document.getElementById("canvas");
+                        var ctx=canvas.getContext("2d");
+                        ctx.fillStyle='black';
+                    }
+                </script>
             </div>
         </div>
     </div>

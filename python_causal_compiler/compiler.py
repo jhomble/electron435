@@ -798,6 +798,10 @@ class Facility_Domain_Compiler(NodeVisitor):
 		## @var parser
 		#  Converts input into AST
 		self.parser = parser
+		## @var M
+		#  Length of longest effect sequence (longest list of
+		#  actions / right side of a causal relation)
+		self.M = 0
 
 	## Visit Literal
 	#
@@ -867,6 +871,9 @@ class Facility_Domain_Compiler(NodeVisitor):
 		acts = []
 		for child in node.children:
 			acts.append(self.visit(child))
+
+		if len(acts) > self.M:
+			self.M = len(acts)
 
 		return acts
 
@@ -1195,13 +1202,13 @@ class Facility_Domain_Compiler(NodeVisitor):
 
 	## Interpret
 	#
-	# Actually compile the statement. Returns a string representing
-	# the compiled program
+	# Actually compile the statement. Returns a tuple of the string 
+	# representing the compiled program as well as the value of M
 	#
-	# @rtype: String
+	# @rtype: (String, String)
 	def interpret(self):
 		tree = self.parser.parse()
-		return self.visit(tree)
+		return self.visit(tree), str(self.M)
 
 ################################################################
 #	Imitation Compiler
@@ -1428,9 +1435,10 @@ def make_facility_domain(interpreter):
 	# TODO: Make sure the template is right
 	template = open("facility_domain_template.txt", "r").read()
 	# Actually compile input
-	result = interpreter.interpret()
+	result, M = interpreter.interpret()
 
 	inserted = template.replace('\t# INSERT CAUSES HERE', result)
+	inserted = inserted.replace('M = 0 # INSERT M HERE', 'M = '+M)
 
 	facility_domain_py.write(inserted)
 	facility_domain_py.close()

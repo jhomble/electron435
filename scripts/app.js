@@ -69,6 +69,11 @@
             templateUrl: 'scripts/home/review.html'
         }
     })
+    .directive('xmlPage', function () {
+        return {
+            templateUrl: 'scripts/home/xmlPage.html'
+        }
+    })
 
     .controller('homeController', ['$scope', '$window', function ($scope, $window) {
         $(document).ready(function () {
@@ -100,6 +105,7 @@
                 $scope.causalParameters = false;
                 $scope.preview = false;
                 $scope.review = false;
+                $scope.xmlPage = false;
             }
             $scope.showInputTask = function () {
                 reset();
@@ -141,6 +147,11 @@
                 $scope.goClass = "ui green button"
                 $scope.error = ""
                 $scope.review = true;
+            }
+
+            $scope.showXML = function(){
+                reset()
+                $scope.xmlPage = true
             }
 
             function unique(list) {

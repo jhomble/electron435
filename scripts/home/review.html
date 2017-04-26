@@ -1,0 +1,39 @@
+<div class="row">
+    <div style="text-align: center">
+        <div class="ui segment">
+            <div class="ui grid">
+                <div class="row">
+                    <div style="text-align: center">
+                        <h2>Final File Input</h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="four wide column"></div>
+                    <div class="eight wide column">
+                        <div>
+                            <div style="text-align: center">
+                                <h3>Upload Inital XML State</h3>
+                                <label class="ui icon button">
+                                    <i class="upload icon"></i>
+                                    Open File <input type="file" hidden ng-model-instant id="fileToUpload" onchange="angular.element(this).scope().XMLInput(this)">
+                                </label>
+                                <h4 ng-bind="xml.name"></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="four wide column"></div>
+                    <div class="eight wide column">
+                        <div>
+                            <div style="text-align: center">
+                                <button class="ui green button" ng-show="run">RUN!</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+</div>

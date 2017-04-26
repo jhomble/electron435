@@ -64,6 +64,11 @@
             templateUrl: 'scripts/home/preview.html'
         }
     })
+    .directive('review', function () {
+        return {
+            templateUrl: 'scripts/home/review.html'
+        }
+    })
 
     .controller('homeController', ['$scope', '$window', function ($scope, $window) {
         $(document).ready(function () {
@@ -74,9 +79,11 @@
             $scope.relationship = false;
             $scope.actionParameters = false;
             $scope.causalParameters = false;
-
+            $scope.preview = false;
+            $scope.review = false;
 
             $scope.knowledgeAdded = false;
+            $scope.run = false
 
             var reset = function () {
                 $scope.inputTask = false;
@@ -87,6 +94,7 @@
                 $scope.actionParameters = false;
                 $scope.causalParameters = false;
                 $scope.preview = false;
+                $scope.review = false;
             }
             $scope.showInputTask = function () {
                 reset();
@@ -121,6 +129,11 @@
             $scope.showPreview = function(){
                 reset()
                 $scope.preview = true;
+            }
+
+            $scope.showReview = function(){
+                reset()
+                $scope.review = true;
             }
 
             function unique(list) {
@@ -266,7 +279,14 @@
             console.log(file)
             $scope.knowledgeFile = {name: file.name, path: file.path}
             $scope.$apply()
+        }
 
+        $scope.XMLInput = function(element){
+            var file = element.files[0]
+            console.log(file)
+            $scope.xml = {name: file.name, path: file.path}
+            $scope.run = true
+            $scope.$apply()
         }
 
     }]);

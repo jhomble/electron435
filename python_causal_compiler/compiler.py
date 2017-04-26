@@ -1383,7 +1383,24 @@ class Imitation_Compiler(NodeVisitor):
 	#
 	#  Return the result of evaluating the boolean expression
 	def visit_Cond(self, node):
-		return self.visit(node.boolean)
+		result = ''
+
+		boolean = self.visit(node.boolean)
+
+		comps = ['==', '<', '>', '<=', '>=']
+
+		# Only evaluate conditional if there are any
+		if boolean:
+			# if boolean[1] is one of the comparative operators than we
+			# know there is only one boolean statement (no && or ||)
+			if boolean[1] in comps:
+				'TODO: Single boolean statement'
+				body, if_stmt = self.compile_bool(boolean)
+				result += body + if_stmt
+			else:
+				'TODO: Multiple boolean statements'
+
+		return result
 
 	## Compile Boolean Statement
 	#
@@ -1392,7 +1409,7 @@ class Imitation_Compiler(NodeVisitor):
 	# conditional.
 	#
 	# @rtype: (String, String)
-	def compile_bool(self, cond, arg_indices):
+	def compile_bool(self, cond):
 		# body     = Additional things added to the body of if_stmt.
 		#			 This could include calls to lookup_type or
 		#			 defining local variables
@@ -1401,8 +1418,6 @@ class Imitation_Compiler(NodeVisitor):
 		#   		 checking the type of an object		
 		body = ''
 		if_stmt = ''
-
-		return '', ''
 
 		# expr1 = left side of comparison. Could be a variable,
 		# 		  literal, or keyword phrase like TYPE(obj)
@@ -1415,50 +1430,13 @@ class Imitation_Compiler(NodeVisitor):
 
 		if comp == '==':
 			if expr1[0] == 'ALL':
-				# make the body statement develop a list of all objects of type
-				# expr1[1] in the current state (state[0])
-				body += 'all_'+expr1[1]+' = [obj_id for (obj_id, obj_type,_,_,_,_)'
-				body += ' in states[0] if obj_type == \''+expr1[1]+'\']\n'
-				# find argument indices for the left-side of the comparison so
-				# that they can be appropriately referenced in the if_stmt
-				args = ''
-				for a in range(0, len(expr2)):
-					arg = expr2[a]
-					# Handle the special case of Keyword CONT
-					if arg[:4] == 'CONT':
-						prev_arg = expr2[a-1]
-						i,j = arg_indices[prev_arg]
-						args = args[:len(args)-(18+len(i)+len(j))] + 'arguments['+i+']['+j+':]'
-					else:
-						i,j = arg_indices[arg]
-						# don't add + sign if it is the last argument
-						if (a == len(expr2) - 1):
-							args += '(arguments['+i+']['+j+'], )'
-						else:
-							args += '(arguments['+i+']['+j+'], )+'
-				if_stmt += 'if set(all_'+expr1[1]+') == set('+args+'):\n'
+				'TODO: Compile All keyword'
 			elif expr1[0] == 'TYPE':
-				var_name = str(expr1[1])
-				i,j = arg_indices[var_name]
-				var_get = 'arguments['+i+']'+'['+j+']'
-				body += var_name+'_type = lookup_type('+var_get+', states[0])\n'
-				if_stmt += 'if '+var_name+'_type == \''+str(expr2)+'\':\n'
+				if_stmt += 'if state.objs['+expr1[1]+'][0] == \''
+				if_stmt += expr2+'\':\n'
+				'TODO: Compile TYPE keyword'
 			else:
-				# var1 and var2 could be either variables or literals
-				var1 = ''
-				var2 = ''
-				if expr1[0] == 'LITERAL':
-					var1 = '\''+str(expr1[1])+'\''
-				else:
-					i,j = arg_indices[expr1]
-					var1 = 'arguments['+i+']['+j+']'
-
-				if expr2[0] == 'LITERAL':
-					var2 = '\''+str(expr2[1])+'\''
-				else:
-					i,j = arg_indices[expr2]
-					var2 = 'arguments['+i+']['+j+']'
-				if_stmt += 'if '+var1+' == '+var2+':\n'
+				'TODO: Compile literal/var comparison'
 		else:
 			raise Exception('\''+str(comp)+'\' currently not supported')
 
@@ -1507,6 +1485,7 @@ class Imitation_Compiler(NodeVisitor):
 
 		for intention in self.methods_dict:
 			args = self.methods_dict[intention][0]
+			conds = self.methods_dict[intention][1]
 			rets = self.methods_dict[intention][2]
 			method_dec = 'def '
 			method_dec += intention
@@ -1517,7 +1496,11 @@ class Imitation_Compiler(NodeVisitor):
 			pyhop_stmt = 'pyhop.declare_methods(\''+intention+'\','
 			pyhop_stmt += intention+')\n'
 			result += method_dec
-			for ret in rets:
+			for i in range(0, len(rets)):
+				ret = rets[i]
+				cond = conds[i]
+				if cond:
+					result += cond
 				result += tab + ret
 			result += pyhop_stmt
 

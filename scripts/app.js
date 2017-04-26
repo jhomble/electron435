@@ -85,6 +85,8 @@
             $scope.knowledgeAdded = false;
             $scope.run = false
 
+            $scope.inputBuilder = true;
+
             var reset = function () {
                 $scope.inputTask = false;
                 $scope.inputSmile = false;
@@ -278,6 +280,7 @@
             var file = element.files[0]
             console.log(file)
             $scope.knowledgeFile = {name: file.name, path: file.path}
+            $scope.inputBuilder = false;
             $scope.$apply()
         }
 
@@ -289,5 +292,12 @@
             $scope.$apply()
         }
 
+        $scope.go = function(){
+            if($scope.inputBuilder){
+                //use string from builder
+            }else {
+                //use knowledgeFile
+            }
+        }
     }]);
 })();

@@ -2,7 +2,18 @@
     <div style="text-align: center">
         <div class="ui segment">
             <div class="ui grid">
-                <h3>Put stuff here</h3>
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+                <canvas id="canvas" width="800" height="800"></canvas>
+
+                <style> ::selection { background: white; /* WebKit/Blink Browsers */ } </style>
+
+                <script type="text/javascript">
+                    window.onload=function(){
+                        var canvas=document.getElementById("canvas");
+                        var ctx=canvas.getContext("2d");
+                        ctx.fillStyle='black';
+                    }
+                </script>
             </div>
         </div>
     </div>

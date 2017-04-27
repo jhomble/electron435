@@ -227,6 +227,7 @@
                 });
                 final = final + " }"
                 console.log(final)
+				return final;
             }
 
             $scope.addCause = function () {
@@ -322,14 +323,18 @@
             console.log($scope.pathString)
 			console.log($scope.inputXML)
 			var util = require("util");
-            var spawn = require("child_process").spawn; 
-			var test = "test.xml"
-            var process = spawn('python',["final_imitation.py",$scope.pathString,$scope.inputXML,test]);
+            var spawn1 = require("child_process").spawn; 
+            //var process1 = spawn('python',["final_imitation.py",$scope.pathString,$scope.inputXML,test]);
             if($scope.inputBuilder){
                 //use string from builder
+				var process1 = spawn1('python',[".\python_causal_compiler\compiler\run.py",$scope.buildString()]);
             }else {
-                //use knowledgeFile
+				console.log("I am calling run.py");
+                var process1 = spawn1('python',[".\python_causal_compiler\compiler\run.py"])
             }
+			//var spawn = require("child_process").spawn; 
+			//var test = "test.xml"
+            var process = spawn1('python',["imitation.py",$scope.pathString,$scope.inputXML]);
         }
     }]);
 })();

@@ -13,13 +13,13 @@ import os
 #
 #  Outputs the first python file that defines CO-PCT tree
 def make_facility_domain(interpreter):
-	out_file = os.path.normpath("output/facility_domain.py")
+	out_file = os.path.normpath(".\\python_causal_compiler\\compiler\\output\\facility_domain.py")
 	facility_domain_py = open(out_file, "w")
 
 	# This block should just be all the text requisite for the file not including cause stuff
 	# TODO: Make sure the template is right
 	print('Opening Facility Domain Template')
-	path = os.path.normpath("templates/facility_domain_template.txt")
+	path = os.path.normpath(".\\python_causal_compiler\\compiler\\templates\\facility_domain_template.txt")
 	template = open(path, "r").read()
 	# Actually compile input
 	print('Running Facility Domain Compiler')
@@ -37,13 +37,13 @@ def make_facility_domain(interpreter):
 # Outputs the second python file that uses pyhop to traverse the
 # CO-PCT tree
 def make_imitation(interpreter):
-	out_file = os.path.normpath("output/imitation.py")
+	out_file = os.path.normpath(".\\python_causal_compiler\\compiler\\output\\imitation.py")
 	imitation_py = open(out_file, "w")
 
 	# This block should just be all the text requisite for the file not including cause stuff
 	# TODO: Make sure the template is right
 	print('Opening Imitation Template')
-	path = os.path.normpath("templates/imitation_template2.txt")
+	path = os.path.normpath(".\\python_causal_compiler\\compiler\\templates\\imitation_template2.txt")
 	template = open(path, "r").read()
 	# Actually compile input
 
@@ -83,9 +83,9 @@ def run_imitation(text):
 
 def main():
 	print('Opening Causal Input')
-	input_path = os.path.normpath('input/causes.txt')
+	input_path = os.path.normpath(".\\python_causal_compiler\\compiler\\input\\causes.txt")
 	text = open(input_path, 'r').read()
-
+	print("past open")
 	run_facility_domain(text)
 	run_imitation(text)
 

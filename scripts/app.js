@@ -370,14 +370,30 @@
             //var process1 = spawn('python',["final_imitation.py",$scope.pathString,$scope.inputXML,test]);
             if($scope.inputBuilder){
                 //use string from builder
-				var process1 = spawn1('python',[".\python_causal_compiler\compiler\run.py",$scope.buildString()]);
+				var process1 = spawn1('python',["python_causal_compiler\compiler\run.py",$scope.buildString()]);
             }else {
 				console.log("I am calling run.py");
-                var process1 = spawn1('python',[".\python_causal_compiler\compiler\run.py"])
+                var process1 = spawn1('python',[".\\python_causal_compiler\\compiler\\run.py"]);
+				console.log("in chunk");
+				process1.stdout.on('data',function(chunk){ //debugging info, prints out stuff python puts in stdout
+					
+
+					var textChunk = chunk.toString('utf8');// buffer to string
+					
+					console.log(textChunk);
+				});
             }
-			//var spawn = require("child_process").spawn; 
+			console.log("Time to run imitation");
+			var spawn2 = require("child_process").spawn; 
 			//var test = "test.xml"
-            var process = spawn1('python',[".\python_causal_compiler\compiler\output\imitation.py",$scope.pathString,$scope.inputXML]);
+            var process = spawn1('python',[".\\python_causal_compiler\\compiler\\output\\imitation.py",$scope.pathString,$scope.inputXML]);
+			process.stdout.on('data',function(chunk){ //debugging info, prints out stuff python puts in stdout
+					
+
+					var textChunk = chunk.toString('utf8');// buffer to string
+					
+					console.log(textChunk);
+			});
             $scope.showFinal();
         }
     }]);

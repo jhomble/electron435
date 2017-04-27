@@ -479,7 +479,7 @@ class Parser(object):
 			node1 = Int()
 			self.eat(DOT)
 			node2 = self.integer()
-			node = Float(left=node1, right=node2)
+			node = Flt(left=node1, right=node2)
 		else:				
 			node = Var(self.current_token)
 			self.eat(ID)

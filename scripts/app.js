@@ -200,8 +200,8 @@
                     $scope.createXML = ""
                 }
 
-                $scope.openPreview = function(){
-                    const {shell} = require('electron')
+                $scope.openPreview = function () {
+                    const { shell } = require('electron')
                     shell.openExternal('https://ambermirza.github.io/preview/')
                 }
 
@@ -307,6 +307,33 @@
                 $scope.addCausalParameter = function (index) {
                     $scope.knowledge[index].parameters.push({ action: "", param: "" })
                 }
+                $scope.buildString = function () {
+                    var final = "RULES { "
+                    $scope.knowledge.forEach(function (cause) {
+                        if (cause.relationship.type === "Conditional") {
+                            final = final + "if(" + cause.relationship.condition + "):"
+                        }
+                        final = final + cause.cause + "("
+                        cause.parameters.forEach(function (param) {
+                            final = final + param.param + ","
+                        });
+                        final = final.slice(0, -1)
+                        final = final + ") := "
+                        cause.actions.forEach(function (action) {
+                            final = final + action.action + "("
+                            action.params.forEach(function (param) {
+                                final = final + param.value + ","
+                            });
+                            final = final.slice(0, -1)
+                            final = final + "),"
+                        });
+                        final = final.slice(0, -1)
+                        final = final + ";"
+                    });
+                    final = final + " }"
+                    console.log(final)
+                    return final;
+                }
 
                 $scope.removeCausalParameter = function (index) {
                     $scope.knowledge[index].parameters.pop()
@@ -353,48 +380,81 @@
                     $scope.$apply()
                 }
 
-                $scope.XMLInput = function (element) {
-                    var file = element.files[0]
-                    console.log(file)
-                    $scope.inputXML = ""
-                    $scope.inputXML = file.path
-                    $scope.xml = { name: file.name, path: file.path }
-                    $scope.run = true
-                    $scope.$apply()
+                $scope.setParams = function (parentIndex, item) {
+                    var actions = []
+                    $scope.knowledge[parentIndex].actions.forEach(function (x) {
+                        actions.push(x.action);
+                    });
+                    var index = actions.indexOf(item);
+                    $scope.causalParamList = $scope.knowledge[parentIndex].actions[index].params
                 }
-
-                $scope.go = function () {
-                    $scope.goClass = "ui green button"
-                    $scope.error = ""
-                    if ($scope.recordings.length == 0) {
-                        $scope.goClass = "ui red button"
-                        $scope.error = "No SMILE Recordings"
-                        return;
-                    }
-                    $scope.buildPathString();
-                    console.log($scope.pathString)
-                    console.log($scope.inputXML)
-                    var util = require("util");
-                    var spawn = require("child_process").spawn;
-                    var test = "test.xml"
-                    var process = spawn('python', ["final_imitation.py", $scope.pathString, $scope.inputXML, test]);
-                    if ($scope.inputBuilder) {
-                        //use string from builder
-                    } else {
-                        //use knowledgeFile
-                    }
-                    $scope.showFinal();
-                }
-
-                $scope.generateXML = function(){
-                    var util = require("util");
-                    var spawn = require("child_process").spawn;
-                    var test = "test.xml"
-                    var process = spawn('python', ["final_imitation.py", $scope.pathString, $scope.inputXML, test]);
-                    
-                    $scope.createXML = ""
-                }
-
             })
+
+            $scope.smileRecordings = function (element) {
+                $scope.recordings = []
+                var myFiles = element.files
+                console.log(myFiles)
+                var i = 0;
+                for (i; i < myFiles.length; i++) {
+                    $scope.recordings.push({ name: myFiles[i].name, path: myFiles[i].path })
+                }
+                $scope.$apply()
+
+            }
+
+            $scope.addKnowledge = function (element) {
+                $scope.knowledgeAdded = true
+                var file = element.files[0]
+                console.log(file)
+                $scope.knowledgeFile = { name: file.name, path: file.path }
+                $scope.inputBuilder = false;
+                $scope.$apply()
+            }
+
+            $scope.XMLInput = function (element) {
+                var file = element.files[0]
+                console.log(file)
+                $scope.inputXML = ""
+                $scope.inputXML = file.path
+                $scope.xml = { name: file.name, path: file.path }
+                $scope.run = true
+                $scope.$apply()
+            }
+
+            $scope.go = function () {
+                $scope.goClass = "ui green button"
+                $scope.error = ""
+                if ($scope.recordings.length == 0) {
+                    $scope.goClass = "ui red button"
+                    $scope.error = "No SMILE Recordings"
+                    return;
+                }
+                $scope.buildPathString();
+                console.log($scope.pathString)
+                console.log($scope.inputXML)
+                var util = require("util");
+                var spawn1 = require("child_process").spawn;
+                //var process1 = spawn('python',["final_imitation.py",$scope.pathString,$scope.inputXML,test]);
+                if ($scope.inputBuilder) {
+                    //use string from builder
+                    var process1 = spawn1('python', [".\python_causal_compiler\compiler\run.py", $scope.buildString()]);
+                } else {
+                    console.log("I am calling run.py");
+                    var process1 = spawn1('python', [".\python_causal_compiler\compiler\run.py"])
+                }
+                //var spawn = require("child_process").spawn;
+                //var test = "test.xml"
+                var process = spawn1('python', [".\python_causal_compiler\compiler\output\imitation.py", $scope.pathString, $scope.inputXML]);
+                $scope.showFinal();
+            }
+
+            $scope.generateXML = function () {
+                var util = require("util");
+                var spawn = require("child_process").spawn;
+                var test = "test.xml"
+                var process = spawn('python', ["final_imitation.py", $scope.pathString, $scope.inputXML, test]);
+
+                $scope.createXML = ""
+            }
         }]);
 })();

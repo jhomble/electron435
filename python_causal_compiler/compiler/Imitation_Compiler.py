@@ -139,7 +139,7 @@ class Imitation_Compiler(NodeVisitor):
 			for a in range(0, len(action[1])):
 				arg = action[1][a]
 				if arg[:4] == 'CONT':
-					if not self.method_var_equivs.has_key(act_name):
+					if not act_name in self.method_var_equivs:
 						self.method_var_equivs[act_name] = {}
 					prev_arg = action[1][a-1]
 					'TODO: THIS COULD CAUSE COLLISION ERROR'
@@ -155,7 +155,7 @@ class Imitation_Compiler(NodeVisitor):
 		print('RET: ' + ret)		
 
 		# Check if method has already been defined
-		if self.methods_dict.has_key(act_name):
+		if act_name in self.methods_dict:
 			args, conds, rets = self.methods_dict[act_name]
 			# Check if you have to change parameters (add final *)
 			if len(intention_Args) > len(args):
@@ -168,11 +168,11 @@ class Imitation_Compiler(NodeVisitor):
 						prev_arg = args[index]
 						for i in range(index, len(intention_Args)):
 							prev_arg_2 = intention_Args[i]
-							if not self.method_var_equivs.has_key(act_name):
+							if not act_name in self.method_var_equivs:
 								self.method_var_equivs[act_name] = {}
 							new_index = i - index
 							self.method_var_equivs[act_name][prev_arg_2] = prev_arg+'['+str(new_index)+']'
-						if not self.method_var_equivs.has_key(act_name):
+						if not act_name in self.method_var_equivs:
 							self.method_var_equivs[act_name] = {}
 						self.method_var_equivs[act_name][prev_arg] = prev_arg +'[0]'
 						prev_arg = '*' + prev_arg
@@ -242,7 +242,7 @@ class Imitation_Compiler(NodeVisitor):
 						if if_stmt2 != '': 
 							if_stmt = if_stmt.replace(':\n',' ')+if_stmt2.replace('if', op)
 
-		if (self.method_var_equivs.has_key(self.intention)):
+		if (self.intention in self.method_var_equivs):
 			self.method_var_equivs[self.intention].update(var_equiv)
 		else:
 			self.method_var_equivs[self.intention] = var_equiv
@@ -338,10 +338,10 @@ class Imitation_Compiler(NodeVisitor):
 						'TODO: Update this'
 						real_var = var2 + '[0]'
 						temp_var = var1
-					elif var_equiv.has_key(var1):
+					elif var1 in var_equiv:
 						real_var = var_equiv[var1]
 						temp_var = var2
-					elif var_equiv.has_key(var2):
+					elif var2 in var_equiv:
 						real_var = var_equiv[var2]
 						temp_var = var1
 					else:
@@ -414,7 +414,7 @@ class Imitation_Compiler(NodeVisitor):
 			int_dict = self.method_var_equivs[intent]
 			for var in int_dict:
 				if 'CONT' in var:
-					if self.method_var_equivs[intent].has_key(int_dict[var]):
+					if int_dict[var] in self.method_var_equivs[intent]:
 						old_val = self.method_var_equivs[intent][int_dict[var]]
 						old_index = old_val[len(old_val)-2]
 						new_index = int(old_index)+1
@@ -430,7 +430,7 @@ class Imitation_Compiler(NodeVisitor):
 			rets = self.methods_dict[intention][2]
 			for c in range(0, len(conds)):
 				cond = conds[c]
-				if self.method_var_equivs.has_key(intention):
+				if intention in self.method_var_equivs:
 					for var in self.method_var_equivs[intention]:
 
 						cond = cond.replace('#'+var, self.method_var_equivs[intention][var])
@@ -440,7 +440,7 @@ class Imitation_Compiler(NodeVisitor):
 					conds[c] = cond				
 			for r in range(0, len(rets)):
 				ret = rets[r]
-				if self.method_var_equivs.has_key(intention):
+				if intention in self.method_var_equivs:
 					for var in self.method_var_equivs[intention]:
 						if 'CONT' in var and var in ret:
 							cont_offset = int(var[4:]) + 1

@@ -5,7 +5,6 @@ import sys
 # Takes a list of files paths, the first one is the 0.txt and the rest are 1-x, x is how many txt files there are.
 def load_demo(demo_directory):
     files = demo_directory
-    print(files)
     # populate the initial state
     state = {}
     # state[object_id] = [object_type, x, y, z, angle]
@@ -74,9 +73,12 @@ def find_destination(state, object_id):
 
 if __name__=='__main__':
     x = sys.argv[1].split(',')
+    z = os.path.normpath(sys.argv[2])
     y = []
     for word in x:
        y.append(os.path.normpath(word))
     demo = load_demo(y)
     for d in demo:
         print(d[1:])
+    #with open("test.txt",'w') as xml:
+     #   xml.write(z)

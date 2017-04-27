@@ -1,11 +1,11 @@
 import sys
 sys.path.append('./copct-master')
-
+ 
 import copct
 from load_facility_demo import load_demo
-
+ 
 # # Background Causal Knowledge:
-# (move-to, obj, dest, dx, dy, dz, da) causes
+# (moveto, obj, dest, dx, dy, dz, da) causes
 #     [(grasp, obj), (release, obj, dest, dx, dy, dz, da)]    
 # (stack, dest, dx, dy, dz, da, obj1) causes
 #     [(move-to, obj1, dest, dx, dy, dz, da)]
@@ -16,7 +16,6 @@ from load_facility_demo import load_demo
 # (stack-all, dx, dy, dz, da) causes
 #     [(stack, 'room', dx, dy, dz, da, obj1, obj2, obj3, ...)]
 #     where obj1, obj2, obj3, ... are all the blocks in the room.
-
 def lookup_type(object_id, state):
     return [obj_type for (obj_id,obj_type,_,_,_,_) in state if obj_id == object_id][0]
 

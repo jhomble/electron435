@@ -156,7 +156,7 @@
                 $scope.recordings.forEach(function(x) {
                     $scope.pathString = $scope.pathString + x.path + "," 
                 });
-                $scope.pathString.slice(0,-1);
+                $scope.pathString =  $scope.pathString.slice(0,-1);
             }
 
             $scope.showCausalParameters = function () {
@@ -307,9 +307,17 @@
             }
             $scope.buildPathString();
             console.log($scope.pathString)
+			var util = require("util");
             var spawn = require("child_process").spawn;
-            var test = "hi,kyle,7777";//this will be a command line argument for whatever python scripts it wants to run
-            var process = spawn('python',["command_line.py",test]);
+            var process = spawn('python',["load_demo.py",$scope.pathString]);
+			util.log('readingin')//debugging info
+
+			process.stdout.on('data',function(chunk){ //debugging info, prints out stuff python puts in stdout
+
+				var textChunk = chunk.toString('utf8');// buffer to string
+
+				util.log(textChunk);
+			});
             if($scope.inputBuilder){
                 //use string from builder
             }else {

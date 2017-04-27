@@ -103,24 +103,6 @@ class Imitation_Compiler(NodeVisitor):
 
 		return acts
 
-	## Create Action Argument Index Reference Dictionary
-	#
-	#  Returns a dictionary where the keys are arguments to the 
-	#  actions in a given causal statement and the values are
-	#  the associated indices i,j in the 2d arguments array
-	#
-	# @rtype: {String, (String, String)}
-	def create_Action_Arg_Index_Reference_Dict(self, acts):
-		arg_index_dict = {}
-
-		for i in range(0, len(acts)):
-			for j in range(0, len(acts[i][1])):
-				# CONT keyword handled later
-				if acts[i][1][j][:4] != 'CONT':
-					arg_index_dict[acts[i][1][j]] = str(i),str(j)
-
-		return arg_index_dict 
-
 	## Visit Caus
 	#
 	# Returns the name of the intention

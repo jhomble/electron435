@@ -303,6 +303,8 @@
         $scope.XMLInput = function(element){
             var file = element.files[0]
             console.log(file)
+			$scope.inputXML = ""
+			$scope.inputXML = file.path
             $scope.xml = {name: file.name, path: file.path}
             $scope.run = true
             $scope.$apply()
@@ -318,17 +320,11 @@
             }
             $scope.buildPathString();
             console.log($scope.pathString)
+			console.log($scope.inputXML)
 			var util = require("util");
-            var spawn = require("child_process").spawn;
-            var process = spawn('python',["load_demo.py",$scope.pathString]);
-			util.log('readingin')//debugging info
-
-			process.stdout.on('data',function(chunk){ //debugging info, prints out stuff python puts in stdout
-
-				var textChunk = chunk.toString('utf8');// buffer to string
-
-				util.log(textChunk);
-			});
+            var spawn = require("child_process").spawn; 
+			var test = "test.xml"
+            var process = spawn('python',["final_imitation.py",$scope.pathString,$scope.inputXML,test]);
             if($scope.inputBuilder){
                 //use string from builder
             }else {

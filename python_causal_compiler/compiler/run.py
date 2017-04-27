@@ -13,7 +13,7 @@ import os
 #
 #  Outputs the first python file that defines CO-PCT tree
 def make_facility_domain(interpreter):
-	out_file = os.path.normpath("templates/facility_domain_template.txt")
+	out_file = os.path.normpath("output/facility_domain.py")
 	facility_domain_py = open(out_file, "w")
 
 	# This block should just be all the text requisite for the file not including cause stuff

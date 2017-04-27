@@ -1,3 +1,8 @@
+## Compiler Runner
+#
+#  This file creates the Lexer and Parser and runs the two
+#  compilers.
+
 from Lexer import Lexer
 from Parser import Parser
 from Facility_Domain_Compiler import Facility_Domain_Compiler
@@ -11,8 +16,10 @@ def make_facility_domain(interpreter):
 
 	# This block should just be all the text requisite for the file not including cause stuff
 	# TODO: Make sure the template is right
-	template = open("facility_domain_template.txt", "r").read()
+	print('Opening Facility Domain Template')
+	template = open("templates/facility_domain_template.txt", "r").read()
 	# Actually compile input
+	print('Running Facility Domain Compiler')
 	result, M = interpreter.interpret()
 
 	inserted = template.replace('\t# INSERT CAUSES HERE', result)
@@ -31,10 +38,12 @@ def make_imitation(interpreter):
 
 	# This block should just be all the text requisite for the file not including cause stuff
 	# TODO: Make sure the template is right
-	template = open("imitation_template.txt", "r").read()
+	print('Opening Imitation Template')
+	template = open("templates/imitation_template.txt", "r").read()
 	# Actually compile input
 
 	# TODO: Use the compiler for imitation, not the same one as facility domain!
+	print('Running Imitation Compiler')
 	result = interpreter.interpret()
 
 	inserted = template.replace('# INSERT METHODS HERE', result)
@@ -43,26 +52,30 @@ def make_imitation(interpreter):
 	imitation_py.close()
 	return result
 
-def main():
-	print('TESTING')
-	text = open('causes.txt', 'r').read()
-
-	print('TESTING LEXER')
+def run_facility_domain(text):
+	print('Making Lexer')
 	lexer = Lexer(text)
-	print('TESTING Parser')	
+	print('Making Parser')	
 	parser = Parser(lexer)
-	print('TESTING FACILITY_DOMAIN_COMPILER')
+	print('Making Facility Domain Compiler')
 	facility_compiler = Facility_Domain_Compiler(parser)
 	make_facility_domain(facility_compiler)
 
-	print('TESTING LEXER')
+def run_imitation(text):
+	print('Making Lexer')
 	lexer = Lexer(text)
-	print('TESTING Parser')	
+	print('Making Parser')	
 	parser = Parser(lexer)
-	print('TESTING IMITATION_COMPILER')
+	print('Making Imitation Compiler')
 	imitation_compiler = Imitation_Compiler(parser)
 	make_imitation(imitation_compiler)
 
+def main():
+	print('Opening Causal Input')
+	text = open('input/causes.txt', 'r').read()
+
+	run_facility_domain(text)
+	run_imitation(text)
 
 
 if __name__ == '__main__':

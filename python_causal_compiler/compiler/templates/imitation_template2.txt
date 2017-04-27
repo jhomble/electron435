@@ -482,4 +482,4 @@ if __name__ == '__main__':
         toXML(state.objs, sys.argv[3], filepaths, tabletop_specs, xmlinfo, varinfo)
     else :
         # otherwise default to provided file
-        toXML(state.objs, './SMILE-1.1.0/tablesetup/final_xml.xml', filepaths, tabletop_specs, xmlinfo, varinfo)
+        toXML(state.objs, 'final_xml.xml', filepaths, tabletop_specs, xmlinfo, varinfo)

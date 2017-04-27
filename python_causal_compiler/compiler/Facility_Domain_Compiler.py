@@ -156,7 +156,7 @@ class Facility_Domain_Compiler(NodeVisitor):
 		# iterate through all the arguments to the intention
 		for a in range(0, len(intention_Args)):
 			arg = intention_Args[a] 
-			if arg_indices.has_key(arg):
+			if arg in arg_indices:
 				i,j = arg_indices[arg]
 				# Don't add + to last argument string
 				if (a == len(intention_Args)-1):

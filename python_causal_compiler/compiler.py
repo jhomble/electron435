@@ -132,7 +132,7 @@ class Lexer(object):
 	#  token
 	def _id(self):
 		result = ''
-		while self.current_char is not None and self.current_char.isalnum():
+		while self.current_char is not None and (self.current_char.isalnum() or self.current_char == '-'):
 			result += self.current_char
 			self.advance()
 
@@ -711,9 +711,11 @@ class Parser(object):
 	#			  | DOT integer            (This is a float)
 	def var(self):
 		if self.current_token.type == INTEGER:
+			print('INTEGER: '+str(self.current_token))
 			node1 = self.integer()
 			if self.current_token.type == DOT:
 				self.eat(DOT)
+				print('FLOAT: '+str(self.current_token))				
 				node2 = self.integer()
 				node = Flt(left=node1, right=node2)
 			else:
@@ -734,11 +736,12 @@ class Parser(object):
 	# integer ->   INTEGER integer
 	#            | INTEGER
 	def integer(self):
-		node = Digit(self.current_token.value)
-
 		root = Int()
 
-		root.digits.append(node)
+		# NOT SURE WHY I THOUGHT I NEED THIS
+		# IF THERE ARE ERRORS LOOK HERE!
+		#node = Digit(self.current_token.value)
+		#root.digits.append(node)
 
 		while self.current_token.type == INTEGER:
 			root.digits.append(Digit(self.current_token.value))
@@ -1352,7 +1355,7 @@ class Imitation_Compiler(NodeVisitor):
 		print('ACT: ' + act_name)
 
 		# return statement
-		ret = 'return ['
+		ret = '__ret_val = ['
 
 		# iterate through each action adding it and its 
 		# arguments to the return string
@@ -1371,6 +1374,8 @@ class Imitation_Compiler(NodeVisitor):
 			ret += ','
 
 		ret = ret[:len(ret)-1] + ']\n'
+
+		ret += 'return __ret_val\n' 
 
 		print('RET: ' + ret)		
 
@@ -1502,6 +1507,18 @@ class Imitation_Compiler(NodeVisitor):
 		if comp == '==':
 			if expr1[0] == 'ALL':
 				'TODO: Compile All keyword'
+				obj_id = expr1[1]+'_id'
+				body += 'all_'+expr1[1]+' = ['+obj_id+' for '
+				body += obj_id+' in state.objs if state.objs['+obj_id
+				body += '][0]==\''+expr1[1]+'\']\n'
+				body += 'if True:\n'
+				for a in range(0, len(expr2)):
+					arg = expr2[a]
+					if arg[:4] == 'CONT':
+						cont_offset = int(arg[4:])
+						self.method_var_equivs[self.intention][arg] = ')+tuple(all_'+expr1[1]+'['+str(a-cont_offset)+':]'
+					else:
+						self.method_var_equivs[self.intention][arg] = 'all_'+expr1[1]+'['+str(a)+']'
 			elif expr1[0] == 'TYPE':
 				var_name = expr1[1]
 				var_name = '#'+expr1[1]
@@ -1625,8 +1642,10 @@ class Imitation_Compiler(NodeVisitor):
 					if self.method_var_equivs[intent].has_key(int_dict[var]):
 						old_val = self.method_var_equivs[intent][int_dict[var]]
 						old_index = old_val[len(old_val)-2]
-						new_index = str(int(old_index)+1)
-						new_val = old_val.replace(old_index+']', new_index+':]')
+						new_index = int(old_index)+1
+						cont_offset = int(var[4:])
+						new_index = str(new_index - cont_offset)
+						new_val = ')+tuple('+old_val.replace(old_index+']', new_index+':]')
 						self.method_var_equivs[intent][var] = new_val
 				print('\t\tdict['+var+'] ='+int_dict[var])
 
@@ -1638,7 +1657,9 @@ class Imitation_Compiler(NodeVisitor):
 				cond = conds[c]
 				if self.method_var_equivs.has_key(intention):
 					for var in self.method_var_equivs[intention]:
+
 						cond = cond.replace('#'+var, self.method_var_equivs[intention][var])
+
 				if cond:
 					cond = cond.replace('#', '')
 					conds[c] = cond				
@@ -1646,6 +1667,23 @@ class Imitation_Compiler(NodeVisitor):
 				ret = rets[r]
 				if self.method_var_equivs.has_key(intention):
 					for var in self.method_var_equivs[intention]:
+						if 'CONT' in var and var in ret:
+							cont_offset = int(var[4:]) + 1
+							temp_ret = ret
+							temp_ret = temp_ret.split('#'+var)
+							temp_ret = temp_ret[0][::-1]
+							index = -1
+							for i in range(0, len(temp_ret)):
+								c = temp_ret[i]
+								if c == ',':
+									index = i
+									cont_offset -= 1
+								if cont_offset == 0:
+									break
+							var_index = ret.find('#'+var)
+							print('RETURN:')
+							print(ret[var_index-index:var_index])
+							ret = ret[0:var_index-index]+ret[var_index:]
 						ret = ret.replace('#'+var, self.method_var_equivs[intention][var])
 				if ret:
 					ret = ret.replace('#', '')
@@ -1656,20 +1694,62 @@ class Imitation_Compiler(NodeVisitor):
 			conds = self.methods_dict[intention][1]
 			rets = self.methods_dict[intention][2]
 			method_dec = 'def '
-			method_dec += intention
+			intention_no_hyphen = intention.replace('-', '_')
+			method_dec += intention_no_hyphen
 			method_dec += '(state'
+			objs_conv = ''
 			for arg in args:
 				method_dec += ', '+arg
+				if arg[0] == '*':
+					objs_conv = tab+arg[1:]+' = flatten('+arg[1:]+')\n'
 			method_dec += '):\n'
 			pyhop_stmt = 'pyhop.declare_methods(\''+intention+'\','
-			pyhop_stmt += intention+')\n'
+			pyhop_stmt += intention_no_hyphen+')\n'
 			result += method_dec
+			result += objs_conv
+			red_check = ''			
+			ret1_tabs = tab
+			ret2_tabs = tab
+			if len(rets) > 1:
+				'TODO: Multiple possible reductions!'
+				ret2_tabs += tab
+				red_check = 2*tab+'__all_args = []\n'
+				red_check += 2*tab+'for __action in __ret_val:\n'
+				red_check += 3*tab+'for __arg in __action:\n'
+				#red_check += 4*tab+'if isinstance(__arg, list):\n'
+				# red_check += 5*tab+'for i in __arg:\n'
+				# red_check += 6*tab+'__all_args.append(__arg)\n'
+				# red_check += 4*tab+'else:\n'
+				red_check += 4*tab+'__all_args.append(__arg)\n'
+				red_check += 2*tab+'__all_intention_args = ['
+				for arg in args:
+					if arg[0] == '*':
+						red_check += '[__obj for __obj in '+arg[1:]+']'
+					else:
+						red_check += '['+arg + '],'
+				red_check += ']\n'
+				red_check += 2*tab+'__all_intention_args = flatten(__all_intention_args)\n'
+				red_check += 2*tab+'__all_args = flatten(__all_args)\n'				
+				red_check += 2*tab+'if set(__all_intention_args).issubset(set(__all_args)):\n'
+				# num_newlines = red_check.count('\n')
+				#red_check = red_check.replace('\n', '\n'+tab, num_newlines-1)
 			for i in range(0, len(rets)):
 				ret = rets[i]
 				cond = conds[i]
+				ret1_temp = ret1_tabs
+				ret2_temp = ret2_tabs
 				if cond:
-					result += tab + cond + tab
-				result += tab + ret
+					if 'if' in cond and ':\n' in cond:
+						print('RET: '+ret)
+						print('\t'+cond)
+						ret1_temp += tab
+						ret2_temp += tab
+					num_newlines = cond.count('\n')
+					result += tab + cond.replace('\n', '\n'+tab, num_newlines-1)
+				ret_lines = ret.split('\n')
+				result += ret1_temp + ret_lines[0] + '\n'
+				result += red_check
+				result += ret2_temp + ret_lines[1] + '\n'
 			result += pyhop_stmt
 
 		return result
@@ -1711,7 +1791,9 @@ class Imitation_Compiler(NodeVisitor):
 	#
 	# @rtype: String
 	def visit_Flt(self, node):
-		return self.visit(node.left) + '.' + self.visit(node.right)
+		flt = self.visit(node.left) + '.' + self.visit(node.right)
+		print('FLOAT: '+flt)
+		return flt
 
 	## Visit ALL
 	#
@@ -1771,7 +1853,7 @@ def make_facility_domain(interpreter):
 # Outputs the second python file that uses pyhop to traverse the
 # CO-PCT tree
 def make_imitation(interpreter):
-	facility_domain_py = open("imitation.py", "w")
+	imitation_py = open("imitation.py", "w")
 
 	# This block should just be all the text requisite for the file not including cause stuff
 	# TODO: Make sure the template is right
@@ -1781,14 +1863,16 @@ def make_imitation(interpreter):
 	# TODO: Use the compiler for imitation, not the same one as facility domain!
 	result = interpreter.interpret()
 
-	facility_domain_py.write("%s\n%s" % (template, result))
-	facility_domain_py.close()
+	inserted = template.replace('# INSERT METHODS HERE', result)
+
+	imitation_py.write(inserted)
+	imitation_py.close()
 	return result
 
 def main():
 	text = open(sys.argv[1], 'r').read()
 
-	makeFacility = False;
+	makeFacility = True;
 	makeImitation = True;
 
 	if makeFacility:

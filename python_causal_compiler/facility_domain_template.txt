@@ -30,10 +30,9 @@ def causes(v):
 
     return g
 
-M = 2 # length of longest effect sequence, aka longest list in if statements of causes
+M = 0 # INSERT M HERE
 
-if __name__=='__main__':
-
+def main():
     # Load demo
     demo = load_demo(demo_directory='./SMILE-1.1.0/room_demo/')
     
@@ -50,3 +49,6 @@ if __name__=='__main__':
     print('First cover of length %d:'%length)
     for intention in pcovs[0][0]:
         print(intention[1:])
+
+if __name__=='__main__':
+    main()

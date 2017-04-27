@@ -7,17 +7,20 @@ from Lexer import Lexer
 from Parser import Parser
 from Facility_Domain_Compiler import Facility_Domain_Compiler
 from Imitation_Compiler import Imitation_Compiler
+import os
 
 ## Make Facility Domain
 #
 #  Outputs the first python file that defines CO-PCT tree
 def make_facility_domain(interpreter):
-	facility_domain_py = open("facility_domain.py", "w")
+	out_file = os.path.normpath("templates/facility_domain_template.txt")
+	facility_domain_py = open(out_file, "w")
 
 	# This block should just be all the text requisite for the file not including cause stuff
 	# TODO: Make sure the template is right
 	print('Opening Facility Domain Template')
-	template = open("templates/facility_domain_template.txt", "r").read()
+	path = os.path.normpath("templates/facility_domain_template.txt")
+	template = open(path, "r").read()
 	# Actually compile input
 	print('Running Facility Domain Compiler')
 	result, M = interpreter.interpret()
@@ -34,12 +37,14 @@ def make_facility_domain(interpreter):
 # Outputs the second python file that uses pyhop to traverse the
 # CO-PCT tree
 def make_imitation(interpreter):
-	imitation_py = open("imitation.py", "w")
+	out_file = os.path.normpath("output/imitation.py")
+	imitation_py = open(out_file, "w")
 
 	# This block should just be all the text requisite for the file not including cause stuff
 	# TODO: Make sure the template is right
 	print('Opening Imitation Template')
-	template = open("templates/imitation_template.txt", "r").read()
+	path = os.path.normpath("templates/imitation_template2.txt")
+	template = open(path, "r").read()
 	# Actually compile input
 
 	# TODO: Use the compiler for imitation, not the same one as facility domain!
@@ -52,6 +57,9 @@ def make_imitation(interpreter):
 	imitation_py.close()
 	return result
 
+## Run Facility Domain
+#
+#  Runs the Facility Domain Compiler
 def run_facility_domain(text):
 	print('Making Lexer')
 	lexer = Lexer(text)
@@ -61,6 +69,9 @@ def run_facility_domain(text):
 	facility_compiler = Facility_Domain_Compiler(parser)
 	make_facility_domain(facility_compiler)
 
+## Run Imitation
+#
+#  Runs the Imitation Compiler
 def run_imitation(text):
 	print('Making Lexer')
 	lexer = Lexer(text)
@@ -72,7 +83,8 @@ def run_imitation(text):
 
 def main():
 	print('Opening Causal Input')
-	text = open('input/causes.txt', 'r').read()
+	input_path = os.path.normpath('input/causes.txt')
+	text = open(input_path, 'r').read()
 
 	run_facility_domain(text)
 	run_imitation(text)

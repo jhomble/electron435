@@ -74,6 +74,11 @@
             templateUrl: 'scripts/home/xmlPage.html'
         }
     })
+    .directive('final', function () {
+        return {
+            templateUrl: 'scripts/home/final.html'
+        }
+    })
 
     .controller('homeController', ['$scope', '$window', function ($scope, $window) {
         $(document).ready(function () {
@@ -86,6 +91,7 @@
             $scope.causalParameters = false;
             $scope.preview = false;
             $scope.review = false;
+            $scope.finalPage = false;
 
             $scope.knowledgeAdded = false;
             $scope.run = false
@@ -106,6 +112,7 @@
                 $scope.preview = false;
                 $scope.review = false;
                 $scope.xmlPage = false;
+                $scope.finalPage = false;
             }
             $scope.showInputTask = function () {
                 reset();
@@ -152,6 +159,42 @@
             $scope.showXML = function(){
                 reset()
                 $scope.xmlPage = true
+            }
+            
+            $scope.showFinal = function(){
+                reset()
+                $scope.finalPage = true;
+            }
+
+            $scope.startOver = function(){
+                $scope.showInputTask();
+                $scope.pathString = ""
+                $scope.recordings = [];
+                $scope.knowledgeAdded = false;
+                $scope.run = false
+                $scope.recordings = []
+                $scope.goClass = "ui green button"
+                $scope.error = ""
+
+                $scope.inputBuilder = true;
+
+                $scope.knowledge = [
+                    {
+                        cause: "Enter Cause",
+                        relationship: {
+                            type: "",
+                            condition: ""
+                        },
+                        parameters: [],
+                        actions: []
+                    }
+                ]
+
+                $scope.inputXML = ""
+                $scope.xml = {}
+                $scope.run = false
+            
+                $scope.knowledgeFile = {}
             }
 
             function unique(list) {
@@ -330,6 +373,7 @@
             }else {
                 //use knowledgeFile
             }
+            $scope.showFinal();
         }
     }]);
 })();

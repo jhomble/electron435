@@ -1232,6 +1232,9 @@ class Imitation_Compiler(NodeVisitor):
 		## @var intention
 		#  Current intention for access from conditional check
 		self.intention = None
+		## @var method_var_equivs
+		#  variable equivalents per method
+		self.method_var_equivs = {}
 
 	## Visit Literal
 	#
@@ -1355,8 +1358,15 @@ class Imitation_Compiler(NodeVisitor):
 		# arguments to the return string
 		for action in acts:
 			ret += '(\''+action[0]+'\','
-			for arg in action[1]:
-				ret += arg + ','
+			for a in range(0, len(action[1])):
+				arg = action[1][a]
+				if arg[:4] == 'CONT':
+					if not self.method_var_equivs.has_key(act_name):
+						self.method_var_equivs[act_name] = {}
+					prev_arg = action[1][a-1]
+					'TODO: THIS COULD CAUSE COLLISION ERROR'
+					self.method_var_equivs[act_name][arg] = prev_arg					
+				ret += '#'+arg + ','
 			ret = ret[:len(ret)-1] + ')'
 			ret += ','
 
@@ -1376,6 +1386,15 @@ class Imitation_Compiler(NodeVisitor):
 					if arg[:4] == 'CONT':
 						index = a - int(arg[4:])
 						prev_arg = args[index]
+						for i in range(index, len(intention_Args)):
+							prev_arg_2 = intention_Args[i]
+							if not self.method_var_equivs.has_key(act_name):
+								self.method_var_equivs[act_name] = {}
+							new_index = i - index
+							self.method_var_equivs[act_name][prev_arg_2] = prev_arg+'['+str(new_index)+']'
+						if not self.method_var_equivs.has_key(act_name):
+							self.method_var_equivs[act_name] = {}
+						self.method_var_equivs[act_name][prev_arg] = prev_arg +'[0]'
 						prev_arg = '*' + prev_arg
 				adjusted_args = args
 				adjusted_args[index] = prev_arg
@@ -1443,6 +1462,10 @@ class Imitation_Compiler(NodeVisitor):
 						if if_stmt2 != '': 
 							if_stmt = if_stmt.replace(':\n',' ')+if_stmt2.replace('if', op)
 
+		if (self.method_var_equivs.has_key(self.intention)):
+			self.method_var_equivs[self.intention].update(var_equiv)
+		else:
+			self.method_var_equivs[self.intention] = var_equiv
 
 		result += body + if_stmt
 
@@ -1481,27 +1504,70 @@ class Imitation_Compiler(NodeVisitor):
 				'TODO: Compile All keyword'
 			elif expr1[0] == 'TYPE':
 				var_name = expr1[1]
-				if var_name not in intention_Args:
-					var_name = expr1[1] + '_TEMP'
-				if_stmt += 'if state.objs['+expr1[1]+'][0] == \''
+				var_name = '#'+expr1[1]
+				if_stmt += 'if state.objs['+var_name+'][0] == \''
 				if_stmt += expr2+'\':\n'
-				'TODO: Compile TYPE keyword'
 			else:
-				'TODO: Compile literal/var comparison'
 				# var1 and var2 could be either variables or literals
 				var1 = ''
 				var2 = ''
+				isVar1Lit = False
+				isVar2Lit = False
+
 				if expr1[0] == 'LITERAL':
 					var1 = '\''+str(expr1[1])+'\''
+					isVar1Lit = True
 				else:
-					i,j = arg_indices[expr1]
-					var1 = 'arguments['+i+']['+j+']'
-
+					var1 = expr1
 				if expr2[0] == 'LITERAL':
 					var2 = '\''+str(expr2[1])+'\''
+					isVar2Lit = True
 				else:
-					i,j = arg_indices[expr2]
-					var2 = 'arguments['+i+']['+j+']'
+					var2 = expr2
+
+				if isVar1Lit and isVar2Lit:
+					raise Exception('Comparing '+var1+' and '+var2+' which are both String literals!')
+				elif not isVar1Lit and not isVar2Lit:
+					var1_star = '*'+var1
+					var2_star = '*'+var2
+					real_var = ''
+					temp_var = ''
+					if var1 in intention_Args:
+						real_var = var1
+						temp_var = var2
+					elif var1_star in intention_Args:
+						'TODO: Update this'
+						real_var = var1 + '[0]'
+						temp_var = var2						
+					elif var2 in intention_Args:
+						real_var = var2
+						temp_var = var1											
+					elif var2_star in intention_Args:
+						'TODO: Update this'
+						real_var = var2 + '[0]'
+						temp_var = var1
+					elif var_equiv.has_key(var1):
+						real_var = var_equiv[var1]
+						temp_var = var2
+					elif var_equiv.has_key(var2):
+						real_var = var_equiv[var2]
+						temp_var = var1
+					else:
+						raise Exception('Variables '+var1+','+var2+' were not found!')
+
+					var_equiv[temp_var] = real_var
+				else:
+					lit_var = ''
+					real_var = ''
+					if isVar1Lit:
+						lit_var = var1
+						real_var = var2
+					else:
+						lit_var = var2
+						real_var = var1
+
+					var_equiv[real_var] = lit_var
+
 		else:
 			raise Exception('\''+str(comp)+'\' currently not supported')
 
@@ -1549,6 +1615,41 @@ class Imitation_Compiler(NodeVisitor):
 		for k in self.methods_dict:
 			v = self.methods_dict[k]
 			print(str(k) + ': ' + str(v))
+
+		print('Vars Dict:')
+		for intent in self.method_var_equivs:
+			print('\tIntention: '+str(intent))
+			int_dict = self.method_var_equivs[intent]
+			for var in int_dict:
+				if 'CONT' in var:
+					if self.method_var_equivs[intent].has_key(int_dict[var]):
+						old_val = self.method_var_equivs[intent][int_dict[var]]
+						old_index = old_val[len(old_val)-2]
+						new_index = str(int(old_index)+1)
+						new_val = old_val.replace(old_index+']', new_index+':]')
+						self.method_var_equivs[intent][var] = new_val
+				print('\t\tdict['+var+'] ='+int_dict[var])
+
+		for intention in self.methods_dict:
+			args = self.methods_dict[intention][0]
+			conds = self.methods_dict[intention][1]
+			rets = self.methods_dict[intention][2]
+			for c in range(0, len(conds)):
+				cond = conds[c]
+				if self.method_var_equivs.has_key(intention):
+					for var in self.method_var_equivs[intention]:
+						cond = cond.replace('#'+var, self.method_var_equivs[intention][var])
+				if cond:
+					cond = cond.replace('#', '')
+					conds[c] = cond				
+			for r in range(0, len(rets)):
+				ret = rets[r]
+				if self.method_var_equivs.has_key(intention):
+					for var in self.method_var_equivs[intention]:
+						ret = ret.replace('#'+var, self.method_var_equivs[intention][var])
+				if ret:
+					ret = ret.replace('#', '')
+					rets[r] = ret				
 
 		for intention in self.methods_dict:
 			args = self.methods_dict[intention][0]

@@ -442,10 +442,14 @@
                     console.log("I am calling run.py");
                     var process1 = spawn1('python', [".\python_causal_compiler\compiler\run.py"])
                 }
+                setTimeout(function () {
+                    var process = spawn1('python', [". \python_causal_compiler\compiler\output\imitation.py", $scope.pathString, $scope.inputXML]);
+                    $scope.showFinal();
+                }, 3000);
+
                 //var spawn = require("child_process").spawn;
                 //var test = "test.xml"
-                var process = spawn1('python', [".\python_causal_compiler\compiler\output\imitation.py", $scope.pathString, $scope.inputXML]);
-                $scope.showFinal();
+
             }
 
             $scope.generateXML = function () {

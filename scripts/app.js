@@ -437,13 +437,13 @@
                 //var process1 = spawn('python',["final_imitation.py",$scope.pathString,$scope.inputXML,test]);
                 if ($scope.inputBuilder) {
                     //use string from builder
-                    var process1 = spawn1('python', [".\python_causal_compiler\compiler\run.py", $scope.buildString()]);
+                    var process1 = spawn1('python', ["\\python_causal_compiler\\compiler\\run.py", $scope.buildString()]);
                 } else {
                     console.log("I am calling run.py");
-                    var process1 = spawn1('python', [".\python_causal_compiler\compiler\run.py"])
+                    var process1 = spawn1('python', ["\\python_causal_compiler\\compiler\\run.py"])
                 }
                 setTimeout(function () {
-                    var process = spawn1('python', [". \python_causal_compiler\compiler\output\imitation.py", $scope.pathString, $scope.inputXML]);
+                    var process = spawn1('python', [".\\python_causal_compiler\\compiler\\output\\imitation.py", $scope.pathString, $scope.inputXML]);
                     $scope.showFinal();
                 }, 3000);
 
@@ -455,7 +455,6 @@
             $scope.generateXML = function () {
                 var util = require("util");
                 var spawn = require("child_process").spawn;
-                var test = "test.xml"
                 var process = spawn('python', ["final_imitation.py", $scope.pathString, $scope.inputXML, test]);
 
                 $scope.createXML = ""

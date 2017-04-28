@@ -173,7 +173,7 @@ def XML_to_pyhop(xml_file_path) :
                 if not instance_rotation or not instance_location or not instance_id :
                     # if info for pyhop-essential attributes not provided in instance xml, must go into file-included template to find default values
                     # if not found in template, resort to SMILE customary defaults
-                    with open('..\\..\\..\\\SMILE-1.1.0\\'+file_to_open, 'r') as instance_file:
+                    with open('.\\SMILE-1.1.0\\'+file_to_open, 'r') as instance_file:
                         for instance_line in instance_file :
                             instance_line = instance_line.strip()
                             # get rid of leading white space aka tabs

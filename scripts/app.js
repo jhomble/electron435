@@ -437,16 +437,29 @@
                 //var process1 = spawn('python',["final_imitation.py",$scope.pathString,$scope.inputXML,test]);
                 if ($scope.inputBuilder) {
                     //use string from builder
-                    var process1 = spawn1('python', ["\\python_causal_compiler\\compiler\\run.py", $scope.buildString()]);
+                    var process1 = spawn1('python', [".\\python_causal_compiler\\compiler\\run.py", $scope.buildString()]);
                 } else {
                     console.log("I am calling run.py");
-                    var process1 = spawn1('python', ["\\python_causal_compiler\\compiler\\run.py"])
+                    var process1 = spawn1('python', [".\\python_causal_compiler\\compiler\\run.py"])
+					process1.stderr.on('data',function(chunk){ //debugging info, prints out stuff python puts in stdout
+
+						var textChunk = chunk.toString('utf8');// buffer to string
+
+						util.log(textChunk);
+					});
                 }
                 setTimeout(function () {
+					console.log("Calling imitation")
                     var process = spawn1('python', [".\\python_causal_compiler\\compiler\\output\\imitation.py", $scope.pathString, $scope.inputXML]);
-                    $scope.showFinal();
-                }, 3000);
+					process.stderr.on('data',function(chunk){ //debugging info, prints out stuff python puts in stdout
 
+						var textChunk = chunk.toString('utf8');// buffer to string
+
+						util.log(textChunk);
+					});
+                    
+                }, 5000);
+				$scope.showFinal();
                 //var spawn = require("child_process").spawn;
                 //var test = "test.xml"
 

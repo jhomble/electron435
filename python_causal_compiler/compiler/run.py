@@ -8,6 +8,7 @@ from Parser import Parser
 from Facility_Domain_Compiler import Facility_Domain_Compiler
 from Imitation_Compiler import Imitation_Compiler
 import os
+import sys
 
 ## Make Facility Domain
 #
@@ -83,9 +84,11 @@ def run_imitation(text):
 
 def main():
 	print('Opening Causal Input')
-	input_path = os.path.normpath(".\\python_causal_compiler\\compiler\\input\\causes.txt")
-	text = open(input_path, 'r').read()
-	print("past open")
+	if len(sys.argv) < 3:
+		text = sys.argv[1]
+	else:
+		input_path = os.path.normpath(sys.argv[1])
+		text = open(input_path, 'r').read()
 	run_facility_domain(text)
 	run_imitation(text)
 

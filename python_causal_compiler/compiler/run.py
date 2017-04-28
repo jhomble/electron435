@@ -89,6 +89,11 @@ def main():
 	run_facility_domain(text)
 	run_imitation(text)
 
+	import output.imitation
+
+	print('Running Imitation')
+	output.imitation.main(sys.argv[1])
+
 
 if __name__ == '__main__':
    main();

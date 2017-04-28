@@ -168,36 +168,8 @@
                 }
 
                 $scope.startOver = function () {
-                    $scope.showInputTask();
-                    $scope.pathString = ""
-                    $scope.recordings = [];
-                    $scope.knowledgeAdded = false;
-                    $scope.run = false
-                    $scope.recordings = []
-                    $scope.goClass = "ui green button"
-                    $scope.error = ""
+                    window.location.reload(false)
 
-                    $scope.inputBuilder = true;
-
-                    $scope.knowledge = [
-                        {
-                            cause: "Enter Cause",
-                            relationship: {
-                                type: "",
-                                condition: ""
-                            },
-                            parameters: [],
-                            actions: []
-                        }
-                    ]
-
-                    $scope.inputXML = ""
-                    $scope.xml = {}
-                    $scope.run = false
-
-                    $scope.knowledgeFile = {}
-                    $scope.inputtedTask = ""
-                    $scope.createXML = ""
                 }
 
                 $scope.openPreview = function () {
@@ -280,6 +252,7 @@
                     });
                     final = final + " }"
                     console.log(final)
+					return final;
                 }
 
                 $scope.addCause = function () {
@@ -376,6 +349,7 @@
                     var file = element.files[0]
                     console.log(file)
                     $scope.knowledgeFile = { name: file.name, path: file.path }
+					
                     $scope.inputBuilder = false;
                     $scope.$apply()
                 }
@@ -437,16 +411,31 @@
                 //var process1 = spawn('python',["final_imitation.py",$scope.pathString,$scope.inputXML,test]);
                 if ($scope.inputBuilder) {
                     //use string from builder
-                    var process1 = spawn1('python', ["\\python_causal_compiler\\compiler\\run.py", $scope.buildString()]);
+					console.log("through gui")
+					//var x = "RULES{move-to(obj, dest, dx, dy, dz, da) := grasp(obj), release(obj, dest, dx, dy, dz, da);if (TYPE(obj)=block):stack(dest, dx, dy, dz, da, obj) := move-to(obj, dest, dx, dy, dz, da);if (TYPE(obj1) = block && obj = obj1):stack(dest, dx, dy, dz, da, obj1, obj2, obj3, CONT3) := move-to(obj, dest, dx, dy, dz, da), stack(obj1, 0, 0, .5, 0, obj2, obj3, CONT2);if (ALL(block)=[obj1, CONT1] && dest = 'room'):stack-all(dx, dy, dz, da) := stack(dest, dx, dy, dz, da, obj1, CONT1)}"
+                    var process1 = spawn1('python', [".\\python_causal_compiler\\compiler\\run.py", $scope.buildString()]);
                 } else {
                     console.log("I am calling run.py");
-                    var process1 = spawn1('python', ["\\python_causal_compiler\\compiler\\run.py"])
+                    var process1 = spawn1('python', [".\\python_causal_compiler\\compiler\\run.py",$scope.knowledgeFile.path, "Dummy"])
+					process1.stderr.on('data',function(chunk){ //debugging info, prints out stuff python puts in stdout
+
+						var textChunk = chunk.toString('utf8');// buffer to string
+
+						util.log(textChunk);
+					});
                 }
                 setTimeout(function () {
+					console.log("Calling imitation")
                     var process = spawn1('python', [".\\python_causal_compiler\\compiler\\output\\imitation.py", $scope.pathString, $scope.inputXML]);
-                    $scope.showFinal();
-                }, 3000);
+					process.stderr.on('data',function(chunk){ //debugging info, prints out stuff python puts in stdout
 
+						var textChunk = chunk.toString('utf8');// buffer to string
+
+						util.log(textChunk);
+					});
+                    
+                }, 5000);
+				$scope.showFinal();
                 //var spawn = require("child_process").spawn;
                 //var test = "test.xml"
 

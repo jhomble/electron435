@@ -373,9 +373,8 @@
 				var process1 = spawn1('python',["python_causal_compiler\compiler\run.py",$scope.buildString()]);
             }else {
 				console.log("I am calling run.py");
-                var process1 = spawn1('python',[".\\python_causal_compiler\\compiler\\run.py"]);
-				console.log("in chunk");
-				process1.stdout.on('data',function(chunk){ //debugging info, prints out stuff python puts in stdout
+                var process1 = spawn1('python',[".\\python_causal_compiler\\compiler\\run.py",$scope.pathString,$scope.inputXML]);
+				process1.stderr.on('data',function(chunk){ //debugging info, prints out stuff python puts in stdout
 					
 
 					var textChunk = chunk.toString('utf8');// buffer to string
@@ -383,18 +382,19 @@
 					console.log(textChunk);
 				});
             }
+			
 			console.log("Time to run imitation");
 			var spawn2 = require("child_process").spawn; 
 			//var test = "test.xml"
             var process = spawn1('python',[".\\python_causal_compiler\\compiler\\output\\imitation.py",$scope.pathString,$scope.inputXML]);
-			process.stdout.on('data',function(chunk){ //debugging info, prints out stuff python puts in stdout
+			//process.stderr.on('data',function(chunk){ //debugging info, prints out stuff python puts in stdout
 					
 
-					var textChunk = chunk.toString('utf8');// buffer to string
+			//		var textChunk = chunk.toString('utf8');// buffer to string
 					
-					console.log(textChunk);
-			});
-            $scope.showFinal();
+				//	console.log(textChunk);
+			//});
+            //$scope.showFinal();
         }
     }]);
 })();

@@ -9,7 +9,13 @@
                 </div>
                 <div class="row">
                     <div style="text-align: center">
-                        <h3>For this Demo, Skip!</h3>
+                        <h3>Type in the XML Parameters</h3>
+                        <h4>XML file will be loaded to the current directory</h4>
+                        <div class="ui input">
+                            <input type="text" ng-model="createXML" placeholder="Enter XML Attributes">
+                        </div>
+                        <button class="ui green button" ng-click="generateXML()">Generate</button>
+                        <br>
                     </div>
                 </div>
             </div>
@@ -33,6 +39,16 @@
                         Next
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="sixteen wide column">
+            <div style="text-align: center">
+                <br>
+                <h5 style="color: gray">examples of XML input will be found on our advertisment webpage doc</h5>
+                <h5 style="color: gray">http://viceroy.cs.umd.edu</h5>
             </div>
         </div>
     </div>

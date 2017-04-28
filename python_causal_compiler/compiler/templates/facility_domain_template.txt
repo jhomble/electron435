@@ -2,7 +2,7 @@ import sys
 sys.path.append('./copct-master')
  
 import copct
-from load_facility_demo import load_demo
+#from load_facilit_demo import load_demo
  
 # # Background Causal Knowledge:
 # (moveto, obj, dest, dx, dy, dz, da) causes
@@ -31,23 +31,21 @@ def causes(v):
 
 M = 0 # INSERT M HERE
 
-def main():
+#def main():
     # Load demo
-    demo = load_demo(demo_directory='./SMILE-1.1.0/room_demo/')
+    #demo = load_demo(demo_directory='./SMILE-1.1.0/room_demo/')
     
     # interpret demo (fixed-parameter-tractable when M is small and explicitly provided)
-    status, tlcovs, g = copct.explain(causes, demo, M=M)
-    print('copct status: %s'%status)
-    print('%d covers'%len(tlcovs))
+    #status, tlcovs, g = copct.explain(causes, demo, M=M)
+    #print('copct status: %s'%status)
+    #print('%d covers'%len(tlcovs))
 
     # get most parsimonious covers
-    pcovs, length = copct.minCardinalityTLCovers(tlcovs)
-    print('%d covers of length %d'%(len(pcovs), length))
+    #pcovs, length = copct.minCardinalityTLCovers(tlcovs)
+    #print('%d covers of length %d'%(len(pcovs), length))
     
     # Show the first one
-    print('First cover of length %d:'%length)
-    for intention in pcovs[0][0]:
-        print(intention[1:])
+    #print('First cover of length %d:'%length)
+    #for intention in pcovs[0][0]:
+    #    print(intention[1:])
 
-if __name__=='__main__':
-    main()

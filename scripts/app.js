@@ -413,10 +413,10 @@
                     //use string from builder
 					console.log("through gui")
 					//var x = "RULES{move-to(obj, dest, dx, dy, dz, da) := grasp(obj), release(obj, dest, dx, dy, dz, da);if (TYPE(obj)=block):stack(dest, dx, dy, dz, da, obj) := move-to(obj, dest, dx, dy, dz, da);if (TYPE(obj1) = block && obj = obj1):stack(dest, dx, dy, dz, da, obj1, obj2, obj3, CONT3) := move-to(obj, dest, dx, dy, dz, da), stack(obj1, 0, 0, .5, 0, obj2, obj3, CONT2);if (ALL(block)=[obj1, CONT1] && dest = 'room'):stack-all(dx, dy, dz, da) := stack(dest, dx, dy, dz, da, obj1, CONT1)}"
-                    var process1 = spawn1('python', [".\\python_causal_compiler\\compiler\\run.py", $scope.buildString()]);
+                    var process1 = spawn1('python', ["./python_causal_compiler/compiler/run.py", $scope.buildString()]);
                 } else {
                     console.log("I am calling run.py");
-                    var process1 = spawn1('python', [".\\python_causal_compiler\\compiler\\run.py",$scope.knowledgeFile.path, "Dummy"])
+                    var process1 = spawn1('python', ["./python_causal_compiler/compiler/run.py",$scope.knowledgeFile.path, "Dummy"])
 					process1.stderr.on('data',function(chunk){ //debugging info, prints out stuff python puts in stdout
 
 						var textChunk = chunk.toString('utf8');// buffer to string
@@ -426,7 +426,7 @@
                 }
                 setTimeout(function () {
 					console.log("Calling imitation")
-                    var process = spawn1('python', [".\\python_causal_compiler\\compiler\\output\\imitation.py", $scope.pathString, $scope.inputXML]);
+                    var process = spawn1('python', ["./python_causal_compiler/compiler/output/imitation.py", $scope.pathString, $scope.inputXML]);
 					process.stderr.on('data',function(chunk){ //debugging info, prints out stuff python puts in stdout
 
 						var textChunk = chunk.toString('utf8');// buffer to string

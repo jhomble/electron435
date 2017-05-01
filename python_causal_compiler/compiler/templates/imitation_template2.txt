@@ -474,7 +474,11 @@ if __name__ == '__main__':
     
     #print('New actions:')
     #for action in new_actions: print(action)
-    
+    f = open('./SMILE-1.1.0/tablesetup/final_actions.txt', 'w')
+    for action in new_actions: 
+        strs=" ".join(str(x) for x in action)
+        f.write(strs + '\n')  # python will convert \n to os.linesep
+    f.close()
     # Simulate new actions
     for action in new_actions:
         action_fun = ops[action[0]]

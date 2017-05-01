@@ -444,7 +444,7 @@
             $scope.generateXML = function () {
                 var util = require("util");
                 var spawn = require("child_process").spawn;
-                var process = spawn('python', [".\\createUserInputXML.py", $scope.createXML]);
+                var process = spawn('python', ["./createUserInputXML.py", $scope.createXML]);
 
                 $scope.createXML = ""
             }

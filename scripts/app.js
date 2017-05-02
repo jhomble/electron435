@@ -303,6 +303,7 @@
                         final = final.slice(0, -1)
                         final = final + ";"
                     });
+                    final = final.slice(0, -1)
                     final = final + " }"
                     console.log(final)
                     return final;

@@ -35,7 +35,7 @@ To clone and run this repository you'll need [Git](https://git-scm.com) and [Nod
 
 ```bash
 # Clone this repository
-$ git clone https://github.com/thomas-barthelemy/electron-angular-boilerplate
+$ git clone https://github.com/jhomble/electron435
 # Go into the repository
 $ cd electron-angular-boilerplate
 # Install dependencies and run the app

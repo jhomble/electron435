@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tabletop xmlns="http://synapse.cs.umd.edu/tabletop-xml" xspan="20" yspan="12">
+  <chain color="red" start="(10, 0, 5)" end="(-10, -1, 4)" linkCount="20"/>
+  <chain color="blue" start="(10, -0.5, 4)" end="(-10, 0, 5)" linkCount="20"/>
+  <chain color="green" start="(10, -1, 4.7)" end="(-10, 0, 3.7)" linkCount="20"/>
+</tabletop>

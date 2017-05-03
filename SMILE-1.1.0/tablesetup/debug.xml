@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><tabletop xmlns="http://synapse.cs.umd.edu/tabletop-xml" xspan="20" yspan="12">
+    
+    
+    
+    
+    
+    
+
+    
+        
+        
+        
+        
+        <composite id="connector" location="(0, 0, 0.51)" rotation="(0, 0, 0)">
+            <block color="gray" location="(0, 0, 0)"/> 
+            
+        
+        
+        
+        
+        
+        
+        
+        <composite id="screwTip" location="(-0.5, 0, 0)" rotation="(0, 90, 0)">
+            <cylinder color="gray" location="(0, 0, -0.112500004)" radius="0.1" rotation="(90, 0, 0)" sides="16" yspan="0.22500001"/>
+            <frustum color="gray" location="(0, 0, -0.26250002)" radiusBottom="0.05" radiusTop="0.1" sides="16" zspan="0.075"/>
+            <guestBondPoint id="screwM" initBondHostId="" initBondTightness="0" location="(0, 0, -0.3)" rotation="(0, 0, 0)" type="ScrewType"/>
+        </composite>
+    
+            
+        
+        
+        
+        
+        
+        
+        
+        <composite id="screwTip" location="(0.5, 0, 0)" rotation="(0, -90, 0)">
+            <cylinder color="gray" location="(0, 0, -0.112500004)" radius="0.1" rotation="(90, 0, 0)" sides="16" yspan="0.22500001"/>
+            <frustum color="gray" location="(0, 0, -0.26250002)" radiusBottom="0.05" radiusTop="0.1" sides="16" zspan="0.075"/>
+            <guestBondPoint id="screwM" initBondHostId="" initBondTightness="0" location="(0, 0, -0.3)" rotation="(0, 0, 0)" type="ScrewType"/>
+        </composite>
+    
+            
+        
+        
+        
+        
+        
+        <composite id="hole" location="(0, -0.5, 0)" rotation="(90, 0, 0)">
+            <frustum color="black" location="(0, 0, 0)" radiusBottom="0.1" radiusTop="0.1" sides="32" zspan="0.02"/>
+            <hostBondPoint id="screwF" location="(0, 0, 0.01)" rotation="(0, 0, 0)" type="ScrewType">
+                <tightness location="(0, 0, -0.10333333)" rotation="(0, 0, 60)"/>
+                <tightness location="(0, 0, -0.20666666)" rotation="(0, 0, 120)"/>
+                <tightness location="(0, 0, -0.31)" rotation="(0, 0, 180)"/>
+            </hostBondPoint>
+        </composite>
+    
+            
+        
+        
+        
+        
+        
+        <composite id="hole" location="(0, 0, 0.5)" rotation="(0, 0, 0)">
+            <frustum color="black" location="(0, 0, 0)" radiusBottom="0.1" radiusTop="0.1" sides="32" zspan="0.02"/>
+            <hostBondPoint id="screwF" location="(0, 0, 0.01)" rotation="(0, 0, 0)" type="ScrewType">
+                <tightness location="(0, 0, -0.10333333)" rotation="(0, 0, 60)"/>
+                <tightness location="(0, 0, -0.20666666)" rotation="(0, 0, 120)"/>
+                <tightness location="(0, 0, -0.31)" rotation="(0, 0, 180)"/>
+            </hostBondPoint>
+        </composite>
+    
+        </composite>
+    
+    
+        
+        
+        
+        
+        <composite id="connector" location="(2, 0, 0.5)" rotation="(0, 0, 0)">
+            <block color="gray" location="(0, 0, 0)"/> 
+            
+        
+        
+        
+        
+        
+        
+        
+        <composite id="screwTip" location="(-0.5, 0, 0)" rotation="(0, 90, 0)">
+            <cylinder color="gray" location="(0, 0, -0.112500004)" radius="0.1" rotation="(90, 0, 0)" sides="16" yspan="0.22500001"/>
+            <frustum color="gray" location="(0, 0, -0.26250002)" radiusBottom="0.05" radiusTop="0.1" sides="16" zspan="0.075"/>
+            <guestBondPoint id="screwM" initBondHostId="" initBondTightness="0" location="(0, 0, -0.3)" rotation="(0, 0, 0)" type="ScrewType"/>
+        </composite>
+    
+            
+        
+        
+        
+        
+        
+        
+        
+        <composite id="screwTip" location="(0.5, 0, 0)" rotation="(0, -90, 0)">
+            <cylinder color="gray" location="(0, 0, -0.112500004)" radius="0.1" rotation="(90, 0, 0)" sides="16" yspan="0.22500001"/>
+            <frustum color="gray" location="(0, 0, -0.26250002)" radiusBottom="0.05" radiusTop="0.1" sides="16" zspan="0.075"/>
+            <guestBondPoint id="screwM" initBondHostId="" initBondTightness="0" location="(0, 0, -0.3)" rotation="(0, 0, 0)" type="ScrewType"/>
+        </composite>
+    
+            
+        
+        
+        
+        
+        
+        <composite id="hole" location="(0, -0.5, 0)" rotation="(90, 0, 0)">
+            <frustum color="black" location="(0, 0, 0)" radiusBottom="0.1" radiusTop="0.1" sides="32" zspan="0.02"/>
+            <hostBondPoint id="screwF" location="(0, 0, 0.01)" rotation="(0, 0, 0)" type="ScrewType">
+                <tightness location="(0, 0, -0.10333333)" rotation="(0, 0, 60)"/>
+                <tightness location="(0, 0, -0.20666666)" rotation="(0, 0, 120)"/>
+                <tightness location="(0, 0, -0.31)" rotation="(0, 0, 180)"/>
+            </hostBondPoint>
+        </composite>
+    
+            
+        
+        
+        
+        
+        
+        <composite id="hole" location="(0, 0, 0.5)" rotation="(0, 0, 0)">
+            <frustum color="black" location="(0, 0, 0)" radiusBottom="0.1" radiusTop="0.1" sides="32" zspan="0.02"/>
+            <hostBondPoint id="screwF" location="(0, 0, 0.01)" rotation="(0, 0, 0)" type="ScrewType">
+                <tightness location="(0, 0, -0.10333333)" rotation="(0, 0, 60)"/>
+                <tightness location="(0, 0, -0.20666666)" rotation="(0, 0, 120)"/>
+                <tightness location="(0, 0, -0.31)" rotation="(0, 0, 180)"/>
+            </hostBondPoint>
+        </composite>
+    
+        </composite>
+    
+    
+        
+        
+        
+        
+        <composite id="connector" location="(-2, 0, 0.5)" rotation="(0, 0, 0)">
+            <block color="gray" location="(0, 0, 0)"/> 
+            
+        
+        
+        
+        
+        
+        
+        
+        <composite id="screwTip" location="(-0.5, 0, 0)" rotation="(0, 90, 0)">
+            <cylinder color="gray" location="(0, 0, -0.112500004)" radius="0.1" rotation="(90, 0, 0)" sides="16" yspan="0.22500001"/>
+            <frustum color="gray" location="(0, 0, -0.26250002)" radiusBottom="0.05" radiusTop="0.1" sides="16" zspan="0.075"/>
+            <guestBondPoint id="screwM" initBondHostId="" initBondTightness="0" location="(0, 0, -0.3)" rotation="(0, 0, 0)" type="ScrewType"/>
+        </composite>
+    
+            
+        
+        
+        
+        
+        
+        
+        
+        <composite id="screwTip" location="(0.5, 0, 0)" rotation="(0, -90, 0)">
+            <cylinder color="gray" location="(0, 0, -0.112500004)" radius="0.1" rotation="(90, 0, 0)" sides="16" yspan="0.22500001"/>
+            <frustum color="gray" location="(0, 0, -0.26250002)" radiusBottom="0.05" radiusTop="0.1" sides="16" zspan="0.075"/>
+            <guestBondPoint id="screwM" initBondHostId="" initBondTightness="0" location="(0, 0, -0.3)" rotation="(0, 0, 0)" type="ScrewType"/>
+        </composite>
+    
+            
+        
+        
+        
+        
+        
+        <composite id="hole" location="(0, -0.5, 0)" rotation="(90, 0, 0)">
+            <frustum color="black" location="(0, 0, 0)" radiusBottom="0.1" radiusTop="0.1" sides="32" zspan="0.02"/>
+            <hostBondPoint id="screwF" location="(0, 0, 0.01)" rotation="(0, 0, 0)" type="ScrewType">
+                <tightness location="(0, 0, -0.10333333)" rotation="(0, 0, 60)"/>
+                <tightness location="(0, 0, -0.20666666)" rotation="(0, 0, 120)"/>
+                <tightness location="(0, 0, -0.31)" rotation="(0, 0, 180)"/>
+            </hostBondPoint>
+        </composite>
+    
+            
+        
+        
+        
+        
+        
+        <composite id="hole" location="(0, 0, 0.5)" rotation="(0, 0, 0)">
+            <frustum color="black" location="(0, 0, 0)" radiusBottom="0.1" radiusTop="0.1" sides="32" zspan="0.02"/>
+            <hostBondPoint id="screwF" location="(0, 0, 0.01)" rotation="(0, 0, 0)" type="ScrewType">
+                <tightness location="(0, 0, -0.10333333)" rotation="(0, 0, 60)"/>
+                <tightness location="(0, 0, -0.20666666)" rotation="(0, 0, 120)"/>
+                <tightness location="(0, 0, -0.31)" rotation="(0, 0, 180)"/>
+            </hostBondPoint>
+        </composite>
+    
+        </composite>
+    
+</tabletop>

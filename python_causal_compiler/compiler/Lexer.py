@@ -188,7 +188,7 @@ class Lexer(object):
 			if self.current_char == '|' and self.peek() == '|':
 				self.advance()
 				self.advance()
-				return Token(AND, '||')			
+				return Token(OR, '||')			
 
 			if self.current_char == ':':
 				self.advance()

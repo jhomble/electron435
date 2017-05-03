@@ -1,1 +1,9 @@
-tabletop,xspan,20,yspan,12:block,id,RedBlock,xspan,1,yspan,1,zspan,1,location,1.9994404,-3.0177548,0.50036395,rotation,-0.04983028,-0.06965088,-15.614626,color,red,mass,1:cylinder,radius,1,yspan,1,location,0,0.5,0.5:sphere,id,BigOlSphere,radius,1,location,0,0,0.5,color,red,mass,1,rotation,0.5,0.5,0.5:box,id,BoxerBriefs,location,0,0,0.5,color,black,mass,5,thickness,56,xspan,1,yspan,1,zspan,1:custom,id,teapot,color,green,scale,0.05,location,0,0,0,rotation,-90,0,-90,file,tablesetup/stl/Teapot.stl:composite,id,comp,location,0,0,3,rotation,0,0,0,mass,0.1,composite,id,comp2,location,1,1,1,rotation,2,2,2,mass,0.5,custom,color,green,scale,0.05,location,0,0,0,rotation,-90,0,0,file,tablesetup/stl/Teapot.stl,block,xspan,2,yspan,2,zspan,2,location,0,0,-1,rotation,0,0,0,color,red
+tabletop,xspan,20,yspan,12
+include,tablesetup/def-room.xml
+include,tablesetup/def-forklift.xml
+instance,room,var,rotation,0,0,270
+instance,forklift,var,rotation,0,0,0,var,location,0,0,0.25
+block,xspan,0.5,yspan,0.5,zspan,0.5,id,crate4,location,-1.5,0.0,0.25,rotation,0,0,0
+block,xspan,0.5,yspan,0.5,zspan,0.5,id,crate1,location,1.5,1.5,0.25,rotation,0,0,0
+block,xspan,0.5,yspan,0.5,zspan,0.5,id,crate3,location,0.0,1.5,0.25,rotation,0,0,0
+block,xspan,0.5,yspan,0.5,zspan,0.5,id,crate2,location,-1.5,1.5,0.25,rotation,0,0,0

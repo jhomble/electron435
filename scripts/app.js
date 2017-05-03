@@ -79,6 +79,11 @@
                 templateUrl: 'scripts/home/final.html'
             }
         })
+        .directive('builderReview', function () {
+            return {
+                templateUrl: 'scripts/home/builderReview.html'
+            }
+        })
 
         .controller('homeController', ['$scope', '$window', function ($scope, $window) {
             $(document).ready(function () {
@@ -92,6 +97,7 @@
                 $scope.preview = false;
                 $scope.review = false;
                 $scope.finalPage = false;
+                $scope.builderReview = false;
 
                 $scope.knowledgeAdded = false;
                 $scope.run = false
@@ -100,7 +106,6 @@
                 $scope.error = ""
                 $scope.createXML = ""
 
-                $scope.inputBuilder = true;
 
                 var reset = function () {
                     $scope.inputTask = false;
@@ -114,6 +119,7 @@
                     $scope.review = false;
                     $scope.xmlPage = false;
                     $scope.finalPage = false;
+                    $scope.builderReview = false;
                 }
                 $scope.showInputTask = function () {
                     reset();
@@ -165,6 +171,11 @@
                 $scope.showFinal = function () {
                     reset()
                     $scope.finalPage = true;
+                }
+
+                $scope.showBuilderReview = function(){
+                    reset()
+                    $scope.builderReview = true;
                 }
 
                 $scope.startOver = function () {
@@ -227,33 +238,6 @@
                     }
                 ]
 
-                $scope.buildString = function () {
-                    var final = "RULES { "
-                    $scope.knowledge.forEach(function (cause) {
-                        if (cause.relationship.type === "Conditional") {
-                            final = final + "if(" + cause.relationship.condition + "):"
-                        }
-                        final = final + cause.cause + "("
-                        cause.parameters.forEach(function (param) {
-                            final = final + param.param + ","
-                        });
-                        final = final.slice(0, -1)
-                        final = final + ") := "
-                        cause.actions.forEach(function (action) {
-                            final = final + action.action + "("
-                            action.params.forEach(function (param) {
-                                final = final + param.value + ","
-                            });
-                            final = final.slice(0, -1)
-                            final = final + "),"
-                        });
-                        final = final.slice(0, -1)
-                        final = final + ";"
-                    });
-                    final = final + " }"
-                    console.log(final)
-					return final;
-                }
 
                 $scope.addCause = function () {
                     var item = {
@@ -309,6 +293,15 @@
                     return final;
                 }
 
+                $scope.downloadContent = function() {
+                    var atag = document.createElement("a");
+                    var content = $scope.buildString();
+                    var file = new Blob([content], {type: 'text/plain'});
+                    atag.href = URL.createObjectURL(file);
+                    atag.download = $scope.inputtedTask + "_knowledge.txt";
+                    atag.click();
+                }
+
                 $scope.removeCausalParameter = function (index) {
                     $scope.knowledge[index].parameters.pop()
                 }
@@ -351,7 +344,6 @@
                     console.log(file)
                     $scope.knowledgeFile = { name: file.name, path: file.path }
 					
-                    $scope.inputBuilder = false;
                     $scope.$apply()
                 }
 
@@ -375,15 +367,6 @@
                 }
                 $scope.$apply()
 
-            }
-
-            $scope.addKnowledge = function (element) {
-                $scope.knowledgeAdded = true
-                var file = element.files[0]
-                console.log(file)
-                $scope.knowledgeFile = { name: file.name, path: file.path }
-                $scope.inputBuilder = false;
-                $scope.$apply()
             }
 
             $scope.XMLInput = function (element) {
@@ -410,21 +393,16 @@
                 var util = require("util");
                 var spawn1 = require("child_process").spawn;
                 //var process1 = spawn('python',["final_imitation.py",$scope.pathString,$scope.inputXML,test]);
-                if ($scope.inputBuilder) {
-                    //use string from builder
-					console.log("through gui")
-					//var x = "RULES{move-to(obj, dest, dx, dy, dz, da) := grasp(obj), release(obj, dest, dx, dy, dz, da);if (TYPE(obj)=block):stack(dest, dx, dy, dz, da, obj) := move-to(obj, dest, dx, dy, dz, da);if (TYPE(obj1) = block && obj = obj1):stack(dest, dx, dy, dz, da, obj1, obj2, obj3, CONT3) := move-to(obj, dest, dx, dy, dz, da), stack(obj1, 0, 0, .5, 0, obj2, obj3, CONT2);if (ALL(block)=[obj1, CONT1] && dest = 'room'):stack-all(dx, dy, dz, da) := stack(dest, dx, dy, dz, da, obj1, CONT1)}"
-                    var process1 = spawn1('python', ["./python_causal_compiler/compiler/run.py", $scope.buildString()]);
-                } else {
-                    console.log("I am calling run.py");
-                    var process1 = spawn1('python', ["./python_causal_compiler/compiler/run.py",$scope.knowledgeFile.path, "Dummy"])
-					process1.stderr.on('data',function(chunk){ //debugging info, prints out stuff python puts in stdout
+                
+                console.log("I am calling run.py");
+                var process1 = spawn1('python', ["./python_causal_compiler/compiler/run.py",$scope.knowledgeFile.path, "Dummy"])
+                process1.stderr.on('data',function(chunk){ //debugging info, prints out stuff python puts in stdout
 
-						var textChunk = chunk.toString('utf8');// buffer to string
+                    var textChunk = chunk.toString('utf8');// buffer to string
 
-						util.log(textChunk);
-					});
-                }
+                    util.log(textChunk);
+                });
+                
                 setTimeout(function () {
 					console.log("Calling imitation")
                     var process = spawn1('python', ["./python_causal_compiler/compiler/output/imitation.py", $scope.pathString, $scope.inputXML]);
@@ -442,10 +420,18 @@
 
             }
 
+            $scope.createXmlFile = function (element) {
+                var file = element.files[0]
+                $scope.createdXML = ""
+                $scope.createdXML = file.path
+                $scope.createXML = { name: file.name, path: file.path }
+                $scope.$apply()
+            }
+
             $scope.generateXML = function () {
                 var util = require("util");
                 var spawn = require("child_process").spawn;
-                var process = spawn('python', ["./createUserInputXML.py", $scope.createXML]);
+                var process = spawn('python', ["./createUserInputXML.py", $scope.createXML.path]);
 
                 $scope.createXML = ""
             }

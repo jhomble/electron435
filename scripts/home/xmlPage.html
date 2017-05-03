@@ -11,8 +11,12 @@
                     <div style="text-align: center">
                         <h3>Type in the XML Parameters</h3>
                         <h4>XML file will be loaded to the current directory</h4>
-                        <div class="ui input">
-                            <input type="text" ng-model="createXML" placeholder="Enter XML Attributes">
+                        <label class="ui icon button">
+                            <i class="upload icon"></i>
+                            Open File <input type="file" hidden ng-model-instant id="fileToUpload" onchange="angular.element(this).scope().createXmlFile(this)">
+                        </label>
+                        <div>
+                            <h4 ng-bind="createXML.name"></h4>
                         </div>
                         <button class="ui green button" ng-click="generateXML()">Generate</button>
                         <br>

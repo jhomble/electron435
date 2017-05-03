@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tabletop xmlns="http://synapse.cs.umd.edu/tabletop-xml" xspan="20" yspan="12">
+    <include file="tablesetup/def-dock.xml"/>
+    <instance def="dockdrawer">
+        <var name="x" value="-5"/>
+        <var name="y" value="-2"/>
+        <!-- states: 0 (green), 1 (none), 2 (red), 3 (none) -->
+        <var name="dockControlState0" value="0"/><!-- nearest control -->
+        <var name="dockControlState1" value="0"/>
+        <var name="dockControlState2" value="2"/>
+        <var name="dockControlState3" value="0"/><!-- farthest control -->
+    </instance>
+
+    <include file="tablesetup/def-cartridge.xml"/>
+    <instance def="cartridge">
+        <var name="id" value="c1"/>
+        <var name="location" value="(-5.76,-3.2,2.228)"/>
+        <var name="topColor" value="green"/>
+    </instance>
+    <instance def="cartridge">
+        <var name="id" value="c2"/>
+        <var name="location" value="(-5.76,-2.4,2.228)"/>
+        <var name="topColor" value="red"/>
+    </instance>
+    <instance def="cartridge">
+        <var name="id" value="c3"/>
+        <var name="location" value="(-5.76,-1.6,2.228)"/>
+        <var name="topColor" value="cyan"/>
+    </instance>
+    <instance def="cartridge">
+        <var name="id" value="c4"/>
+        <var name="location" value="(-5.76,-0.8,2.228)"/>
+        <var name="topColor" value="magenta"/>
+    </instance>
+    <instance def="cartridge">
+        <var name="id" value="c5"/>
+        <var name="location" value="(5.76,-0.8,2.228)"/>
+        <var name="topColor" value="yellow"/>
+    </instance>
+</tabletop>

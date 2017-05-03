@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tabletop xmlns="http://synapse.cs.umd.edu/tabletop-xml" xspan="20" yspan="12">
+    <include file="tablesetup/def-lidbox.xml"/>
+    <instance def="lidbox">
+        <var name="rocation" value="(90, 0, 90)"/>
+        <var name="location" value="(0, 0, 2.7)"/>
+        <var name="xspan" value="4"/>
+        <var name="yspan" value="6"/>
+        <var name="zspan" value="3"/>
+        <var name="thickness" value="0.3"/>
+    </instance>
+    <block location="(1, 0, 6)" rotation="(0, 15, 15)" color="yellow"/>
+    <block location="(-1, 0, 6)" rotation="(0, 15, -45)" color="orange"/>
+</tabletop>

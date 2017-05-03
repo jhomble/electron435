@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tabletop xmlns="http://synapse.cs.umd.edu/tabletop-xml">
+    <def name="lid">
+        <var name="id" value="lid"/>
+        <var name="mass" value="1"/>
+        <var name="location" value="(0, 0, 0.1)"/>
+        <var name="rotation" value="(0, 0, 0)"/>
+        <var name="xspan" value="6"/>
+        <var name="yspan" value="4"/>
+        <var name="thickness" value="0.2"/>
+        <var name="color" value="red"/>
+        <var name="handleXspan" value="1"/>
+        <var name="handleYspan" value="2"/>
+        <var name="handleZspan" value="0.5"/>
+        <var name="handleThickness" value="0.3"/>
+        <var name="handleColor" value="green"/>
+        <composite id="$id$" location="$location$" rotation="$rotation$" mass="$mass$">
+            <block location="(0, 0, 0)" xspan="$xspan$" yspan="$yspan$" zspan="$thickness$" color="$color$"/>
+            <box location="(0, 0, $(handleZspan+thickness)/2$)" xspan="$handleXspan$" yspan="$handleYspan$" zspan="$handleZspan$"
+                thickness="$handleThickness$" color="$handleColor$"/>
+        </composite>
+    </def>
+</tabletop>
+

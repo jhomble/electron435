@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tabletop xmlns="http://synapse.cs.umd.edu/tabletop-xml">
+    <def name="forklift">
+        <var name="id" value="forklift"/>
+        <var name="mass" value="2"/>
+        <var name="xspan" value="1"/>
+        <var name="yspan" value=".75"/>
+        <var name="zspan" value=".5"/>
+        <var name="color" value="darkgray"/>
+        <var name="location" value="(0, 0, $zspan/2$)"/>
+        <var name="rotation" value="(0, 0, 0)"/>
+        <composite id="$id$" location="$location$" rotation="$rotation$" mass="$mass$">
+            <description name="shape" value="forklift"/>
+            <box id="$id$Chassis" location="(0, 0, 0)" xspan="$xspan$" yspan="$yspan$" zspan="$zspan$" color="$color$"/>
+            <cylinder id="$id$Wheel1" location="($xspan/4$, $yspan/2$, 0)" radius="$xspan/4$" yspan="$yspan/6$" color="black"/>
+            <cylinder id="$id$Wheel2" location="($-xspan/4$, $yspan/2$, 0)" radius="$xspan/4$" yspan="$yspan/6$" color="black"/>
+            <cylinder id="$id$Wheel3" location="($xspan/4$, $-yspan/2$, 0)" radius="$xspan/4$" yspan="$yspan/6$" color="black"/>
+            <cylinder id="$id$Wheel4" location="($-xspan/4$, $-yspan/2$, 0)" radius="$xspan/4$" yspan="$yspan/6$" color="black"/>
+            <block id="$id$Lift1" location="($xspan/2$,$yspan*3/8$,$zspan$)" xspan="$yspan/8$" yspan="$yspan/4$" zspan="$zspan*3$" color="$color$"/>
+            <block id="$id$Lift2" location="($xspan/2$,$-yspan*3/8$,$zspan$)" xspan="$yspan/8$" yspan="$yspan/4$" zspan="$zspan*3$" color="$color$"/>
+                <block id="$id$Prong1" location="($xspan$,$yspan*3/8$,0)" xspan="$xspan$" yspan="$yspan/4$" zspan="$yspan/8$" color="black"/>
+                <block id="$id$Prong1" location="($xspan$,$-yspan*3/8$,0)" xspan="$xspan$" yspan="$yspan/4$" zspan="$yspan/8$" color="black"/>
+        </composite>
+    </def>
+</tabletop>

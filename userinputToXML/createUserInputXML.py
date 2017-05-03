@@ -20,7 +20,7 @@ def simpleTypeXML(xmlfile, obj_type, tabs, **kwargs) :
 	# write to xml all attributes present in kwargs; if not present, default values will be inferred by SMILE for attribute
 	xml = xmlfile
 	obj_type = obj_type
-	
+
 	xml.write('\t'*tabs + '<%s location = "(%s,%s,%s)"'%(obj_type, kwargs["location"][0],kwargs["location"][1],kwargs["location"][2]))
 	# use tabs counter to indent appropriately in case simpleType object is child of composite object
 	# writes type of simple object (block, cylinder, sphere, box, or custom) and location attribute since always present
@@ -73,8 +73,9 @@ def compositeXML(xmlfile, tabs, child_type, **kwargs) :
 		xml.write(' id="%s"'%kwargs["id"])
 	if "rotation" in kwargs :
 		xml.write(' rotation="(%s,%s,%s)"'%tuple(kwargs["rotation"]))
-	if "mass" in kwargs :
-		xml.write(' mass="%s"'%kwargs["mass"])
+	#if "mass" in kwargs :
+
+	#	xml.write(' mass="%s"'%kwargs["mass"])
 
 	xml.write('>\n')
 	# end composite parent element and add new line
@@ -154,27 +155,27 @@ def createSimpleDictionary(line_list) :
 		exit(1)
 	return line_dict
 
-def createUserInputXML(string_input, file_path_output) :
+def createUserInputXML(file_path_input, file_path_output) :
 	with open(file_path_output,'w') as xml :
 		xml.write('<?xml version="1.0" encoding="UTF-8"?>\n')
 		xml.write('<tabletop xmlns="http://synapse.cs.umd.edu/tabletop-xml" ')
-		text = string_input.split(':')
-		for line in text :
-			# read string input from command line
-			line_list = line.strip().split(',')
-			if line_list[0] == 'tabletop' :
-				xml.write('xspan="%s" yspan="%s">\n'%(line_list[2],line_list[4]))
-				#first line is tabletop specifications, allows user to set size of facility layout; root element of xml
-			elif line_list[0] == 'composite' :
-				child_type, comp_dict = createCompositeDictionary(line_list[1:])
-				compositeXML(xml,1,child_type,**comp_dict)
-			elif line_list[0] == 'include' :
-				xml.write('\t<%s file="%s"/>\n'%tuple(line_list))
-			elif line_list[0] == 'instance' :
-				instanceXML(xml,line_list)
-			else :
-				line_dict = createSimpleDictionary(line_list)
-				simpleTypeXML(xml,line_list[0],1,**line_dict)
+		with open(file_path_input,'r') as text :
+			for line in text :
+				# read string input from command line
+				line_list = line.strip().split(',')
+				if line_list[0] == 'tabletop' :
+					xml.write('xspan="%s" yspan="%s">\n'%(line_list[2],line_list[4]))
+					#first line is tabletop specifications, allows user to set size of facility layout; root element of xml
+				elif line_list[0] == 'composite' :
+					child_type, comp_dict = createCompositeDictionary(line_list[1:])
+					compositeXML(xml,1,child_type,**comp_dict)
+				elif line_list[0] == 'include' :
+					xml.write('\t<%s file="%s"/>\n'%tuple(line_list))
+				elif line_list[0] == 'instance' :
+					instanceXML(xml,line_list)
+				else :
+					line_dict = createSimpleDictionary(line_list)
+					simpleTypeXML(xml,line_list[0],1,**line_dict)
 
 		xml.write('</tabletop>\n')
 		xml.close()
@@ -189,7 +190,6 @@ def instanceXML(xmlfile, line_list) :
 			if line_list[i] == 'var' :
 				# goes thru each var element series in list and prints out corresponding xml line
 				if line_list[i+1] == 'location' or line_list[i+1] == 'rotation' :
-					print (line_list[i+2:i+5])
 					xml.write('\t\t<var name="%s" value="%s"/>\n'%(line_list[i+1],str(tuple([float(line_list[i+2]),float(line_list[i+3]),float(line_list[i+4])]))))
 					i = i + 5
 				else :

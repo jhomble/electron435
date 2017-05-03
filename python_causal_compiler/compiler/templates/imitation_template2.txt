@@ -479,10 +479,23 @@ if __name__ == '__main__':
         strs=" ".join(str(x) for x in action)
         f.write(strs + '\n')  # python will convert \n to os.linesep
     f.close()
+
+    # make directory to place intermediate XML states in; state of environment after each pyhop task
+    if not os.path.exists('./SMILE-1.1.0/tablesetup/imitation_XMLs') :
+        os.makedirs('./SMILE-1.1.0/tablesetup/imitation_XMLs')
+
+    i = 1
     # Simulate new actions
     for action in new_actions:
         action_fun = ops[action[0]]
         state = action_fun(state, *action[1:])
+        # creates unique name composed of task step # and action being performed
+        state_xml_name = '%d_%s.xml'%(i,action[0])
+        i += 1
+        toXML(state.objs, './SMILE-1.1.0/tablesetup/imitation_XMLs/'+state_xml_name, filepaths, tabletop_specs, xmlinfo, varinfo)
+
+
+
 
     # Print and export final state after new actions are performed
     #print('Resulting state:')

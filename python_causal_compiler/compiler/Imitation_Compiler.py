@@ -144,13 +144,16 @@ class Imitation_Compiler(NodeVisitor):
 				arg = action[1][a]
 				# Handle the special case of the CONT keyword
 				if arg[:4] == 'CONT':
+					print('Handling CONT Args: '+str(arg))					
 					# create a dictionary for act_name intention
 					# in the method_var_equivs if it's not there
 					if not act_name in self.method_var_equivs:
 						self.method_var_equivs[act_name] = {}
-					prev_arg = action[1][a-1]
+					index = a - int(arg[4:])
+					prev_arg = action[1][index]
 					# adjust arg name to avoid collisions
 					arg = arg + "-" + prev_arg
+					print('Argument: '+str(arg))
 					self.method_var_equivs[act_name][arg] = prev_arg					
 				# use hashtag notation to indicate arg_name to be replaced
 				ret += '#'+arg + ','
@@ -174,13 +177,15 @@ class Imitation_Compiler(NodeVisitor):
 					arg = intention_Args[a]
 					# handle CONT keyword
 					if arg[:4] == 'CONT':
+						print('Handling CONT Args: '+str(arg))
 						# Get argument referenced by CONT number
 						index = a - int(arg[4:])
 						prev_arg = args[index]
 						# iterate through intention args coming after the first item
 						# referenced by the CONT
-						for i in range(index, len(intention_Args)):
+						for i in range(index, len(intention_Args)-1):
 							prev_arg_2 = intention_Args[i]
+							print("Previous Arg: "+str(prev_arg_2))
 							# check if there's an entry yet for this intention
 							if not act_name in self.method_var_equivs:
 								self.method_var_equivs[act_name] = {}
@@ -541,7 +546,9 @@ class Imitation_Compiler(NodeVisitor):
 			int_dict = self.method_var_equivs[intent]
 			# iterate through the variables in the method_var_equivs at a 
 			# given intention
+			print('Intention: '+str(intent))			
 			for var in int_dict:
+				print('int_dict['+str(var)+'] = '+str(int_dict[var]))
 				# Only make changes if one of the vars is CONT
 				if 'CONT' in var:
 					# Check for/update value mapped to CONT and update it
@@ -551,8 +558,18 @@ class Imitation_Compiler(NodeVisitor):
 						new_index = int(old_index)+1
 						cont_offset = int(var[4:var.find('-')])
 						new_index = str(new_index - cont_offset)
-						new_val = ')+tuple('+old_val.replace(old_index+']', new_index+':]')
+						# new_val = ')+tuple('+old_val.replace(old_index+']', new_index+':]')
+						new_val = ')+tuple('+old_val.replace(']', ':]')
+						print('Replacing '+str(old_val)+' with '+str(new_val))						
 						self.method_var_equivs[intent][var] = new_val
+
+		for intent in self.method_var_equivs:
+			int_dict = self.method_var_equivs[intent]
+			# iterate through the variables in the method_var_equivs at a 
+			# given intention
+			print('Intention: '+str(intent))			
+			for var in int_dict:
+				print('int_dict['+str(var)+'] = '+str(int_dict[var]))
 
 		# Iterate through each intention in the methods dictionary
 		for intention in self.methods_dict:
@@ -579,6 +596,7 @@ class Imitation_Compiler(NodeVisitor):
 					for var in self.method_var_equivs[intention]:
 						# Handle CONT keyword
 						if 'CONT' in var and var in ret:
+							print('VAR: '+str(var))
 							cont_offset = int(var[4:var.find('-')]) + 1
 							temp_ret = ret
 							temp_ret = temp_ret.split('#'+var)

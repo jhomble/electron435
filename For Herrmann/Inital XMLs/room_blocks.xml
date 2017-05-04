@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tabletop xmlns="http://synapse.cs.umd.edu/tabletop-xml" xspan="20" yspan="12">
+<include file="tablesetup/def-room.xml"/>
+<include file="tablesetup/def-forklift.xml"/>
+<instance def="room">
+<var name="rotation" value="(0,0,0)"/>
+</instance>
+<block xspan=".5" yspan=".5" zspan=".5" id="crate1" location="(-4,1.5,0.25)" rotation="(0,0,0)"/>
+<block xspan=".5" yspan=".5" zspan=".5" id="crate2" location="(-7,1.5,0.25)" rotation="(0,0,0)"/>
+<block xspan=".5" yspan=".5" zspan=".5" id="crate3" location="(-7,0,0.25)" rotation="(0,0,0)"/>
+</tabletop>

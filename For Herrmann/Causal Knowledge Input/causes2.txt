@@ -1,0 +1,9 @@
+RULES {
+	move-to(obj, dest, dx, dy, dz, da) := grasp(obj), release(obj, dest, dx, dy, dz, da);
+	if (TYPE(obj)=block): 
+		movehelp(dest, dx, dy, dz, da, obj) := move-to(obj, dest, dx, dy, dz, da);
+	if (TYPE(obj1) = block && obj = obj1): 
+		movehelp(dest, dx, dy, dz, da, obj1, obj2, obj3, CONT3) := move-to(obj, dest, dx, dy, dz, da), movehelp(obj1, 1, 0, 0, 0, obj2, obj3, CONT2);
+	if (ALL(block)=[obj1, CONT1] && dest = 'room'):
+		moveall(dx, dy, dz, da) := movehelp(dest, dx, dy, dz, da, obj1, CONT1)
+}

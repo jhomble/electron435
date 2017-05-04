@@ -287,7 +287,6 @@ class Parser(object):
 	#
 	# stmt -> cond caus
 	def stmt(self):
-		print('STMT')
 		node1 = self.cond()
 		node2 = self.caus()
 
@@ -395,7 +394,6 @@ class Parser(object):
 		node1 = None;
 		node2 = None;
 		token = None;
-		print('BOOLS')
 		if self.current_token.type == LPAREN:
 			self.eat(LPAREN)
 			node1 = self.bools();
@@ -425,97 +423,10 @@ class Parser(object):
 
 		return node
 
-	## BoolsAnd
-	#
-	# boolsAnd -> boolsOr (AND boolsOr)*
-	def boolsAnd(self):
-		paren = ''
-
-		while self.current_token.type == LPAREN:
-			self.eat(LPAREN)
-			self.paren_balance += 1
-			paren += '('
-
-		node = self.boolsOr()
-
-		# while self.current_token.type == RPAREN:
-		# 	if self.paren_balance > 0:
-		# 		print('AND HERE 2')
-		# 		self.eat(RPAREN)
-		# 		self.paren_balance -= 1
-		# 		paren += ')'
-		# 	else:
-		# 		break
-
-		while self.current_token.type == AND:
-			token = self.current_token
-			self.eat(AND)
-
-			while self.current_token.type == LPAREN or self.current_token.type == RPAREN:
-				if self.current_token.type == LPAREN:
-					self.eat(LPAREN)
-					self.paren_balance += 1
-					paren += '('
-				# if self.current_token.type == RPAREN:
-				# 	if self.paren_balance > 0:
-				# 		print('AND HERE 4')
-				# 		self.eat(RPAREN)
-				# 		self.paren_balance -= 1
-				# 		paren += ')'
-
-			node = BoolExpr(paren = paren, left=node, op=token, right=self.boolsOr())
-			paren = ''
-
-		return node
-
-	## BoolsOr
-	#
-	# boolsOr -> boolean (OR boolean)*
-	def boolsOr(self):
-		paren = ''
-
-		# while self.current_token.type == LPAREN:
-		# 	print('OR HERE 1')
-		# 	self.eat(LPAREN)
-		# 	self.paren_balance += 1
-		# 	paren += '('
-
-		node = self.boolean()
-
-		while self.current_token.type == RPAREN:
-			if self.paren_balance > 0:
-				self.eat(RPAREN)
-				self.paren_balance -= 1
-				paren += ')'
-			else:
-				break
-
-		while self.current_token.type == OR:
-			token = self.current_token
-			self.eat(OR)
-
-			while self.current_token.type == LPAREN or self.current_token.type == RPAREN:
-				# if self.current_token.type == LPAREN:
-				# 	print('OR HERE 3')
-				# 	self.eat(LPAREN)
-				# 	self.paren_balance += 1
-				# 	paren += '('
-				if self.current_token.type == RPAREN:
-					if self.paren_balance > 0:
-						self.eat(RPAREN)
-						self.paren_balance -= 1
-						paren += ')'
-
-			node = BoolExpr(paren=paren, left=node, op=token, right=self.boolean())
-			paren = ''
-
-		return node
-
 	## Boolean
 	#
 	# boolean -> expr EQUALS expr
 	def boolean(self):
-		print('BOOLEAN')
 		node1 = self.expr()
 		if self.current_token.type == EQUALS :
 			token = self.current_token
@@ -546,7 +457,6 @@ class Parser(object):
 	#		  | TYPE LPAREN var RPAREN
 	#		  | QUOTE var QUOTE
 	#		  | LBRACK args RBRACK
-	#		  | LPAREN boolsAnd RPAREN
 	def expr(self):
 		if self.current_token.type == ALL:		
 			self.eat(ALL)
@@ -567,10 +477,6 @@ class Parser(object):
 			self.eat(LBRACK)
 			node = self.args()
 			self.eat(RBRACK)
-		# elif self.current_token.type == LPAREN:		
-		# 	self.eat(LPAREN)
-		# 	node = self.boolsAnd
-		# 	self.eat(RPAREN)
 		else:
 			node = self.var()
 
@@ -608,11 +514,6 @@ class Parser(object):
 	#            | INTEGER
 	def integer(self):
 		root = Int()
-
-		# NOT SURE WHY I THOUGHT I NEED THIS
-		# IF THERE ARE ERRORS LOOK HERE!
-		#node = Digit(self.current_token.value)
-		#root.digits.append(node)
 
 		while self.current_token.type == INTEGER:
 			root.digits.append(Digit(self.current_token.value))

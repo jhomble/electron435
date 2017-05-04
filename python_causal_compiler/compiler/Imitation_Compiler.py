@@ -144,7 +144,6 @@ class Imitation_Compiler(NodeVisitor):
 				arg = action[1][a]
 				# Handle the special case of the CONT keyword
 				if arg[:4] == 'CONT':
-					print('Handling CONT Args: '+str(arg))					
 					# create a dictionary for act_name intention
 					# in the method_var_equivs if it's not there
 					if not act_name in self.method_var_equivs:
@@ -153,7 +152,6 @@ class Imitation_Compiler(NodeVisitor):
 					prev_arg = action[1][index]
 					# adjust arg name to avoid collisions
 					arg = arg + "-" + prev_arg
-					print('Argument: '+str(arg))
 					self.method_var_equivs[act_name][arg] = prev_arg					
 				# use hashtag notation to indicate arg_name to be replaced
 				ret += '#'+arg + ','
@@ -177,7 +175,6 @@ class Imitation_Compiler(NodeVisitor):
 					arg = intention_Args[a]
 					# handle CONT keyword
 					if arg[:4] == 'CONT':
-						print('Handling CONT Args: '+str(arg))
 						# Get argument referenced by CONT number
 						index = a - int(arg[4:])
 						prev_arg = args[index]
@@ -185,7 +182,6 @@ class Imitation_Compiler(NodeVisitor):
 						# referenced by the CONT
 						for i in range(index, len(intention_Args)-1):
 							prev_arg_2 = intention_Args[i]
-							print("Previous Arg: "+str(prev_arg_2))
 							# check if there's an entry yet for this intention
 							if not act_name in self.method_var_equivs:
 								self.method_var_equivs[act_name] = {}
@@ -214,7 +210,62 @@ class Imitation_Compiler(NodeVisitor):
 	#
 	# Return None when there is no conditional
 	def visit_NoCond(self,node):
+		self.methods_dict[self.intention][1].append(None)
 		return None
+
+	## Listify Boolean Expression
+	#
+	#  Converts a boolean expression in the tuplized form (see 
+	#  visit_BoolExpr return) into a list of the form [a,b,c,...]
+	#  where a,b,c,... are conjunctions. The commas represent disjunctions.
+	#  Parsing the boolean expressions in this matter allows us to 
+	#  properly evaluate 'or' expressions.
+	#
+	#  @rtype: (Tuple List) List
+	def listify_BoolExpr(self, cond):
+		new_conds = []
+
+		if not cond:
+			return []
+
+		if cond[0] == 'UNIT':
+			# Return single statement as is, nested in two lists
+			new_conds.append([cond])
+		else:
+			# Check if the first value in the tuple is a boolean
+			# if so, remove the boolean and evaluate appropriately
+			if isinstance(cond[0], bool):
+				# If the boolean is surrounded by parentheses
+				# evaluate it as a whole
+				if (cond[0]):
+					return self.listify_BoolExpr(cond[1:])
+				else:
+					# otherwise just cut of the first tuple val					
+					cond = cond[1:]
+
+			# left = evaluate the left-most value (this language is
+			#        right associative by default)
+			left = self.listify_BoolExpr(cond[0])
+
+			# Evaluate the rest of the conditions if there are any
+			if len(cond) > 1:
+				op = cond[1]
+				right = self.listify_BoolExpr([cond[2:]])
+				if (op == 'and'):
+					# iterate through each list and append the concatenation
+					# of each sublist of left and right
+					#    i.e. if left = [[a],[b] and right = [[c],[d]]
+					#		     output = [[a,c],[a,d],[b,c],[b,d]]
+					for a in left:
+						for b in right:							
+							new_conds.append(a+b)
+				elif (op == 'or'):
+					# for or just concatenate the lists
+					new_conds = left+right
+			else:
+				new_conds = left
+
+		return new_conds
 
 	## Traverse Boolean Expression
 	#
@@ -224,8 +275,6 @@ class Imitation_Compiler(NodeVisitor):
 	def traverse_BoolExpr(self, cond):
 		# if cond[1] is one of the comparative operators than we
 		# know there is only one boolean statement (no && or ||)
-
-		print('Traversing: '+str(cond))
 
 		if not cond:
 			return '', ''
@@ -248,13 +297,11 @@ class Imitation_Compiler(NodeVisitor):
 			#		see in the code below
 			op = 'if'
 			if isinstance(cond[0], bool):
-				'TODO'
 				body, if_stmt = self.traverse_BoolExpr(cond[1:])
 				if_stmt = if_stmt.replace('if ', 'if (')
 				if_stmt = if_stmt.replace(':\n', '):\n')				
 			else:
 				body, if_stmt = self.traverse_BoolExpr(cond[0])
-				print('COND: '+str(cond))
 				body2 = if_stmt2 = ''
 				if len(cond) > 1:
 					op = cond[1]
@@ -274,6 +321,22 @@ class Imitation_Compiler(NodeVisitor):
 
 		return body, if_stmt
 
+
+	## Develop And Expression
+	#
+	#  Takes in a list of boolean expressions and returns the 'AND'
+	#  tuple of each element. The input is the same form as the output 
+	#  of the listify_BoolExpr function.
+	#
+	#  @rtype: Tuple
+	def develop_and_expr(self, exprList):
+		if len(exprList) == 0:
+			return None
+		elif len(exprList) == 1:
+			return exprList[0]
+		else:
+			return False, exprList[0], 'and', self.develop_and_expr(exprList[1:])
+
 	## Visit Conditional
 	#
 	#  Return the result of evaluating the boolean expression
@@ -281,6 +344,12 @@ class Imitation_Compiler(NodeVisitor):
 		result = ''
 
 		boolean = self.visit(node.boolean)
+
+		bools_listified = self.listify_BoolExpr(boolean)
+
+		bool_list = []
+		for and_expr in bools_listified:
+			bool_list.append(self.develop_and_expr(and_expr))
 
 		# Comparative Operators in Custom Language
 		comps = ['==', '<', '>', '<=', '>=']
@@ -295,45 +364,19 @@ class Imitation_Compiler(NodeVisitor):
 		body = ''
 		paren = ''
 
-		# Only evaluate conditional if there are any
-		if boolean:
-			body, if_stmt = self.traverse_BoolExpr(boolean)
-			# # if boolean[1] is one of the comparative operators than we
-			# # know there is only one boolean statement (no && or ||)
-			# if boolean[1] in comps:
-			# 	body, if_stmt = self.compile_bool(boolean, '', '')
-			# else:
-			# 	# op  = the previous operand (either && or ||). It 
-			# 	#  		starts as 'if' for convenience sake as you'll
-			# 	#		see in the code below
-			# 	op = 'if'
-			# 	# Go through each boolean statement
-			# 	for i in range(0, len(boolean)):
-			# 		# change the operand appropriately to reflect which op it is
-			# 		if len(boolean[i]) > 0:
-			# 			if boolean[i] == ')' or boolean[i][0] == '(':
-			# 				paren += boolean[i]
-			# 			else:
-			# 				if boolean[i] == '&&':
-			# 					op = 'and'
-			# 				elif boolean[i] == '||':
-			# 					op = 'or'
-			# 				else:
-			# 					body2, if_stmt2 = self.compile_bool(boolean[i], op, paren)
-			# 					# Only add in tabs if the new addition to body 
-			# 					# is not empty
-			# 					if body2 != '':
-			# 						body += body2
-			# 					# Replace the ending colon and newline character with a
-			# 					# space for the previous if statement. Replace the 'if'
-			# 					# from the new if statement with the appropriate operand
-			# 					# (either 'and' or 'or'). Doing this allows us to have 
-			# 					# the whole conditional on one line, avoiding tabbing issues
-			# 					if if_stmt2 != '': 
-			# 						if_stmt = if_stmt.replace(':\n',' ')+if_stmt2.replace('if', op)
+		copy_ret = ''
+		# Evaluate each bool from bool_list and add it to the methods_dict
+		# along with a copy of the appropriate ret_val
+		if len(bool_list) > 0:
+			if len(self.methods_dict[self.intention][2]) > 0:
+				copy_ret = self.methods_dict[self.intention][2][len(self.methods_dict[self.intention][2])-1]
+				self.methods_dict[self.intention][2].pop()
 
-		print('HERE1: '+str(body))								
-		print('HERE2: '+str(if_stmt))										
+			for bool2 in bool_list:
+				body, if_stmt = self.traverse_BoolExpr(bool2)
+				result = body + if_stmt
+				self.methods_dict[self.intention][1].append(result)			
+				self.methods_dict[self.intention][2].append(copy_ret)
 
 		result += body + if_stmt
 
@@ -524,7 +567,7 @@ class Imitation_Compiler(NodeVisitor):
 		#		 formatting here
 		cond = self.visit(node.cond)
 
-		self.methods_dict[intention][1].append(cond)
+		# self.methods_dict[intention][1].append(cond)
 
 		return None
 
@@ -546,9 +589,7 @@ class Imitation_Compiler(NodeVisitor):
 			int_dict = self.method_var_equivs[intent]
 			# iterate through the variables in the method_var_equivs at a 
 			# given intention
-			print('Intention: '+str(intent))			
 			for var in int_dict:
-				print('int_dict['+str(var)+'] = '+str(int_dict[var]))
 				# Only make changes if one of the vars is CONT
 				if 'CONT' in var:
 					# Check for/update value mapped to CONT and update it
@@ -560,16 +601,7 @@ class Imitation_Compiler(NodeVisitor):
 						new_index = str(new_index - cont_offset)
 						# new_val = ')+tuple('+old_val.replace(old_index+']', new_index+':]')
 						new_val = ')+tuple('+old_val.replace(']', ':]')
-						print('Replacing '+str(old_val)+' with '+str(new_val))						
 						self.method_var_equivs[intent][var] = new_val
-
-		for intent in self.method_var_equivs:
-			int_dict = self.method_var_equivs[intent]
-			# iterate through the variables in the method_var_equivs at a 
-			# given intention
-			print('Intention: '+str(intent))			
-			for var in int_dict:
-				print('int_dict['+str(var)+'] = '+str(int_dict[var]))
 
 		# Iterate through each intention in the methods dictionary
 		for intention in self.methods_dict:
@@ -596,7 +628,6 @@ class Imitation_Compiler(NodeVisitor):
 					for var in self.method_var_equivs[intention]:
 						# Handle CONT keyword
 						if 'CONT' in var and var in ret:
-							print('VAR: '+str(var))
 							cont_offset = int(var[4:var.find('-')]) + 1
 							temp_ret = ret
 							temp_ret = temp_ret.split('#'+var)
@@ -733,7 +764,6 @@ class Imitation_Compiler(NodeVisitor):
 	# @rtype: String
 	def visit_Flt(self, node):
 		flt = self.visit(node.left) + '.' + self.visit(node.right)
-		print('FLOAT: '+flt)
 		return flt
 
 	## Visit ALL

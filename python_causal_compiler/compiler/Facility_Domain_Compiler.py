@@ -206,8 +206,6 @@ class Facility_Domain_Compiler(NodeVisitor):
 		body = ''
 		if_stmt = ''
 
-		print('COMPILE BOOL: '+str(cond))
-
 		# expr1 = left side of comparison. Could be a variable,
 		# 		  literal, or keyword phrase like TYPE(obj)
 		# comp  = comparison operator (should be '==')
@@ -277,8 +275,6 @@ class Facility_Domain_Compiler(NodeVisitor):
 		# if cond[1] is one of the comparative operators than we
 		# know there is only one boolean statement (no && or ||)
 
-		print('Traversing: '+str(cond))
-
 		if not cond:
 			return '', ''
 
@@ -299,13 +295,11 @@ class Facility_Domain_Compiler(NodeVisitor):
 			#		see in the code below
 			op = 'if'
 			if isinstance(cond[0], bool):
-				'TODO'
 				body, if_stmt = self.traverse_BoolExpr(cond[1:], arg_indices)
 				if_stmt = if_stmt.replace('if ', 'if (')
 				if_stmt = if_stmt.replace(':\n', '):\n')				
 			else:
 				body, if_stmt = self.traverse_BoolExpr(cond[0], arg_indices)
-				print('COND: '+str(cond))
 				body2 = if_stmt2 = ''
 				if len(cond) > 1:
 					op = cond[1]

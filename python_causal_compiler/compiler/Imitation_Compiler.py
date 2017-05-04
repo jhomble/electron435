@@ -144,7 +144,6 @@ class Imitation_Compiler(NodeVisitor):
 				arg = action[1][a]
 				# Handle the special case of the CONT keyword
 				if arg[:4] == 'CONT':
-					print('Handling CONT Args: '+str(arg))					
 					# create a dictionary for act_name intention
 					# in the method_var_equivs if it's not there
 					if not act_name in self.method_var_equivs:
@@ -153,7 +152,6 @@ class Imitation_Compiler(NodeVisitor):
 					prev_arg = action[1][index]
 					# adjust arg name to avoid collisions
 					arg = arg + "-" + prev_arg
-					print('Argument: '+str(arg))
 					self.method_var_equivs[act_name][arg] = prev_arg					
 				# use hashtag notation to indicate arg_name to be replaced
 				ret += '#'+arg + ','
@@ -214,7 +212,41 @@ class Imitation_Compiler(NodeVisitor):
 	#
 	# Return None when there is no conditional
 	def visit_NoCond(self,node):
+		self.methods_dict[self.intention][1].append(None)
 		return None
+
+	def listify_BoolExpr(self, cond):
+		new_conds = []
+
+		if not cond:
+			return []
+
+		if cond[0] == 'UNIT':
+			# Single statement
+			new_conds.append([cond])
+		else:
+			if isinstance(cond[0], bool):
+				if (cond[0]):
+					return self.listify_BoolExpr(cond[1:])
+				else:
+					cond = cond[1:]
+
+			left = self.listify_BoolExpr(cond[0])
+
+			if len(cond) > 1:
+				op = cond[1]
+				right = self.listify_BoolExpr([cond[2:]])
+				if (op == 'and'):
+					for a in left:
+						print('\ta: '+str(a))
+						for b in right:							
+							new_conds.append(a+b)
+				elif (op == 'or'):
+					new_conds = left+right
+			else:
+				new_conds = left
+
+		return new_conds
 
 	## Traverse Boolean Expression
 	#
@@ -248,7 +280,6 @@ class Imitation_Compiler(NodeVisitor):
 			#		see in the code below
 			op = 'if'
 			if isinstance(cond[0], bool):
-				'TODO'
 				body, if_stmt = self.traverse_BoolExpr(cond[1:])
 				if_stmt = if_stmt.replace('if ', 'if (')
 				if_stmt = if_stmt.replace(':\n', '):\n')				
@@ -274,6 +305,14 @@ class Imitation_Compiler(NodeVisitor):
 
 		return body, if_stmt
 
+
+	def develop_and_expr(self, exprList):
+		if len(exprList) == 0:
+			return None
+		elif len(exprList) == 1:
+			return exprList[0]
+		else:
+			return False, exprList[0], 'and', self.develop_and_expr(exprList[1:])
 	## Visit Conditional
 	#
 	#  Return the result of evaluating the boolean expression
@@ -281,6 +320,19 @@ class Imitation_Compiler(NodeVisitor):
 		result = ''
 
 		boolean = self.visit(node.boolean)
+
+		print
+		print('LISTIFY: '+str(boolean))
+		bools_listified = self.listify_BoolExpr(boolean)
+		print(bools_listified)
+		print
+
+		bool_list = []
+		for and_expr in bools_listified:
+			bool_list.append(self.develop_and_expr(and_expr))
+
+		print('BOOL List:')
+		print(bool_list)
 
 		# Comparative Operators in Custom Language
 		comps = ['==', '<', '>', '<=', '>=']
@@ -295,10 +347,22 @@ class Imitation_Compiler(NodeVisitor):
 		body = ''
 		paren = ''
 
+		copy_ret = ''
+		if len(bool_list) > 0:
+			if len(self.methods_dict[self.intention][2]) > 0:
+				copy_ret = self.methods_dict[self.intention][2][len(self.methods_dict[self.intention][2])-1]
+				self.methods_dict[self.intention][2].pop()
+
+			for bool2 in bool_list:
+				body, if_stmt = self.traverse_BoolExpr(bool2)
+				result = body + if_stmt
+				self.methods_dict[self.intention][1].append(result)			
+				self.methods_dict[self.intention][2].append(copy_ret)
+
 		# Only evaluate conditional if there are any
-		if boolean:
-			body, if_stmt = self.traverse_BoolExpr(boolean)
-			# # if boolean[1] is one of the comparative operators than we
+		# if boolean:
+		# 	body, if_stmt = self.traverse_BoolExpr(boolean)
+			# if boolean[1] is one of the comparative operators than we
 			# # know there is only one boolean statement (no && or ||)
 			# if boolean[1] in comps:
 			# 	body, if_stmt = self.compile_bool(boolean, '', '')
@@ -331,9 +395,6 @@ class Imitation_Compiler(NodeVisitor):
 			# 					# the whole conditional on one line, avoiding tabbing issues
 			# 					if if_stmt2 != '': 
 			# 						if_stmt = if_stmt.replace(':\n',' ')+if_stmt2.replace('if', op)
-
-		print('HERE1: '+str(body))								
-		print('HERE2: '+str(if_stmt))										
 
 		result += body + if_stmt
 
@@ -524,7 +585,7 @@ class Imitation_Compiler(NodeVisitor):
 		#		 formatting here
 		cond = self.visit(node.cond)
 
-		self.methods_dict[intention][1].append(cond)
+		# self.methods_dict[intention][1].append(cond)
 
 		return None
 
@@ -624,6 +685,8 @@ class Imitation_Compiler(NodeVisitor):
 			args = self.methods_dict[intention][0]
 			conds = self.methods_dict[intention][1]
 			rets = self.methods_dict[intention][2]
+			print('CONDS: '+str(conds))
+			print('RETS: '+str(rets))
 			# Build method declaration string
 			method_dec = 'def '
 			# python functions cannot have hyphens :(

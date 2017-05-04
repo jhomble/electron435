@@ -38,22 +38,22 @@ class Facility_Domain_Compiler(NodeVisitor):
 
 	## Visit Boolean
 	#
-	# Returns a three-tuple of the form e1, comp, e2 where
+	# Returns a four-tuple of the form 'UNIT', e1, comp, e2 where
 	# e1 and e2 are tuples representing eithing literals, variables
 	# or keyword phrases
 	#
-	# @rtype: (Tuple, String, Tuple)
+	# @rtype: (String, Tuple, String, Tuple)
 	def visit_Boolean(self, node):
 		if node.op.type == EQUALS :
-			return self.visit(node.e1), "==", self.visit(node.e2)
+			return 'UNIT', (self.visit(node.e1), "==", self.visit(node.e2))
 		elif node.op.type == LESSTHAN :
-			return self.visit(node.e1), "<", self.visit(node.e2)
+			return 'UNIT', (self.visit(node.e1), "<", self.visit(node.e2))
 		elif node.op.type == GREATERTHAN :
-			return self.visit(node.e1), ">", self.visit(node.e2)
+			return 'UNIT', (self.visit(node.e1), ">", self.visit(node.e2))
 		elif node.op.type == GREATEREQUAL :
-			return self.visit(node.e1), ">=", self.visit(node.e2)
+			return 'UNIT', (self.visit(node.e1), ">=", self.visit(node.e2))
 		elif node.op.type == LESSEQUAL :
-			return self.visit(node.e1), "<=", self.visit(node.e2)
+			return 'UNIT', (self.visit(node.e1), "<=", self.visit(node.e2))
 
 	## Visit Boolean Expression
 	#
@@ -61,10 +61,13 @@ class Facility_Domain_Compiler(NodeVisitor):
 	#
 	# @rtype: (Tuple, String, Tuple)
 	def visit_BoolExpr(self, node):
-		if node.op.type == AND:
-			return self.visit(node.left), "&&", self.visit(node.right)
-		elif node.op.type == OR:
-			return self.visit(node.left) , "||", self.visit(node.right)
+		if node.op:
+			if node.op.type == AND:
+				return node.bound, self.visit(node.left), "and", self.visit(node.right)
+			elif node.op.type == OR:
+				return node.bound, self.visit(node.left) , "or", self.visit(node.right)
+		else:
+			return self.visit(node.left)
 
 	## Visit Arguments
 	#
@@ -203,6 +206,8 @@ class Facility_Domain_Compiler(NodeVisitor):
 		body = ''
 		if_stmt = ''
 
+		print('COMPILE BOOL: '+str(cond))
+
 		# expr1 = left side of comparison. Could be a variable,
 		# 		  literal, or keyword phrase like TYPE(obj)
 		# comp  = comparison operator (should be '==')
@@ -263,6 +268,62 @@ class Facility_Domain_Compiler(NodeVisitor):
 
 		return body, if_stmt
 
+	## Traverse Boolean Expression
+	#
+	#  Recursively descend Boolean Expression and appropriately print it out
+	#
+	#  @rtype: (String, String)
+	def traverse_BoolExpr(self, cond, arg_indices):
+		# if cond[1] is one of the comparative operators than we
+		# know there is only one boolean statement (no && or ||)
+
+		print('Traversing: '+str(cond))
+
+		if not cond:
+			return '', ''
+
+		body = ''
+		if_stmt = ''
+
+		tab = '    '
+
+		# if cond[1] in comps:
+		if cond[0] == 'UNIT':
+			body, if_stmt = self.compile_bool(cond[1], arg_indices)
+			# Only add in tabs for body if there is a body
+			if body != '':
+				body = 2*tab + body
+		else:
+			# op  = the previous operand (either && or ||). It 
+			#  		starts as 'if' for convenience sake as you'll
+			#		see in the code below
+			op = 'if'
+			if isinstance(cond[0], bool):
+				'TODO'
+				body, if_stmt = self.traverse_BoolExpr(cond[1:], arg_indices)
+				if_stmt = if_stmt.replace('if ', 'if (')
+				if_stmt = if_stmt.replace(':\n', '):\n')				
+			else:
+				body, if_stmt = self.traverse_BoolExpr(cond[0], arg_indices)
+				print('COND: '+str(cond))
+				body2 = if_stmt2 = ''
+				if len(cond) > 1:
+					op = cond[1]
+					body2, if_stmt2 = self.traverse_BoolExpr(cond[2:], arg_indices)
+					# Only add in tabs if the new addition to body 
+					# is not empty
+					if body2 != '':
+						body += 2*tab+body2
+					# Replace the ending colon and newline character with a
+					# space for the previous if statement. Replace the 'if'
+					# from the new if statement with the appropriate operand
+					# (either 'and' or 'or'). Doing this allows us to have 
+					# the whole conditional on one line, avoiding tabbing issues 
+					if_stmt = if_stmt.replace(':\n',' ')+if_stmt2.replace('if', op)
+
+
+		return body, if_stmt
+
 	## Visit Statement
 	#
 	# Returns a String representing a properly compiled full statement,
@@ -278,6 +339,7 @@ class Facility_Domain_Compiler(NodeVisitor):
 		# arg_indices = dictionary containing the i,j indices in the 2d
 		#				arguments array for each of the arguments of the
 		#				actions
+
 		if_stmt, gadd, arg_indices = self.visit(node.caus)
 
 		# cond = tuple representing the conditions under which the rule
@@ -300,40 +362,10 @@ class Facility_Domain_Compiler(NodeVisitor):
 		# Defined to represent a tab in Python (four spaces)
 		tab = '    '
 
+
 		# Only evaluate conditional statements if there are any
 		if cond:
-			# if cond[1] is one of the comparative operators than we
-			# know there is only one boolean statement (no && or ||)
-			if cond[1] in comps:
-				body, if_stmt2 = self.compile_bool(cond, arg_indices)
-				# Only add in tabs for body if there is a body
-				if body != '':
-					body = 2*tab + body
-			else:
-				# op  = the previous operand (either && or ||). It 
-				#  		starts as 'if' for convenience sake as you'll
-				#		see in the code below
-				op = 'if'
-				# Go through each boolean statement
-				for i in range(0, len(cond)):
-					# change the operand appropriately to reflect which op it is
-					if cond[i] == '&&':
-						op = 'and'
-					elif cond[i] == '||':
-						op = 'or'
-					else:
-						body2, if_stmt2_2 = self.compile_bool(cond[i], arg_indices)
-						# Only add in tabs if the new addition to body 
-						# is not empty
-						if body2 != '':
-							body += 2*tab+body2
-						# Replace the ending colon and newline character with a
-						# space for the previous if statement. Replace the 'if'
-						# from the new if statement with the appropriate operand
-						# (either 'and' or 'or'). Doing this allows us to have 
-						# the whole conditional on one line, avoiding tabbing issues 
-						if_stmt2 = if_stmt2.replace(':\n',' ')+if_stmt2_2.replace('if', op)
-
+			body, if_stmt2 = self.traverse_BoolExpr(cond, arg_indices)
 
 		# tabs required before the g.add and second if statements
 		# respectively

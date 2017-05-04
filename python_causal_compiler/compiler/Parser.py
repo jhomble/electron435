@@ -103,7 +103,7 @@ class Boolean(AST):
 #  A list of Boolean Statements separated by either &&s or ||s
 class BoolExpr(AST):
 	## Constructor
-	def __init__(self, left, op, right):
+	def __init__(self, bound, left, op, right):
 		## @var left
 		#  Boolean Statement to the left of the operator
 		self.left = left
@@ -115,6 +115,9 @@ class BoolExpr(AST):
 		## @var left
 		#  Boolean Expression to the right of the operator
 		self.right = right
+		## @var bound
+		#  Boolean indicating whether or not this boolean is parenthesed
+		self.bound = bound
 
 ## Arguments
 #
@@ -232,14 +235,16 @@ class Parser(object):
 		## @var current_token
 		#  the current token being parsed
 		self.current_token = self.lexer.get_next_token()
+		self.paren_balance = 0;
 
 	## Parser Error
 	#
 	#  Alerts the user of invalid syntax indicated by a 
 	#  token that cannot be parsed into an AST object
-	def error(self):
-		raise Exception('Invalid syntax: {token}'.format(
-			token = self.current_token
+	def error(self, expected):
+		raise Exception('Invalid syntax: {expected} was expected, not {token}'.format(
+			token = self.current_token,
+			expected = expected
 		))
 
 	## Eat
@@ -249,7 +254,7 @@ class Parser(object):
 		if self.current_token.type == token_type:
 			self.current_token = self.lexer.get_next_token()
 		else:
-			self.error()
+			self.error(token_type)
 
 	## Program
 	#
@@ -282,6 +287,7 @@ class Parser(object):
 	#
 	# stmt -> cond caus
 	def stmt(self):
+		print('STMT')
 		node1 = self.cond()
 		node2 = self.caus()
 
@@ -291,13 +297,13 @@ class Parser(object):
 
 	## Cond
 	#
-	# cond -> IF LPAREN boolsAnd RPAREN COLON
+	# cond -> IF LPAREN bools RPAREN COLON
 	#		  | empty		    
 	def cond(self):
 		if self.current_token.type == IF:
 			self.eat(IF)
 			self.eat(LPAREN)
-			node1 = self.boolsAnd()
+			node1 = self.bools()
 			self.eat(RPAREN)
 			self.eat(COLON)
 
@@ -366,17 +372,99 @@ class Parser(object):
 
 		return root
 
+	## Bools2
+	#
+	# bools2 ->   boolean AND bools
+	#		    | boolean OR bools
+	#			| boolean
+	#			| (bools2) AND bools
+	#			| (bools2) OR bools
+	#			| (bools2)
+	#def bools2(self):
+
+	## Bools
+	#
+	# bools ->   boolean AND bools
+	#		   | boolean OR bools
+	#		   | boolean
+	#		   | (bools) AND bools
+	#		   | (bools) OR bools
+	#		   | (bools)
+	def bools(self):
+		node = None;
+		node1 = None;
+		node2 = None;
+		token = None;
+		print('BOOLS')
+		if self.current_token.type == LPAREN:
+			self.eat(LPAREN)
+			node1 = self.bools();
+			self.eat(RPAREN)
+			if self.current_token.type == AND:
+				token = self.current_token
+				self.eat(AND)
+				node2 = self.bools()
+			elif self.current_token.type == OR:
+				token = self.current_token
+				self.eat(OR)
+				node2 = self.bools()
+
+			node = BoolExpr(bound = True, left=node1, op=token, right=node2)
+		else:
+			node1 = self.boolean();
+			if self.current_token.type == 'AND':
+				token = self.current_token
+				self.eat(AND)
+				node2 = self.bools()
+			elif self.current_token.type == 'OR':
+				token = self.current_token
+				self.eat(OR)
+				node2 = self.bools()
+
+			node = BoolExpr(bound = False, left=node1, op=token, right=node2)
+
+		return node
+
 	## BoolsAnd
 	#
 	# boolsAnd -> boolsOr (AND boolsOr)*
 	def boolsAnd(self):
+		paren = ''
+
+		while self.current_token.type == LPAREN:
+			self.eat(LPAREN)
+			self.paren_balance += 1
+			paren += '('
+
 		node = self.boolsOr()
+
+		# while self.current_token.type == RPAREN:
+		# 	if self.paren_balance > 0:
+		# 		print('AND HERE 2')
+		# 		self.eat(RPAREN)
+		# 		self.paren_balance -= 1
+		# 		paren += ')'
+		# 	else:
+		# 		break
 
 		while self.current_token.type == AND:
 			token = self.current_token
 			self.eat(AND)
 
-			node = BoolExpr(left=node, op=token, right=self.boolsOr())
+			while self.current_token.type == LPAREN or self.current_token.type == RPAREN:
+				if self.current_token.type == LPAREN:
+					self.eat(LPAREN)
+					self.paren_balance += 1
+					paren += '('
+				# if self.current_token.type == RPAREN:
+				# 	if self.paren_balance > 0:
+				# 		print('AND HERE 4')
+				# 		self.eat(RPAREN)
+				# 		self.paren_balance -= 1
+				# 		paren += ')'
+
+			node = BoolExpr(paren = paren, left=node, op=token, right=self.boolsOr())
+			paren = ''
 
 		return node
 
@@ -384,13 +472,42 @@ class Parser(object):
 	#
 	# boolsOr -> boolean (OR boolean)*
 	def boolsOr(self):
+		paren = ''
+
+		# while self.current_token.type == LPAREN:
+		# 	print('OR HERE 1')
+		# 	self.eat(LPAREN)
+		# 	self.paren_balance += 1
+		# 	paren += '('
+
 		node = self.boolean()
+
+		while self.current_token.type == RPAREN:
+			if self.paren_balance > 0:
+				self.eat(RPAREN)
+				self.paren_balance -= 1
+				paren += ')'
+			else:
+				break
 
 		while self.current_token.type == OR:
 			token = self.current_token
 			self.eat(OR)
 
-			node = BoolExpr(left=node, op=token, right=self.boolean())
+			while self.current_token.type == LPAREN or self.current_token.type == RPAREN:
+				# if self.current_token.type == LPAREN:
+				# 	print('OR HERE 3')
+				# 	self.eat(LPAREN)
+				# 	self.paren_balance += 1
+				# 	paren += '('
+				if self.current_token.type == RPAREN:
+					if self.paren_balance > 0:
+						self.eat(RPAREN)
+						self.paren_balance -= 1
+						paren += ')'
+
+			node = BoolExpr(paren=paren, left=node, op=token, right=self.boolean())
+			paren = ''
 
 		return node
 
@@ -398,6 +515,7 @@ class Parser(object):
 	#
 	# boolean -> expr EQUALS expr
 	def boolean(self):
+		print('BOOLEAN')
 		node1 = self.expr()
 		if self.current_token.type == EQUALS :
 			token = self.current_token
@@ -449,10 +567,10 @@ class Parser(object):
 			self.eat(LBRACK)
 			node = self.args()
 			self.eat(RBRACK)
-		elif self.current_token.type == LPAREN:		
-			self.eat(LPAREN)
-			node = self.boolsAnd
-			self.eat(RPAREN)
+		# elif self.current_token.type == LPAREN:		
+		# 	self.eat(LPAREN)
+		# 	node = self.boolsAnd
+		# 	self.eat(RPAREN)
 		else:
 			node = self.var()
 
@@ -466,11 +584,9 @@ class Parser(object):
 	#			  | DOT integer            (This is a float)
 	def var(self):
 		if self.current_token.type == INTEGER:
-			print('INTEGER: '+str(self.current_token))
 			node1 = self.integer()
 			if self.current_token.type == DOT:
 				self.eat(DOT)
-				print('FLOAT: '+str(self.current_token))				
 				node2 = self.integer()
 				node = Flt(left=node1, right=node2)
 			else:

@@ -1,6 +1,4 @@
-from compiler import Lexer
-from compiler import Parser
-from compiler import Interpreter
+import compiler as cp
 
 def lexer_print_tokens(lexer):
 	token = lexer.get_next_token()
@@ -9,23 +7,29 @@ def lexer_print_tokens(lexer):
 		token = lexer.get_next_token()
 
 def main():
-	print ("TESTING...")
 	text = open('causes.txt', 'r').read()
-	#text = open(sys.argv[1], 'r').read()
 
-	print ("TESTING LEXER")
-	lexer = Lexer(text)
+	print("TESTING:")
+	makeFacility = True;
+	makeImitation = True;
 
-	# lexer_print_tokens(lexer)
+	print("makeFacility...")
+	if makeFacility:
+		print("\tLexer...")
+		facility_lexer = cp.Lexer(text)
+		print("\tParser...")
+		facility_parser = cp.Parser(facility_lexer)
+		print("\tCompiler...")
+		facility_compiler = cp.Facility_Domain_Compiler(facility_parser)
 
-	print ("TESTING PARSER")
-	parser = Parser(lexer)
-
-	print ("TESTING INTERPRETER")
-	interpreter = Interpreter(parser)
-	result = interpreter.interpret()
-
-	#print (result)
+	print("makeImitation...")
+	if makeImitation:
+		print("\tLexer...")
+		imitation_lexer = cp.Lexer(text)
+		print("\tParser...")
+		imitation_parser = cp.Parser(imitation_lexer)
+		print("\tCompiler...")
+		imitation_compiler = cp.Imitation_Compiler(imitation_parser)
 
 if __name__ == '__main__':
    main();

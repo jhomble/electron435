@@ -1,0 +1,545 @@
+import sys
+sys.path.extend(['./copct-master','./dananau-pyhop-195ab6320571'])
+
+from load_demo import load_demo
+from facility_domain import causes, M
+import copct
+import pyhop
+import math
+import os
+
+# states: same hash-based representation as load_facility_demo:
+# state.objs[object_id] = [object_type, x, y, z, angle]
+def deep_copy(state):
+    new_state = pyhop.State(state.__name__)
+    new_state.objs = {obj_id: list(state.objs[obj_id]) for obj_id in state.objs}
+    return new_state
+
+def write_XML(obj_attr, xml, xml_dict, obj_id, tabs) :
+     # handle writing element types using xml_dict and pyhop state'
+    xml.write('\t'*tabs+'<%s ' %obj_attr[0])
+    # write element type tag i.e. <block
+    xml.write('id="%s" location="%s" rotation="(0,0,%s)"'%(obj_id, str(tuple(obj_attr[1:4])),obj_attr[4]))
+    # write all attributes from pyhop state dictionary
+
+    for k, v in xml_dict[obj_id].items() :
+        #print k
+        #print v
+                # xml_dict[obj_id] = dictionary where k = attribute name, v = attribute value
+                # write all attributes next to element tag and id/location/rotation attributes i.e. ... xspan="6" yspan="7" ...
+        if k not in ['location', 'rotation','elem_type','children','id'] :
+            # make sure composite children do not use attributes that have already been taken care of
+            # had to be written before for loop because iterating thru hash does not preserve order (element tag might not have been written first, etc.)
+            xml.write(' %s="%s"'%(k,v))
+            # rest of attributes only need simple write formatting unlike 3-tuple of location, rotation
+
+    if obj_attr[0] != 'composite' :
+        # composite elements have children, can't close element yet
+        xml.write('/>\n')
+    else :
+        xml.write('>\n')
+        # write all child elements of composite element on next line
+        # handle nesting of elements
+        for k,v in xml_dict[obj_id]['children'].items() :
+            # create an obj_attr array from child's dictionary
+            surrogate_obj_attr = [xml_dict[obj_id]['children'][k]['elem_type']]
+            surrogate_obj_attr.extend(xml_dict[obj_id]['children'][k]['location'])
+            surrogate_obj_attr.append(xml_dict[obj_id]['children'][k]['rotation'][2])
+            #print "this is ",surrogate_obj_attr
+            write_XML(surrogate_obj_attr, xml, xml_dict[obj_id]['children'], k, tabs+1)
+            # iterate tabs in param so that formatting is correct for children
+        xml.write('\t'*tabs+'</composite>\n')
+    return
+
+def toXML(state, xml_file_path, included_files, tabletop_specs, xml_dict, var_dict):
+    with open(xml_file_path,'w') as xml:
+        xml.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+        xml.write('<tabletop xmlns="http://synapse.cs.umd.edu/tabletop-xml" xspan="%s" yspan="%s">\n'%tabletop_specs)
+        for file in included_files :
+            xml.write('\t<include file="%s"/>\n'%file)
+
+        for obj_id, obj_attr in state.items() :
+            if obj_attr[0] in ['block','box','sphere','cylinder','custom','composite'] :
+                write_XML(obj_attr, xml, xml_dict, obj_id, 1)
+                # call helper function to write the XML for each element in state
+            else :
+                xml.write('\t<instance def="%s">\n'%obj_attr[0])
+                # instances are always single tabbed and var lines are always nested in instance so double tabbed
+                xml.write('\t\t<var name="id" value="%s"/>\n'%obj_id)
+                xml.write('\t\t<var name="location" value="(%s,%s,%s)"/>\n'%tuple(obj_attr[1:4]))
+                xml.write('\t\t<var name="rotation" value="(0,0,%s)"/>\n'%obj_attr[4])
+                # use pyhop state for id, location, rotation attributes
+                for k,v in var_dict[obj_id].items() :
+                    # get rest of var attributes from var dictionary; will print all extra vars from included template as well
+                    xml.write('\t\t<var name="%s" value="%s"/>\n'%(k,v))
+                xml.write('\t</instance>\n')
+
+        xml.write('</tabletop>\n')
+
+# primitive operators - these change the state of the environment
+def grasp(state, obj):
+    return deep_copy(state) # don't actually need to change anything
+def release(state, obj, dest, dx, dy, dz, da):
+    new_state = deep_copy(state)
+    # transform and position object relative to dest's frame of reference
+    dest_x, dest_y, dest_z, dest_angle = state.objs[dest][1:5]
+    radians = dest_angle*math.pi/180
+    rx = dx*math.cos(radians) - dy*math.sin(radians)
+    ry = dx*math.sin(radians) + dy*math.cos(radians)
+    new_state.objs[obj][1:] = [dest_x + rx, dest_y+ry, dest_z + dz, dest_angle + da]
+    return new_state
+ops = pyhop.declare_operators(grasp, release)
+
+def moveTo(state, obj, dest, dx, dy, dz, da):
+    __ret_val = [('grasp',obj),('release',obj,dest,dx,dy,dz,da)]
+    return __ret_val
+pyhop.declare_methods('moveTo',moveTo)
+def stack(state, dest, dx, dy, dz, da, *obj):
+    obj = flatten(obj)
+    if state.objs[obj[0]][0] == 'block':
+        __ret_val = [('moveTo',obj[0],dest,dx,dy,dz,da)]
+        __all_args = []
+        for __action in __ret_val:
+            for __arg in __action:
+                __all_args.append(__arg)
+        __all_intention_args = [[dest],[dx],[dy],[dz],[da],[__obj for __obj in obj]]
+        __all_intention_args = flatten(__all_intention_args)
+        __all_args = flatten(__all_args)
+        if set(__all_intention_args).issubset(set(__all_args)):
+            return __ret_val
+    if (state.objs[obj[0]][0] == 'block' and True):
+        __ret_val = [('moveTo',obj[0],dest,dx,dy,dz,da),('stack',obj[0],0,0,.5,0,)+tuple(obj[1:])]
+        __all_args = []
+        for __action in __ret_val:
+            for __arg in __action:
+                __all_args.append(__arg)
+        __all_intention_args = [[dest],[dx],[dy],[dz],[da],[__obj for __obj in obj]]
+        __all_intention_args = flatten(__all_intention_args)
+        __all_args = flatten(__all_args)
+        if set(__all_intention_args).issubset(set(__all_args)):
+            return __ret_val
+pyhop.declare_methods('stack',stack)
+def stackAll(state, dx, dy, dz, da):
+    all_block = [block_id for block_id in state.objs if state.objs[block_id][0]=='block']
+    if (True and True):
+        __ret_val = [('stack','room',dx,dy,dz,da,)+tuple(all_block[0:])]
+        return __ret_val
+pyhop.declare_methods('stackAll',stackAll)
+
+
+def XML_to_pyhop(xml_file_path) :
+    # takes in xml file, converts to pyhop state of variable bindings in form of dictionary
+    with open(xml_file_path,'r') as xml_file :
+        # handle simple element types and composite : read line and parse out values for location and rotation (only ones used by pyhop operators/methods)
+
+        # add handling for instance defined elements drawing from other xml files : 
+        # open template xml and find any attributes not provided by var tags in actual xml
+        count = 0
+        # used for assigning id to object when not specified by user in xml
+
+        ret = dict()
+        xmlinfo = dict()
+        varinfo = dict()
+        filepaths = []
+        # variables that will be returned for use in final xml conversion
+
+        xml_file.readline()
+        tabletop = xml_file.readline()
+        xspan = isolate_attr(tabletop, tabletop.find('xspan'))
+        yspan = isolate_attr(tabletop, tabletop.find('yspan'))
+        # read thru xml version declaration and root tabletop element, need tabletop specs for final xml
+
+        while True :
+            # using for loop prevents mixing iteration and code; need to readline inside
+            line = xml_file.readline().strip()
+            # get rid of any leading whitespace aka formatting tabs in xml
+            if not line :
+                # break at end of file (when line = None)
+                break
+            elem_type = line[1:line.find(' ')]
+            # get type of current object using xml element tag
+            if elem_type == 'include' :
+                # need to store filepaths in original xml to be included in final xml
+                file_index = line.find('file')
+                if file_index == -1 :
+                    raise Exception('could not retrieve file path\n')
+                else :
+                    filepaths.append(isolate_attr(line, file_index))
+            elif elem_type == 'instance' :
+                instance_type_index = line.find('def')
+                # determine index of instance type
+                if instance_type_index == -1 :
+                    raise Exception('could not find instance def attribute\n')
+                instance_type = isolate_attr(line, instance_type_index)
+                for path in filepaths :
+                    if path.find(instance_type) != -1 :
+                        # use previously found instance type to determine which included file to access for vars
+                        file_to_open = os.path.normpath(path)
+
+                var_lines = xml_file.readline()
+                var_dict = dict()
+                # used to collect vars for individual instances, will be added as value to varinfo dictionary at end
+                instance_rotation = None
+                instance_location = None
+                instance_id = None
+                # start as None so if not found in instance var lines, 
+                # then go into included xml file and find attribute values there after
+                while var_lines.startswith('<var') :
+                    # go through var xml lines following <instance... and get provided value for provided attribute name
+                    instance_value = isolate_attr(var_lines,var_lines.find('value'))
+
+                    if var_lines.find('rotation') != -1 :
+                        instance_rotation = create_coord_array(instance_value)
+
+                    elif var_lines.find('location') != -1 :
+                        instance_location = create_coord_array(instance_value)
+                        #print instance_location
+
+                    elif var_lines.find('id') != -1 :
+                        instance_id = instance_value
+                    else :
+                        instance_name = isolate_attr(var_lines, var_lines.find('name'))
+                        var_dict[instance_name] = instance_value
+                        # keep extra var info for final xml conversion
+
+                    # continue thru var lines of instance tag
+                    var_lines = xml_file.readline()
+
+                if not instance_rotation or not instance_location or not instance_id :
+                    # if info for pyhop-essential attributes not provided in instance xml, must go into file-included template to find default values
+                    # if not found in template, resort to SMILE customary defaults
+                    with open('./SMILE-1.1.0/'+file_to_open, 'r') as instance_file:
+                        for instance_line in instance_file :
+                            instance_line = instance_line.strip()
+                            # get rid of leading white space aka tabs
+                            line_start = instance_line[1:instance_line.find(' ')]
+                            #gets element tag at beginning of xml line
+
+                            if line_start == 'var' :
+                                # only one attribute per var line so retrieve it immediately
+                                instance_value = isolate_attr(instance_line, instance_line.find('value'))
+                                # determine whether variable-based attributes present; if so, will need to evaluate expression
+                                attr_var_index = instance_line.find('$')
+
+                                # don't replace already assigned attribute
+                                if not instance_rotation and instance_line.find('rotation') != -1 :
+                                    if attr_var_index != -1 :
+                                        # if variable-based, call function to evaluate before isolating, converting, and assigning
+                                        expression = instance_line[attr_var_index+1:instance_line.find('$',attr_var_index+1,len(instance_line))]
+                                        instance_line = replaceVariables(instance_line, expression, var_dict)
+                                        instance_value = isolate_attr(instance_line, instance_line.find('value'))
+
+                                    # convert already isolated attribute or variable-replaced isolated attribute
+                                    instance_rotation = create_coord_array(instance_value)
+
+                                elif not instance_location and instance_line.find('location') != -1 :
+                                    if attr_var_index != -1 :
+                                        expression = instance_line[attr_var_index+1:instance_line.find('$',attr_var_index+1,len(instance_line))]
+                                        instance_line = replaceVariables(instance_line, expression, var_dict)
+                                        instance_value = isolate_attr(instance_line, instance_line.find('value'))
+                                    
+                                    instance_location = create_coord_array(instance_value)
+
+                                elif not instance_id and instance_line.find('id') != -1 :
+                                    if attr_var_index != -1 :
+                                        expression = instance_line[attr_var_index+1:instance_line.find('$',attr_var_index+1,len(instance_line))]
+                                        # variable-based id can only be simple substitution, no math, so search thru previously declared vars in dictionary
+                                        # for replacement variable
+                                        for k,v in var_dict.iteritems() :
+                                            if k == expression :
+                                                instance_value = var_dict[k]
+
+                                    instance_id = instance_value
+
+                                else :
+                                    # if not any of above, store in var dict in case of variable-based attributes
+                                    instance_name = isolate_attr(instance_line, instance_line.find('name'))
+                                    var_dict[instance_name] = instance_value
+
+                    # if still None, resort to customary defaults
+                    if not instance_rotation :
+                        instance_rotation = [0,0,0]
+                    if not instance_location :
+                        # location is required though, no default here
+                        if 'location' in var_dict.keys() :
+                            instance_location = var_dict['location']
+                        else :
+                            raise Exception('location attribute required in instance definition or instance template')
+                    if not instance_id :
+                        instance_id = instance_type
+
+                # add to return dictionary that will be set to pyhop state.objs
+                ret[instance_id] = [instance_type]
+                ret[instance_id].extend(instance_location)
+                ret[instance_id].append(instance_rotation[2])
+
+                # pyhop state object stores these attributes; don't want them reprinted later
+                if var_dict.get('location') :
+                    del var_dict['location']
+                if var_dict.get('id') :
+                    del var_dict['id']
+                if var_dict.get('rotation') :
+                    del var_dict['rotation']
+
+                varinfo[instance_id] = var_dict
+                # associate vars with instance object id so can be reconstructed in final xml
+            elif elem_type in ['block','cylinder','custom','sphere','box','composite'] :
+                # boolean present determines whether found attribute
+                present, elem_id = findid(line)
+                if not present :
+                    # if no id attribute specified, generate string composed of element type and iterating counter to ensure uniqueness
+                    elem_id = line[1:(line.index(' '))] + str(count)
+                    count += 1
+                ret[elem_id] = [elem_type]
+
+                present, elem_location = findlocation(line)
+                if not present :
+                    # if no location attribute specified, error because required
+                    raise Exception('location attribute required')
+                ret[elem_id].extend(elem_location)
+
+                present, elem_rotation = findrotation(line)
+                if not present :
+                    # if no rotation attribute specified, use default rotation
+                    elem_rotation = [0,0,0]
+                ret[elem_id].append(elem_rotation[2])
+                # only append rotation around z-coordinate because pyhop takes singular arg for rotation angle; was done in given example
+                getExtraAttributes(xmlinfo, line, xml_file, elem_type, elem_id, count, False)
+                # get rest of attributes for xml objects so can be reconstructed in final xml
+            else :
+                continue
+        return ret, filepaths, (xspan, yspan), xmlinfo, varinfo
+
+def getExtraAttributes(xml_dict, line, xml_file, elem_type, elem_id, count, child_flag) :
+    # if composite, run thru child elements, otherwise just collect all possible attributes other than id, rotation, location, and
+    # put them in a dictionary with object id as key so they can be rewritten in final xml
+    xml_dict[elem_id] = dict()
+
+    if child_flag :
+        # xml_dict[composite_id]['children'][elem_id]['elem_type'] = elem_type
+        xml_dict[elem_id]['elem_type'] = elem_type
+        present, elem_location = findlocation(line)
+        if not present :
+            raise Exception('location required in composite child elements\' attributes')
+        xml_dict[elem_id]['location'] = elem_location
+        present, elem_rotation = findrotation(line)
+        if not present :
+            elem_rotation = [0,0,0]
+        xml_dict[elem_id]['rotation'] = elem_rotation
+
+    if elem_type != 'composite' :
+        # for some reason SMILE won't let my composite XML elements have mass attribute so whaddya gunna do
+        mass_index = line.find('mass')
+        if mass_index != -1 :
+            xml_dict[elem_id]['mass'] = isolate_attr(line, mass_index)
+        color_index = line.find('color')
+        if color_index != -1 :
+            xml_dict[elem_id]['color'] = isolate_attr(line, color_index)
+
+    if elem_type == 'block' or elem_type == 'box' or elem_type == 'cylinder' :
+        yspan_index = line.find('yspan')
+        if yspan_index != -1 :
+            xml_dict[elem_id]['yspan'] = isolate_attr(line, yspan_index)
+        if elem_type != 'cylinder' :
+            xspan_index = line.find('xspan')
+            if xspan_index != -1 :
+                xml_dict[elem_id]['xspan'] = isolate_attr(line, xspan_index)
+            zspan_index = line.find('zspan')
+            if zspan_index != -1 :
+                xml_dict[elem_id]['zspan'] = isolate_attr(line, zspan_index)
+            if elem_type != 'block' :
+                thickness_index = line.find('thickness')
+                if thickness_index != -1 :
+                    xml_dict[elem_id]['thickness'] = isolate_attr(line, thickness_index)
+
+    if elem_type == 'cylinder' or elem_type == 'sphere' :      
+        radius_index = line.find('radius')
+        if radius_index != -1 :
+            xml_dict[elem_id]['radius'] = isolate_attr(line, radius_index)
+    
+    if elem_type == 'custom' :
+        file_index = line.find('file')
+        if file_index != -1 :
+            xml_dict[elem_id]['file'] = isolate_attr(line, file_index)
+        scale_index = line.find('scale')
+        if scale_index != -1 :
+            xml_dict[elem_id]['scale'] = isolate_attr(line, scale_index)
+
+    if elem_type == 'composite' :
+        # recursively deal with composite types
+        # xml_dict[composite_id][children] = {}
+        # xml_dict[composite_id][children][child_id] = {}
+        # xml_dict[composite_id][attr] = val
+        xml_dict[elem_id]['children'] = dict()
+        line = xml_file.readline().strip()
+
+        while line.find('</composite>') == -1 :
+            elem_type = line[1:line.find(' ')]
+            present, child_id = findid(line)
+            if not present :
+                child_id = elem_type + str(count)
+            getExtraAttributes(xml_dict[elem_id]['children'], line, xml_file, elem_type, child_id, count+1, True)
+            line = xml_file.readline().strip()
+
+def replaceVariables(instance_line, expression, var_dict) :
+    # isolate the variable-based expression
+    for k,v in var_dict.items() :
+        if k in expression :
+        # create previously declared in var lines variables that are present in expression 
+        # to be used in eval operation
+            exec(k + ' = ' + 'float(' +str(var_dict[k]) + ')')
+
+    # turn string operation into actual python operation using eval now that necessary variables are declared using exec
+    newattr = eval(expression)
+    
+    instance_line = instance_line.replace('$' + expression + '$', str(newattr))
+    # replace variable-based attribute values with new evaluated attribute value
+    return instance_line
+
+def flatten(l):
+    out = []
+    for item in l:
+        if isinstance(item, (list,tuple)):
+            out.extend(flatten(item))
+        else:
+           out.append(item)
+    return out
+
+def isolate_attr(xml_line, index) :
+    # helper function to isolate attribute within quotations using starting index of attribute tag
+    elem_id_start = xml_line.find('"',index,len(xml_line))
+    if elem_id_start < 0 :
+        raise Exception('unable to isolate attribute start\n')
+    elem_id_end = xml_line.find('"',elem_id_start+1,len(xml_line))
+    if elem_id_end < 0 :
+        raise Exception('unable to isolate attribute end\n')
+    elem_id = xml_line[elem_id_start+1:elem_id_end]
+    # remove quotations from attribute
+    return elem_id
+
+def create_coord_array(elem_coord) :
+    # turns string of (x,y,z) into array of [x,y,z]
+    elem_coord = elem_coord[1:elem_coord.find(')')]
+    # cut off parentheses, leaving string of x,y,z
+    separate_coord = elem_coord.split(',')
+    # split coordinates on commas
+    for i, coord in enumerate(separate_coord) :
+            # convert string coordinates of array to numbers so pyhop can use them for math
+            if separate_coord[i].find('.') == -1 :
+                separate_coord[i] = int(coord)
+            else :
+                separate_coord[i] = float(coord)
+    return separate_coord
+
+def findid(xml_line) :
+    # goes through line to find index of id attribute, then isolates it by calling helper;
+    # accompanied by boolean in return to tell if not present in line
+    index = xml_line.find('id')
+    if index == -1 :
+        return False, None
+    else :
+        elem_id = isolate_attr(xml_line, index)
+        return True, elem_id
+
+def findlocation(xml_line) :
+    # goes through line to find index of location attribute, then isolates it by calling helper;
+    # accompanied by boolean in return to tell if not present in line
+    index = xml_line.find('location')
+    if index == -1 :
+        return False, None
+    else :
+        elem_location = isolate_attr(xml_line, index)
+        # returns string of (x,y,z)
+        separate_coord = create_coord_array(elem_location)
+        return True, separate_coord
+
+def findrotation(xml_line) :
+    # goes through line to find index of rotation attribute, then isolates it by calling helper;
+    # accompanied by boolean in return to tell if not present in line
+    index = xml_line.find('rotation')
+    if index == -1 :
+        return False, None
+    else :
+        elem_rotation = isolate_attr(xml_line, index)
+        # returns string of (x,y,z)
+        separate_coord = create_coord_array(elem_rotation)
+        return True, separate_coord
+
+# Arg1 are the smile recordings, Arg2 is the input xml, and arg3 is the output file name
+if __name__ == '__main__':
+    recording_files = sys.argv[1].split(',')
+    recording_array = []
+    for word in recording_files:
+       recording_array.append(os.path.normpath(word))
+    demo = load_demo(recording_array)
+    # Infer intentions from demo
+    demo = load_demo(recording_array)
+    _, tlcovs, _ = copct.explain(causes, demo, M=M)
+    pcovs, _ = copct.minCardinalityTLCovers(tlcovs)
+
+    input_file = sys.argv[2]
+
+    # reformat as pyhop tasks
+    tasks = [(u[1],) + u[2] for u in pcovs[0][0]]
+    
+    # Make new state with room rotated and more crates
+    state = pyhop.State('')
+    state.objs, filepaths, tabletop_specs, xmlinfo, varinfo = XML_to_pyhop(input_file)
+    # xmlinfo[elem_id] = {attribute name : attribute value} so dict of dict
+    # special case if element is composite : xmlinfo[composite_id]['children'][child_id] = {attribute name : attribute value} so dict of dict of dict of dict
+    # varinfo[instance_id] = {attribute name : attribute value} so dict of dict
+
+    #state.objs = {
+     #              element,x,y,z,rotation
+     #   'room': ['room', 0,0,.5, 270],
+      #  'forklift': ['forklift', 0,0,.25,0],
+      #  'crate1': ['block', 1.5, 1.5, .25, 0],
+      #  'crate2': ['block', -1.5, 1.5, .25, 0],
+      #  'crate3': ['block', 0.0, 1.5, .25, 0],
+      #  'crate4': ['block', -1.5, 0.0, .25, 0],
+    #}
+
+    #pyhop.print_state(state)
+    # export to xml for smile viewing
+    #toXML(state,'./SMILE-1.1.0/tablesetup/room2.xml')
+    
+    # Plan new actions for the new situation
+    #print(tasks)
+    new_actions = pyhop.pyhop(state, tasks,verbose=0)
+    
+    #print('New actions:')
+    #for action in new_actions: print(action)
+    f = open('./SMILE-1.1.0/tablesetup/final_actions.txt', 'w')
+    for action in new_actions: 
+        strs=" ".join(str(x) for x in action)
+        f.write(strs + '\n')  # python will convert \n to os.linesep
+    f.close()
+
+    # make directory to place intermediate XML states in; state of environment after each pyhop task
+    if not os.path.exists('./SMILE-1.1.0/tablesetup/imitation_XMLs') :
+        os.makedirs('./SMILE-1.1.0/tablesetup/imitation_XMLs')
+
+    i = 1
+    # Simulate new actions
+    for action in new_actions:
+        action_fun = ops[action[0]]
+        state = action_fun(state, *action[1:])
+        # creates unique name composed of task step # and action being performed
+        state_xml_name = '%d_%s.xml'%(i,action[0])
+        i += 1
+        toXML(state.objs, './SMILE-1.1.0/tablesetup/imitation_XMLs/'+state_xml_name, filepaths, tabletop_specs, xmlinfo, varinfo)
+
+
+
+
+    # Print and export final state after new actions are performed
+    #print('Resulting state:')
+   # for obj in state.objs:
+     #   print(obj, state.objs[obj])
+    #print state.objs
+    if len(sys.argv) == 4 :
+        # if output file provided
+        toXML(state.objs, sys.argv[3], filepaths, tabletop_specs, xmlinfo, varinfo)
+    else :
+        # otherwise default to provided file
+        toXML(state.objs, './SMILE-1.1.0/tablesetup/final_xml.xml', filepaths, tabletop_specs, xmlinfo, varinfo)

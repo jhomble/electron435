@@ -5,7 +5,39 @@
                 <div class="row">
                     <div style="text-align: center">
                         <h2>Define Causal Parameters</h2>
+                        <br>
+                        <button ng-click="toggleCustom()" ng-class="customClass">Toggle Custom Parameters</button>
                     </div>
+                </div>
+                <div class="row" ng-show="showCustom">
+                    <div class="sixteen wide column">
+                        <div class="ui grid">
+                            <div class="row">
+                                <div class="ten wide column">
+                                    <h3>Add Custom Parameters</h3>
+                                    <button ng-click="addCustomParam()" class="circular ui green icon button"><i class="icon plus"></i></button>
+                                    <button ng-click="removeCustomParam()" class="circular ui red icon button"><i class="icon minus"></i></button>
+                                </div>
+                                <div class="six wide column">
+                                    <br>
+                                    <div class="row" ng-repeat="custom in customParams">
+                                        <div class="ui grid">
+                                            <div class="row">
+                                                <div class="sixteen wide column">
+                                                    <div class="ui input">
+                                                        <input type="text" ng-model="custom.value">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <button ng-show="customParams.length" class="ui primary button" ng-click="createParamList()">Add Parameters</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui divider"></div>
                 </div>
                 <div class="row">
                     <div class="sixteen wide column">

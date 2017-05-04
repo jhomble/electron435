@@ -105,7 +105,8 @@
                 $scope.goClass = "ui green button"
                 $scope.error = ""
                 $scope.createXML = ""
-
+                $scope.showCustom = false;
+                $scope.customClass = "ui grey button"
 
                 var reset = function () {
                     $scope.inputTask = false;
@@ -125,7 +126,7 @@
                     reset();
                     $scope.inputTask = true;
                 }
-
+                
                 $scope.showInputSmile = function () {
                     reset();
                     $scope.inputSmile = true;
@@ -208,6 +209,21 @@
 
                 $scope.showCausalParameters = function () {
                     reset()
+                    $scope.causalParameters = true;
+                    $scope.createParamList();
+                }
+
+                $scope.toggleCustom = function(){
+                    if($scope.showCustom){
+                        $scope.showCustom = false;
+                        $scope.customClass = "ui grey button"
+                    }else{
+                        $scope.showCustom = true;
+                        $scope.customClass = "ui green button"
+                    }
+                }
+
+                $scope.createParamList = function(){
                     $scope.paramList = [];
                     var temp = [];
                     $scope.causalParameters = true;
@@ -215,10 +231,12 @@
                         temp = []
                         item.actions.forEach(function (action) {
                             action.params.forEach(function (param) {
-                                //temp.push(action.action + " - " + param.value)
                                 temp.push(param.value)
                             })
                         })
+                        $scope.customParams.forEach(function(param) {
+                            temp.push(param.value)
+                        });
                         temp = unique(temp)
                         $scope.paramList.push(temp)
                     });
@@ -312,6 +330,16 @@
 
                 $scope.removeActionParameter = function (parentIndex, index) {
                     $scope.knowledge[parentIndex].actions[index].params.pop()
+                }
+
+                $scope.customParams = []
+
+                $scope.addCustomParam = function(){
+                    $scope.customParams.push({value: ""})
+                }
+
+                $scope.removeCustomParam = function(){
+                    $scope.customParams.pop()
                 }
 
                 $scope.defaultActions = ['release', 'grab', 'move']

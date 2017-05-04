@@ -28,7 +28,7 @@
                 <div ng-repeat="item in knowledge" class="row">
                     <div class="six wide column">
                         <div class="ui input">
-                            <input type="text" ng-model="item.cause">
+                            <input type="text" placeholder="Enter Cause" ng-model="item.cause">
                         </div>
                     </div>
                     <div class="five wide column" style="text-align: center">
@@ -39,7 +39,7 @@
                         <div class="row" ng-repeat="action in item.actions">
                             <div class="sixteen wide column">
                                 <div class="ui input">
-                                    <input type="text" ng-model="action.action">
+                                    <input type="text" placeholder="Enter Action" ng-model="action.action">
                                 </div>
                             </div>
                         </div>

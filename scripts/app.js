@@ -246,7 +246,7 @@
 
                 $scope.knowledge = [
                     {
-                        cause: "Enter Cause",
+                        cause: "",
                         relationship: {
                             type: "",
                             condition: ""
@@ -259,7 +259,7 @@
 
                 $scope.addCause = function () {
                     var item = {
-                        cause: "Enter Cause",
+                        cause: "",
                         relationship: { type: "", condition: "" },
                         parameters: [],
                         actions: []
@@ -272,7 +272,7 @@
                 }
 
                 $scope.addAction = function (index) {
-                    $scope.knowledge[index].actions.push({ action: "Enter Action", params: [] })
+                    $scope.knowledge[index].actions.push({ action: "", params: [] })
                 }
 
                 $scope.removeAction = function (index) {

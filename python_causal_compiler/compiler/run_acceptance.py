@@ -14,13 +14,14 @@ import sys
 #
 #  Outputs the first python file that defines CO-PCT tree
 def make_facility_domain(interpreter):
-	out_file = os.path.normpath("./python_causal_compiler/compiler/output/facility_domain.py")
+	# out_file = os.path.normpath("./python_causal_compiler/compiler/output/acceptance.py")
+	out_file = os.path.normpath("./acceptance.py")
 	facility_domain_py = open(out_file, "w")
 
 	# This block should just be all the text requisite for the file not including cause stuff
 	# TODO: Make sure the template is right
 	print('Opening Facility Domain Template')
-	path = os.path.normpath("./python_causal_compiler/compiler/templates/facility_domain_template.txt")
+	path = os.path.normpath("./python_causal_compiler/compiler/templates/acceptance_template.txt")
 	template = open(path, "r").read()
 	# Actually compile input
 	print('Running Facility Domain Compiler')
@@ -90,7 +91,7 @@ def main():
 		input_path = os.path.normpath(sys.argv[1])
 		text = open(input_path, 'r').read()
 	run_facility_domain(text)
-	run_imitation(text)
+	#run_imitation(text)
 
 if __name__ == '__main__':
    main();

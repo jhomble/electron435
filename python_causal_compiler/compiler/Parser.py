@@ -22,6 +22,17 @@ class All(AST):
 		#  The type given as a String argument to keywork ALL.
 		self.arg = arg
 
+## Python
+#
+#  Special PYTHON keyword. Allows user limited ability to inline
+#  python code
+class Python(AST):
+	## Constructor
+	def __init__(self, code):
+		## @var arg
+		#  The type given as a String argument to keywork ALL.
+		self.code = code
+
 ## Type
 #
 #  Special TYPE keyword. Means get the type of arg
@@ -31,6 +42,16 @@ class Type(AST):
 		## @var arg
 		#  The object name as a String whose type is desired
 		self.arg = arg
+
+## State
+#
+#  Special State keyword. Used for accessing current state
+class State(AST):
+	## Constructor
+	def __init__(self, args):
+		## @var arg
+		#  The object name as a String whose type is desired
+		self.args = args
 
 ## Digit
 #
@@ -359,7 +380,18 @@ class Parser(object):
 	# args ->   var COMMA args
 	#		  | var
 	def args(self):
-		node = self.var()
+		node = None;
+		if self.current_token.type == QUOTE:
+			self.eat(QUOTE)
+			node = Literal(name=self.var())
+			self.eat(QUOTE)
+		elif self.current_token.type == STATE:
+			self.eat(STATE)
+			self.eat(LPAREN)
+			node = State(args=self.args())
+			self.eat(RPAREN)
+		else:
+			node = self.var()
 
 		root = Args()
 
@@ -367,19 +399,21 @@ class Parser(object):
 
 		while self.current_token.type == COMMA:
 			self.eat(COMMA)
-			root.children.append(self.var())
+			if self.current_token.type == QUOTE:
+				self.eat(QUOTE)
+				node = Literal(name=self.var())				
+				self.eat(QUOTE)
+			elif self.current_token.type == STATE:
+				self.eat(STATE)
+				self.eat(LPAREN)
+				node = State(args=self.args())
+				self.eat(RPAREN)
+			else:
+				node = self.var()
+
+			root.children.append(node)
 
 		return root
-
-	## Bools2
-	#
-	# bools2 ->   boolean AND bools
-	#		    | boolean OR bools
-	#			| boolean
-	#			| (bools2) AND bools
-	#			| (bools2) OR bools
-	#			| (bools2)
-	#def bools2(self):
 
 	## Bools
 	#
@@ -426,11 +460,16 @@ class Parser(object):
 	## Boolean
 	#
 	# boolean -> expr EQUALS expr
+	# boolean -> expr
 	def boolean(self):
 		node1 = self.expr()
+		equals = True
 		if self.current_token.type == EQUALS :
 			token = self.current_token
 			self.eat(EQUALS)
+		elif self.current_token.type == NOTEQUAL :
+			token = self.current_token
+			self.eat(NOTEQUAL)		
 		elif self.current_token.type == LESSTHAN :
 			token = self.current_token
 			self.eat(LESSTHAN)
@@ -443,8 +482,13 @@ class Parser(object):
 		elif self.current_token.type == LESSEQUAL :
 			token = self.current_token
 			self.eat(LESSEQUAL)
+		else:
+			equals = False
+			token = Token(PYTHON, PYTHON)
+			node2 = None
 
-		node2 = self.expr()
+		if equals:
+			node2 = self.expr()
 
 		root = Boolean(e1=node1, op=token, e2=node2)
 
@@ -488,6 +532,8 @@ class Parser(object):
 	#             | integer
 	#             | integer DOT integer    (This is a float)
 	#			  | DOT integer            (This is a float)
+	#		      | STATE LPAREN args RPAREN
+	#			  | PYTHON	
 	def var(self):
 		if self.current_token.type == INTEGER:
 			node1 = self.integer()
@@ -502,6 +548,14 @@ class Parser(object):
 			self.eat(DOT)
 			node2 = self.integer()
 			node = Flt(left=node1, right=node2)
+		elif self.current_token.type == STATE:		
+			self.eat(STATE)
+			self.eat(LPAREN)
+			node = State(args=self.args())
+			self.eat(RPAREN)
+		elif self.current_token.type == PYTHON:
+			node = Python(code=self.current_token.value)
+			self.eat(PYTHON)
 		else:				
 			node = Var(self.current_token)
 			self.eat(ID)

@@ -6,11 +6,11 @@ from Token import Token
 # Token Types
 (LPAREN, RPAREN, COMMA, LBRACK, RBRACK, LCURLY, RCURLY, SEMI,
 	EQUALS, LESSTHAN, GREATERTHAN, LESSEQUAL, GREATEREQUAL, AND, OR, COLON, ID, INTEGER, CAUSES, DOT, QUOTE, 
-	RULES, TYPE, ALL, CONT, IF, EOF) = (
+	RULES, TYPE, ALL, CONT, IF, NOTEQUAL, STATE, PYTHON, EOF) = (
 	'LPAREN', 'RPAREN', 'COMMA', 'LBRACK', 'RBRACK', 'LCURLY',
 	'RCURLY', 'SEMI', 'EQUALS', 'LESSTHAN','GREATERTHAN', 'LESSEQUAL', 'GREATEREQUAL', 'AND', 'OR', 'COLON', 'ID', 
 	'INTEGER', 'CAUSES', 'DOT', 'QUOTE', 'RULES', 'TYPE', 
-	'ALL', 'CONT', 'IF', 'EOF'
+	'ALL', 'CONT', 'IF', 'NOTEQUAL', 'STATE', 'PYTHON', 'EOF'
 )
 
 # Automatically tokenizes certain reserved keywords
@@ -19,6 +19,8 @@ RESERVED_KEYWORDS = {
 	'TYPE':   Token('TYPE', 'TYPE'),
 	'ALL':   Token('ALL', 'ALL'),
 	'CONT':   Token('CONT', 'CONT'),
+	'STATE':   Token('STATE', 'STATE'),	
+	'PYTHON':   Token('PYTHON', 'PYTHON'),		
 	'if': Token('IF', 'IF'),
 }
 
@@ -93,11 +95,26 @@ class Lexer(object):
 	#  token
 	def _id(self):
 		result = ''
-		while self.current_char is not None and (self.current_char.isalnum() or self.current_char == '-'):
+		while self.current_char is not None and (self.current_char.isalnum() or self.current_char == '-' or self.current_char == '_'):
 			result += self.current_char
 			self.advance()
 
+		result = result.replace('_', ' ')
+
 		token = RESERVED_KEYWORDS.get(result, Token(ID, result))
+
+		result2 = ''
+
+		if token.type == PYTHON:
+			self.advance()
+			self.advance()
+			while self.current_char != '#':
+				result2 += self.current_char
+				self.advance()
+			self.advance()
+			self.advance()
+			token = Token(PYTHON, result2)
+
 		return token
 
 	## Get Next Token
@@ -157,6 +174,11 @@ class Lexer(object):
 			if self.current_char == '=':
 				self.advance()
 				return Token(EQUALS, '=')
+
+			if self.current_char == '!' and self.peek() == '=':
+				self.advance()
+				self.advance()				
+				return Token(NOTEQUAL,'!=')
 
 			if self.current_char == '<' and self.peek() != '=':
 				self.advance()

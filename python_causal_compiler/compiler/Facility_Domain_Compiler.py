@@ -3,6 +3,8 @@
 # Library Imports
 import operator
 import functools
+import string
+import random
 
 # Local Imports
 import Token
@@ -54,6 +56,10 @@ class Facility_Domain_Compiler(NodeVisitor):
 			return 'UNIT', (self.visit(node.e1), ">=", self.visit(node.e2))
 		elif node.op.type == LESSEQUAL :
 			return 'UNIT', (self.visit(node.e1), "<=", self.visit(node.e2))
+		elif node.op.type == NOTEQUAL :
+			return 'UNIT', (self.visit(node.e1), "!=", self.visit(node.e2))
+		elif node.op.type == PYTHON :
+			return 'UNIT', (self.visit(node.e1), "PYTHON", None)
 
 	## Visit Boolean Expression
 	#
@@ -158,8 +164,26 @@ class Facility_Domain_Compiler(NodeVisitor):
 
 		# iterate through all the arguments to the intention
 		for a in range(0, len(intention_Args)):
-			arg = intention_Args[a] 
-			if arg in arg_indices:
+			arg = intention_Args[a]
+			if isinstance(arg, (list, tuple)):
+				if arg[0] == 'LITERAL':
+					if a == len(intention_Args)-1:
+						args += '(\''+arg[1]+'\',)'
+					else:
+						args += '(\''+arg[1]+'\',)+'
+				elif arg[0] == 'STATE':
+					if a == len(intention_Args)-1:
+						args += '(get_state(states[0],'+arg[1]+'),)'
+					else:
+						args += '(get_state(states[0],'+arg[1]+'),)+'
+				elif arg[0] == 'PYTHON':
+					if a == len(intention_Args)-1:
+						args += '('+arg[1]+',)'
+					else:
+						args += '('+arg[1]+',)+'						
+				else:
+					raise Exception('Argument '+str(arg)+' is of invalid type!')
+			elif arg in arg_indices:
 				i,j = arg_indices[arg]
 				# Don't add + to last argument string
 				if (a == len(intention_Args)-1):
@@ -170,12 +194,17 @@ class Facility_Domain_Compiler(NodeVisitor):
 					prev_arg = intention_Args[a-1]
 					i,j = arg_indices[prev_arg]
 					args = args[:len(args)-(18+len(i)+len(j))] + 'arguments['+i+']['+j+':]'
+			elif arg == 'NONE':
+				if a == len(intention_Args)-1:
+					args += '((),)'					
+				else:	
+					args += '((),)+'									
 			else:
 				raise Exception('Could not find argument: ', arg)
 
 		gadd = 'g.add((states[0],\''+act[0]+'\','+args+'))\n'
 
-		return (if_stmt, gadd, arg_indices)
+		return (if_stmt, gadd, arg_indices, act[0])
 
 	## Visit No Conditional
 	#
@@ -188,6 +217,15 @@ class Facility_Domain_Compiler(NodeVisitor):
 	#  Return the result of evaluating the boolean expression
 	def visit_Cond(self, node):
 		return self.visit(node.boolean)
+
+	## ID Generator
+	#
+	#  Randomly generates a variable id. Developed from:
+	#     https://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits-in-python
+	#
+	#  @rtype: String
+	def id_generator(self, size=10, chars=string.ascii_uppercase):
+	    return ''.join(random.choice(chars) for _ in range(size))
 
 	## Compile Boolean Statement
 	#
@@ -226,8 +264,17 @@ class Facility_Domain_Compiler(NodeVisitor):
 				args = ''
 				for a in range(0, len(expr2)):
 					arg = expr2[a]
+
+					if isinstance(arg, (tuple, list)):
+						if arg[0] == 'STATE':
+							if a == len(expr2) -1 :
+								args += '(get_state(states[0],'+str(arg[1])+'),)'
+							else:
+								args += '(get_state(states[0],'+str(arg[1])+'),)+'
+						else:
+							raise Exception('Bad arg type to TYPE: '+str(arg))
 					# Handle the special case of Keyword CONT
-					if arg[:4] == 'CONT':
+					elif arg[:4] == 'CONT':
 						prev_arg = expr2[a-1]
 						i,j = arg_indices[prev_arg]
 						args = args[:len(args)-(18+len(i)+len(j))] + 'arguments['+i+']['+j+':]'
@@ -240,9 +287,18 @@ class Facility_Domain_Compiler(NodeVisitor):
 							args += '(arguments['+i+']['+j+'], )+'
 				if_stmt += 'if set(all_'+expr1[1]+') == set('+args+'):\n'
 			elif expr1[0] == 'TYPE':
-				var_name = str(expr1[1])
-				i,j = arg_indices[var_name]
-				var_get = 'arguments['+i+']'+'['+j+']'
+				var_get = ''
+				var_name = ''
+				if isinstance(expr1[1], (tuple, list)):
+					if expr1[1][0] == 'STATE':
+						var_get = 'get_state(states[0],'+str(expr1[1][1])+'),)'
+						var_name = self.id_generator()
+					else:
+						raise Exception('Bad arg type to TYPE: '+str(expr1[1]))
+				else:
+					var_name = str(expr1[1])
+					i,j = arg_indices[var_name]
+					var_get = 'arguments['+i+']'+'['+j+']'
 				body += var_name+'_type = lookup_type('+var_get+', states[0])\n'
 				if_stmt += 'if '+var_name+'_type == \''+str(expr2)+'\':\n'
 			else:
@@ -252,15 +308,105 @@ class Facility_Domain_Compiler(NodeVisitor):
 				if expr1[0] == 'LITERAL':
 					var1 = '\''+str(expr1[1])+'\''
 				else:
-					i,j = arg_indices[expr1]
-					var1 = 'arguments['+i+']['+j+']'
+					try:
+						float(expr1)
+						var1 = str(expr1)
+					except:
+						i,j = arg_indices[expr1]
+						var1 = 'arguments['+i+']['+j+']'
 
 				if expr2[0] == 'LITERAL':
 					var2 = '\''+str(expr2[1])+'\''
 				else:
-					i,j = arg_indices[expr2]
-					var2 = 'arguments['+i+']['+j+']'
+					try:
+						float(expr2)
+						var2 = str(expr2)
+					except:
+						i,j = arg_indices[expr2]
+						var2 = 'arguments['+i+']['+j+']'
+
 				if_stmt += 'if '+var1+' == '+var2+':\n'
+		elif comp == '!=':
+			if expr1[0] == 'ALL':
+				# make the body statement develop a list of all objects of type
+				# expr1[1] in the current state (state[0])
+				body += 'all_'+expr1[1]+' = [obj_id for (obj_id, obj_type,_,_,_,_)'
+				body += ' in states[0] if obj_type == \''+expr1[1]+'\']\n'
+				# find argument indices for the left-side of the comparison so
+				# that they can be appropriately referenced in the if_stmt
+				args = ''
+				for a in range(0, len(expr2)):
+					arg = expr2[a]
+					# Handle the special case of Keyword CONT
+					if isinstance(arg, (tuple, list)):
+						if arg[0] == 'STATE':
+							if a == len(expr2) -1 :
+								args += '(get_state(states[0],'+str(arg[1])+'),)'
+							else:
+								args += '(get_state(states[0],'+str(arg[1])+'),)+'
+						else:
+							raise Exception('Bad arg type to TYPE: '+str(arg))
+					if arg[:4] == 'CONT':
+						prev_arg = expr2[a-1]
+						i,j = arg_indices[prev_arg]
+						args = args[:len(args)-(18+len(i)+len(j))] + 'arguments['+i+']['+j+':]'
+					else:
+						i,j = arg_indices[arg]
+						# don't add + sign if it is the last argument
+						if (a == len(expr2) - 1):
+							args += '(arguments['+i+']['+j+'], )'
+						else:
+							args += '(arguments['+i+']['+j+'], )+'
+				if_stmt += 'if not set(all_'+expr1[1]+') == set('+args+'):\n'
+			elif expr1[0] == 'TYPE':
+				if isinstance(expr1[1], (tuple, list)):
+					if expr1[1][0] == 'STATE':
+						var_get = 'get_state(states[0],'+str(expr1[1][1])+')'
+						var_name = self.id_generator()
+					else:
+						raise Exception('Bad arg type to TYPE: '+str(expr1[1]))
+				else:
+					var_name = str(expr1[1])
+					i,j = arg_indices[var_name]
+					var_get = 'arguments['+i+']'+'['+j+']'
+				body += var_name+'_type = lookup_type('+var_get+', states[0])\n'
+				if_stmt += 'if not '+var_name+'_type == \''+str(expr2)+'\':\n'
+			else:
+				# var1 and var2 could be either variables or literals
+				var1 = ''
+				var2 = ''
+				if expr1[0] == 'LITERAL':
+					var1 = '\''+str(expr1[1])+'\''
+				else:
+					try:
+						float(expr1)
+						var1 = str(expr1)
+					except:
+						i,j = arg_indices[expr1]
+						var1 = 'arguments['+i+']['+j+']'
+
+				if expr2[0] == 'LITERAL':
+					var2 = '\''+str(expr2[1])+'\''
+				else:
+					try:
+						float(expr2)
+						var2 = str(expr2)
+					except:
+						i,j = arg_indices[expr2]
+						var2 = 'arguments['+i+']['+j+']'
+
+				if_stmt += 'if not '+var1+' == '+var2+':\n'
+		elif comp == 'PYTHON':
+			new_expr = expr1[1]
+			while new_expr.find('$') != -1:
+				begin_index = new_expr.find('$')+1
+				end_index = new_expr.find('$', begin_index)
+				var = new_expr[begin_index:end_index]
+				i,j = arg_indices[var]
+				arg = 'arguments['+i+']['+j+']'
+				new_expr = new_expr.replace('$'+var+'$', arg)
+				
+			if_stmt += new_expr + '\n'
 		else:
 			raise Exception('\''+str(comp)+'\' currently not supported')
 
@@ -306,8 +452,8 @@ class Facility_Domain_Compiler(NodeVisitor):
 					body2, if_stmt2 = self.traverse_BoolExpr(cond[2:], arg_indices)
 					# Only add in tabs if the new addition to body 
 					# is not empty
-					if body2 != '':
-						body += 2*tab+body2
+					# if body2 != '':
+					body += body2
 					# Replace the ending colon and newline character with a
 					# space for the previous if statement. Replace the 'if'
 					# from the new if statement with the appropriate operand
@@ -334,7 +480,7 @@ class Facility_Domain_Compiler(NodeVisitor):
 		#				arguments array for each of the arguments of the
 		#				actions
 
-		if_stmt, gadd, arg_indices = self.visit(node.caus)
+		if_stmt, gadd, arg_indices, intention = self.visit(node.caus)
 
 		# cond = tuple representing the conditions under which the rule
 		#		 holds. See visit_BoolExpr for more insight into the 
@@ -371,9 +517,12 @@ class Facility_Domain_Compiler(NodeVisitor):
 			if_stmt2_tabs = ''
 			gadd_tabs = 2*tab
 
+		# DEBUGGING
+		debug_print = 'print(\''+intention+'\')\n'
+
 		# Return appropriately tabbed string of single if statement block
 		# from the causes() function in facility_domain.py
-		return tab + if_stmt + body + if_stmt2_tabs + if_stmt2 + gadd_tabs + gadd
+		return tab + if_stmt + body + if_stmt2_tabs + if_stmt2 + gadd_tabs + debug_print + gadd_tabs + gadd
 
 	## Visit Statements
 	#
@@ -416,6 +565,37 @@ class Facility_Domain_Compiler(NodeVisitor):
 			result += self.visit(digit)
 
 		return result
+
+	## Visit State
+	#
+	#  Returns a tuple of ('STATE', state_args)
+	#
+	#  @rtype: (String, String list)
+	def visit_State(self, node):
+		args = self.visit(node.args)	
+		arg_str = ''
+		for a in range(0, len(args)):
+			arg = args[a]
+			if isinstance(arg, (tuple, list)):
+				if arg[0] == 'LITERAL':
+					arg = '\''+arg[1]+'\''
+				else:
+					raise Exception('Unrecognized argument type to STATE: '+str(arg))
+			if a == len(args) - 1:
+				arg_str += str(arg)
+			else:
+				arg_str += str(arg)+','
+		return STATE, arg_str
+
+	## Visit Python
+	#
+	# Returns a tuple of ('PYTHON', code_str) where the code_str
+	# is the Python code to be inlined
+	#
+	# @rtype: (String, String)
+	def visit_Python(self, node):
+		return 'PYTHON', node.code
+
 
 	## Visit Float
 	#

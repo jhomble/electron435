@@ -8,3 +8,7 @@ These tests are meant to show that functionality from Katz and Reggia's software
 $ chmod +x run_test_suite_2.sh
 $ ./run_test_suite_2.sh
 ```
+
+## Results
+
+The results should be in comparison.txt once the script is run. They list the test name, followed by the average run time (of 5 trials), followed by the standard deviation (of the same 5 trials). 

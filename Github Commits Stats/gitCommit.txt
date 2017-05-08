@@ -1,0 +1,751 @@
+Open this in an editor for better formatting
+
+commit de48aec9dbdabf8d46926bfe97006a4d574027e6
+Author: jhomble <jhomble7@gmail.com>
+Date:   Thu May 4 12:12:34 2017 -0400
+
+    demo
+
+commit 2499a4e69fc87a7076eead8d039e4eea5a2fb8c4
+Author: jhomble <jhomble7@gmail.com>
+Date:   Thu May 4 12:11:26 2017 -0400
+
+    demo
+
+commit 64d0eb78432181396610dd335a5e5e8017cb4b08
+Author: jhomble <jhomble7@gmail.com>
+Date:   Thu May 4 12:09:31 2017 -0400
+
+    docs
+
+commit c3e57352ce215377b7b25849616b606e105bceca
+Merge: 71f804a 783a5a5
+Author: jhomble <jhomble7@gmail.com>
+Date:   Thu May 4 12:02:28 2017 -0400
+
+    Merge branch 'master' of https://github.com/jhomble/electron435
+
+commit 71f804a6dfdc413c77a83a92d20f27536b8ead7f
+Author: jhomble <jhomble7@gmail.com>
+Date:   Thu May 4 12:02:25 2017 -0400
+
+    demo
+
+commit 783a5a5b9aa75f5034877b0f622cacf70cf5da0f
+Author: Kyle Urban <Kyle Urban>
+Date:   Thu May 4 12:00:53 2017 -0400
+
+    added herrmann folder
+
+commit 1e5405c40e6c6c95b23902cb952679cfc569ba24
+Author: Ben Mariano <benmariano@Bens-MacBook-Pro.local>
+Date:   Thu May 4 00:15:23 2017 -0400
+
+    refactored and cleaned a bit
+
+commit 9b398c03c43071873edd7409426107f41d38ce1c
+Author: Kyle Urban <Kyle Urban>
+Date:   Wed May 3 23:44:34 2017 -0400
+
+    just kidding, not putting the pictures in here
+
+commit ddc8a5ebc0cd88235624490bbf2a1e27d517d009
+Merge: 3926c8e 3a949c5
+Author: Kyle Urban <Kyle Urban>
+Date:   Wed May 3 23:23:11 2017 -0400
+
+    Merge branch 'master' of https://github.com/jhomble/electron435
+
+commit 3926c8ed80b0bb64c83e6e3f8cbac0db8090d103
+Author: Kyle Urban <Kyle Urban>
+Date:   Wed May 3 23:22:57 2017 -0400
+
+    folder for pictures
+
+commit 3a949c58cbf6a0a99e3ad50c1a91d92da7baf5c0
+Author: Ben Mariano <benmariano@Bens-MacBook-Pro.local>
+Date:   Wed May 3 23:04:24 2017 -0400
+
+    fixed or to really work hopefully
+
+commit 24c4bf1d0336f70bac9068c88f0771d212cddc19
+Merge: 67b8bb1 405af86
+Author: jhomble <jhomble7@gmail.com>
+Date:   Wed May 3 22:56:13 2017 -0400
+
+    Merge branch 'master' of https://github.com/jhomble/electron435
+
+commit 67b8bb1f29d43846bad54ff503bd12e95331c839
+Author: jhomble <jhomble7@gmail.com>
+Date:   Wed May 3 22:56:07 2017 -0400
+
+    more editing, added the custom parameter option
+
+commit 405af86d939e0d074ca1a7fa954e21cd34c16f6a
+Author: Ben Mariano <benmariano@Bens-MacBook-Pro.local>
+Date:   Wed May 3 19:41:00 2017 -0400
+
+    fixed CONT problem
+
+commit 0557f10a40e66698417c2e6b01c7744f89bb5255
+Author: Derek Farley <derekfarley23@gmail.com>
+Date:   Wed May 3 16:27:01 2017 -0400
+
+    added intermediate XML generation to imitation template
+
+commit 5f9abcb011d0147e4386f6a733ed5c8bed327837
+Author: Kyle Urban <Kyle Urban>
+Date:   Wed May 3 08:41:44 2017 -0400
+
+    missing def files in SMILE
+
+commit 131f79e47617d7afc3ddefe8dbd88051989eccb1
+Author: Derek Farley <derekfarley23@gmail.com>
+Date:   Wed May 3 02:43:05 2017 -0400
+
+    slight change to javascript to call python script in folder instead of root directory
+
+commit ab88d7ba1a4373e0f7401ff674e38edb2ab0f2c8
+Author: Derek Farley <derekfarley23@gmail.com>
+Date:   Wed May 3 02:22:28 2017 -0400
+
+    modified to accept text file input instead of string from front end
+
+commit 42843bd06452ec84387b3babe11eca4a7a367a90
+Author: Ben Mariano <benmariano@Bens-MacBook-Pro.local>
+Date:   Wed May 3 02:14:51 2017 -0400
+
+    added in parentheses option and fixed many bugs
+
+commit d183e415d9200ce97ff116d380e0882148d669da
+Merge: 3b399ba d5990df
+Author: jhomble <jhomble7@gmail.com>
+Date:   Wed May 3 02:13:00 2017 -0400
+
+    Merge branch 'master' of https://github.com/jhomble/electron435
+
+commit 3b399ba3c74691605ba7873e9db6e0ddb3f04ff5
+Author: jhomble <jhomble7@gmail.com>
+Date:   Wed May 3 02:12:58 2017 -0400
+
+    create text file from builder and file input for xml
+
+commit d5990df8cf053083a272c2bc980599a5a3b5710c
+Merge: 2396cd8 77df251
+Author: Derek Farley <derekfarley23@gmail.com>
+Date:   Wed May 3 01:24:26 2017 -0400
+
+    Merge branch 'master' of https://github.com/jhomble/electron435
+
+commit 2396cd8f30a6626f8f0391f7668bf4ac62af12b4
+Author: Derek Farley <derekfarley23@gmail.com>
+Date:   Wed May 3 01:24:10 2017 -0400
+
+    added fresh SMILE, copct, and pyhop directories with corresponding files
+
+commit 77df251b344bad9515dc017ed2d424d388ed9bf4
+Merge: c45d1e8 0a2e406
+Author: jhomble <jhomble7@gmail.com>
+Date:   Tue May 2 13:04:20 2017 -0400
+
+    Merge branch 'master' of https://github.com/jhomble/electron435
+
+commit c45d1e892ef1b7b37d5047c39a2312252cc09ebd
+Author: jhomble <jhomble7@gmail.com>
+Date:   Tue May 2 13:04:17 2017 -0400
+
+    fixed string
+
+commit 0a2e40645a9da7da1f0f04afc45d8da1bdc8ad11
+Author: Julien Homble <jhomble7@gmail.com>
+Date:   Mon May 1 22:56:00 2017 -0400
+
+    update readme
+
+commit c27862b5110d7916f2152e9da142b3211dc0182c
+Author: Kyle Urban <Kyle Urban>
+Date:   Sun Apr 30 20:55:45 2017 -0400
+
+    added functionality, writes a txt file to SMILE/tablesetup with the list of actions it took to produce the new imitation xml
+
+commit 969437e4e51859892859e29affd8406f2eed0f95
+Author: Kyle Urban <Kyle Urban>
+Date:   Sun Apr 30 19:53:08 2017 -0400
+
+    everyone should be able to run the demo now
+
+commit 3c2dde112cf02acc597e06f8ff5586dbefdcf079
+Merge: b14462c bce2e07
+Author: Derek Farley <derekfarley23@gmail.com>
+Date:   Fri Apr 28 09:26:04 2017 -0400
+
+    Merge branch 'master' of https://github.com/jhomble/electron435
+
+commit b14462cea04a2347d40360bfd59a52490c9c59b2
+Author: Derek Farley <derekfarley23@gmail.com>
+Date:   Fri Apr 28 09:25:44 2017 -0400
+
+    added test input for user input xml generation; isolated to own directory
+
+commit bce2e07a0fca470bccd9cc13cd9ed26115ffeefa
+Author: Kyle Urban <Kyle Urban>
+Date:   Thu Apr 27 23:09:31 2017 -0400
+
+    should be ready for demo
+
+commit 07cd6f60182358a304497367df713743725a89fe
+Merge: c00bbfe dbc959d
+Author: Kyle Urban <Kyle Urban>
+Date:   Thu Apr 27 21:35:58 2017 -0400
+
+    Merge branch 'master' of https://github.com/jhomble/electron435
+
+commit c00bbfe1997fc1a7572d093103e3b028ed6035d2
+Author: Kyle Urban <Kyle Urban>
+Date:   Thu Apr 27 21:35:34 2017 -0400
+
+    got it to work with timer
+
+commit dbc959d154903c77039b7fdf5c3618d2deb83087
+Author: Derek Farley <derekfarley23@gmail.com>
+Date:   Thu Apr 27 21:31:37 2017 -0400
+
+    linked xml generating script to GUI; added python script
+
+commit e5f20fa4fdfe32bb6581145184c85c4091a85eaf
+Merge: bac04d6 0f0a5d0
+Author: Kyle Urban <Kyle Urban>
+Date:   Thu Apr 27 21:13:04 2017 -0400
+
+    Merge branch 'master' of https://github.com/jhomble/electron435
+
+commit bac04d6197b063efea4eecd98257c51512d4fe6b
+Merge: a89c57b bd7c540
+Author: Kyle Urban <Kyle Urban>
+Date:   Thu Apr 27 21:11:28 2017 -0400
+
+    going back to timer option
+
+commit 0f0a5d07912533807043ff1ce70b1c6b46b5d6b2
+Merge: 4fb7083 59786eb
+Author: jhomble <jhomble7@gmail.com>
+Date:   Thu Apr 27 21:09:37 2017 -0400
+
+    Merge branch 'master' of https://github.com/jhomble/electron435
+
+commit 4fb70833234bda96b2382eb3a2978b7627b2fa67
+Author: jhomble <jhomble7@gmail.com>
+Date:   Thu Apr 27 21:09:34 2017 -0400
+
+    timer
+
+commit 59786ebf8a11d79b89bbb8ad486b9e27b151cab3
+Author: Ben Mariano <benmariano@wireless-10-105-227-193.umd.edu>
+Date:   Thu Apr 27 21:04:05 2017 -0400
+
+    removed silly python import stuff
+
+commit a89c57bf07010e065fbf61088e98fc0989f79d29
+Author: Kyle Urban <Kyle Urban>
+Date:   Thu Apr 27 21:02:38 2017 -0400
+
+    going back to timer option
+
+commit bd7c5400b9132829d9898d8ecb601d4e2f587b42
+Author: jhomble <jhomble7@gmail.com>
+Date:   Thu Apr 27 21:01:21 2017 -0400
+
+    timer
+
+commit 75a629d59b282d028d10e4be846dd05c232b19c4
+Author: jhomble <jhomble7@gmail.com>
+Date:   Thu Apr 27 20:47:15 2017 -0400
+
+    fix
+
+commit ab11b6fb0b40d1763ed851c3a0e675833fccab84
+Author: jhomble <jhomble7@gmail.com>
+Date:   Thu Apr 27 20:46:37 2017 -0400
+
+    xml page
+
+commit 963352c30357d705dc89faa615190ba337cf8d93
+Merge: 4eb5906 b344b4b
+Author: jhomble <jhomble7@gmail.com>
+Date:   Thu Apr 27 20:12:43 2017 -0400
+
+    Merge branch 'master' of https://github.com/jhomble/electron435
+
+commit b344b4beb01721ce890a173d240051880677f797
+Author: Ben Mariano <benmariano@wireless-10-105-227-193.umd.edu>
+Date:   Thu Apr 27 20:04:48 2017 -0400
+
+    should run imitation from run.py now
+
+commit 4eb5906d28ff43ba02f99fdc8f88f39b6400c4d9
+Merge: 8664068 c43215d
+Author: jhomble <jhomble7@gmail.com>
+Date:   Thu Apr 27 19:59:00 2017 -0400
+
+    merging backend
+
+commit 1b3263c3725f7bee41ba92f0ea1a38726e54504e
+Author: Kyle Urban <Kyle Urban>
+Date:   Thu Apr 27 19:56:46 2017 -0400
+
+    imitation may only work on windows, but slowly integrating with bens stuff
+
+commit 8664068b6c6b2cfc20eecdb29dbc936a1cd44226
+Author: jhomble <jhomble7@gmail.com>
+Date:   Thu Apr 27 19:48:56 2017 -0400
+
+    added all the xml stuff
+
+commit c43215dda9df2b95d6672201d3a03c1839acba81
+Author: Ben Mariano <benmariano@wireless-10-105-227-193.umd.edu>
+Date:   Thu Apr 27 18:27:33 2017 -0400
+
+    fixed the error
+
+commit e74df40a002d0e41247fe1ff3bc45a9b59608106
+Author: Ben Mariano <benmariano@wireless-10-105-227-193.umd.edu>
+Date:   Thu Apr 27 18:24:17 2017 -0400
+
+    rewrote facility template
+
+commit 103fa6782af00d59f8f3dcfbdee92089823d63d2
+Author: Ben Mariano <benmariano@wireless-10-105-227-193.umd.edu>
+Date:   Thu Apr 27 18:12:54 2017 -0400
+
+    more updates to please Python 3
+
+commit a018211349abb79372a579b0da1442651a35edf4
+Author: Kyle Urban <Kyle Urban>
+Date:   Thu Apr 27 18:03:17 2017 -0400
+
+    templates changed
+
+commit 5a039c93082afb88e507392412f150017e660ac5
+Author: Ben Mariano <benmariano@wireless-10-105-227-193.umd.edu>
+Date:   Thu Apr 27 17:56:47 2017 -0400
+
+    changed file paths to be windows nice too
+
+commit a400877a63c41fcaa7dc15989e6420fbd6e92f27
+Merge: cfc44bf e217a47
+Author: Kyle Urban <Kyle Urban>
+Date:   Thu Apr 27 17:55:18 2017 -0400
+
+    fixing conflicts
+
+commit cfc44bfc268eb6c87552866a7dfd104fcefb5134
+Author: Kyle Urban <Kyle Urban>
+Date:   Thu Apr 27 17:48:45 2017 -0400
+
+    app now runs run.py
+
+commit 1444d664abae707e02ed7cf05f080deef495ad77
+Author: Kyle Urban <Kyle Urban>
+Date:   Thu Apr 27 17:47:37 2017 -0400
+
+    adjusted template
+
+commit e217a47e8beef3f5d833c5682579ca6770eda9cb
+Merge: 49a7f34 18d4dbb
+Author: Ben Mariano <benmariano@wireless-10-105-227-193.umd.edu>
+Date:   Thu Apr 27 17:43:53 2017 -0400
+
+    merged bug
+
+commit 49a7f349df360db231371fe82e24db903da1c6c9
+Author: Ben Mariano <benmariano@wireless-10-105-227-193.umd.edu>
+Date:   Thu Apr 27 17:41:41 2017 -0400
+
+    changed weird 2.7 python bug
+
+commit 18d4dbb4cf019f70b953617c8ae83074e28155c3
+Merge: 60ba34e 78d3828
+Author: jhomble <jhomble7@gmail.com>
+Date:   Thu Apr 27 17:32:49 2017 -0400
+
+    Merge branch 'master' of https://github.com/jhomble/electron435
+
+commit 60ba34e99c1d6ef22a96d2032e53cb8c598e3bd9
+Author: jhomble <jhomble7@gmail.com>
+Date:   Thu Apr 27 17:32:29 2017 -0400
+
+    added final page
+
+commit 78d3828e8f8592fc3915c5a8ff57aaaf46363e75
+Author: Amber Mirza <ambermirza89@gmail.com>
+Date:   Thu Apr 27 17:28:56 2017 -0400
+
+    Update preview.html
+
+commit cb1c219cd662005307b7e0f85175b6f0417add49
+Author: Amber Mirza <ambermirza89@gmail.com>
+Date:   Thu Apr 27 17:28:32 2017 -0400
+
+    Update preview.html
+
+commit 7dea460386185cae6a1c7c7f4c3f3d0636ca90f6
+Author: Ben Mariano <benmariano@wireless-10-105-227-193.umd.edu>
+Date:   Thu Apr 27 17:21:19 2017 -0400
+
+    changed output
+
+commit 4ea1667560218f5ad970f1ab6c0549a98e4ce4ac
+Author: Ben Mariano <benmariano@Bens-MacBook-Pro.local>
+Date:   Thu Apr 27 16:00:50 2017 -0400
+
+    removed unnecessary code block
+
+commit 47a42598939338fcb02a411b2b19bc491e62163e
+Author: Ben Mariano <benmariano@Bens-MacBook-Pro.local>
+Date:   Thu Apr 27 15:56:52 2017 -0400
+
+    more cleanup
+
+commit e79120d05a434e4d6897db93f61d2d93eda49e98
+Author: Ben Mariano <benmariano@Bens-MacBook-Pro.local>
+Date:   Thu Apr 27 15:43:44 2017 -0400
+
+    reorganized compiler into multiple files for simplicity and clarity
+
+commit 14fd2bd6cbdf3a5b9d2dfbd0718ae8e194b1f580
+Author: Kyle Urban <Kyle Urban>
+Date:   Thu Apr 27 12:41:48 2017 -0400
+
+    updated for final_imitation
+
+commit 5c8207c033c22b923d145d73737c042794f08f70
+Merge: 6c69a15 772d28e
+Author: Kyle Urban <Kyle Urban>
+Date:   Thu Apr 27 12:37:04 2017 -0400
+
+    forgot to push
+
+commit 772d28e1779fbe98242919fd3f5f5204ab941c4c
+Author: Ben Mariano <benmariano@wireless-10-104-233-198.umd.edu>
+Date:   Thu Apr 27 01:36:01 2017 -0400
+
+    compiler now successfully compiles both imitation and facility. now time to debug and refactor
+
+commit 6c69a152db5fea140bb9eaee98562668f8de1808
+Merge: 63aa2c8 40bec14
+Author: Kyle Urban <Kyle Urban>
+Date:   Wed Apr 26 22:28:12 2017 -0400
+
+    Merge branch 'master' of https://github.com/jhomble/electron435
+
+commit 40bec14e2efd44c54a19a0dea281185712cfd6e3
+Author: Ben Mariano <benmariano@wireless-10-104-233-198.umd.edu>
+Date:   Wed Apr 26 21:29:30 2017 -0400
+
+    fixed variable name issues, handling most of CONT issues
+
+commit 63aa2c88ea3f21689d4d556004c85d9d13b5ac55
+Merge: a0deef8 997047b
+Author: Kyle Urban <Kyle Urban>
+Date:   Wed Apr 26 21:02:49 2017 -0400
+
+    Merge remote-tracking branch 'refs/remotes/origin/master'
+
+commit a0deef864208b39d0a6530d8b6e7bbc3defefa68
+Author: Kyle Urban <Kyle Urban>
+Date:   Wed Apr 26 21:02:12 2017 -0400
+
+    got the app to run my python load_demo.py
+
+commit 997047b1d1d6dd9d00a9995d8e2929ab7e19e1fa
+Merge: eb3f19f 1919fd3
+Author: jhomble <jhomble7@gmail.com>
+Date:   Wed Apr 26 19:04:23 2017 -0400
+
+    Merge branch 'master' of https://github.com/jhomble/electron435
+
+commit eb3f19fd7127e511a3c585c52d7c007577c8a9e2
+Author: jhomble <jhomble7@gmail.com>
+Date:   Wed Apr 26 19:04:19 2017 -0400
+
+    xml page
+
+commit 1919fd31c0c330ebe6df16dbf3538e2a5b5ee496
+Author: Ben Mariano <benmariano@wireless-10-104-233-198.umd.edu>
+Date:   Wed Apr 26 16:59:35 2017 -0400
+
+    handles type and adding star to method def
+
+commit 5ab95a4d9b0f3b7acb0fbc9c82e3767ce2259bdd
+Author: jhomble <jhomble7@gmail.com>
+Date:   Wed Apr 26 00:52:09 2017 -0400
+
+    added a lot of error checking
+
+commit ddcda4c8cc90164676792858b5b2d319c79eaa17
+Author: jhomble <jhomble7@gmail.com>
+Date:   Wed Apr 26 00:32:03 2017 -0400
+
+    added conditional and run function
+
+commit ad3de5b2f13c14ff385ef0df4219410e88e8d522
+Author: jhomble <jhomble7@gmail.com>
+Date:   Wed Apr 26 00:28:01 2017 -0400
+
+    back button
+
+commit 2b237542e3385002fe88222c4e4823617bc026f7
+Merge: c0f3c8b 86e9d73
+Author: jhomble <jhomble7@gmail.com>
+Date:   Wed Apr 26 00:24:47 2017 -0400
+
+    Merge branch 'master' of https://github.com/jhomble/electron435
+
+commit c0f3c8b99ce1854f9ee27f25f2ebc92603d73cb6
+Author: jhomble <jhomble7@gmail.com>
+Date:   Wed Apr 26 00:24:42 2017 -0400
+
+    added xml input
+
+commit 86e9d73946015f8311c149f34605c5317fa556a0
+Author: Ben Mariano <benmariano@wireless-10-104-238-96.umd.edu>
+Date:   Wed Apr 26 00:15:13 2017 -0400
+
+    further strides on imitation compiler
+
+commit a0b142facb93badeafbbbb0c8eb22f5d40f4df93
+Author: Ben Mariano <benmariano@wireless-10-104-238-96.umd.edu>
+Date:   Tue Apr 25 23:43:28 2017 -0400
+
+    added beginnings of imitation compiler
+
+commit 125f0c8e1128def2cce41f783206ead399152c3c
+Merge: 4f0258b d4e18a4
+Author: jhomble <jhomble7@gmail.com>
+Date:   Tue Apr 25 23:17:49 2017 -0400
+
+    Merge branch 'master' of https://github.com/jhomble/electron435
+
+commit 4f0258bbcb948d03c5abde0bc4b1dd27c9e78685
+Author: jhomble <jhomble7@gmail.com>
+Date:   Tue Apr 25 23:17:40 2017 -0400
+
+    added build path string function
+
+commit d4e18a4422775e6ca331eea6b2a605b6e52fa0fc
+Author: Amber Mirza <ambermirza89@gmail.com>
+Date:   Tue Apr 25 23:07:35 2017 -0400
+
+    debugging
+
+commit 0bb32274adc5bd6239db64fdc727b8431645932c
+Author: Amber Mirza <ambermirza89@gmail.com>
+Date:   Tue Apr 25 22:47:28 2017 -0400
+
+    tag for console bug
+
+commit 42665f2eebf57e484e7588dae1b44cb86d09038b
+Author: Amber Mirza <ambermirza89@gmail.com>
+Date:   Tue Apr 25 22:40:57 2017 -0400
+
+    added style tag for console bug
+
+commit c5cb06b2d4a691f225cb3f6725b57505e333f4ca
+Author: Ben Mariano <benmariano@wireless-10-104-238-96.umd.edu>
+Date:   Tue Apr 25 22:01:14 2017 -0400
+
+    added in M variable for facility_domain
+
+commit 6c1cc3d5f9148405d27cfbe521693e057a47d4ce
+Author: Ben Mariano <benmariano@wireless-10-104-238-96.umd.edu>
+Date:   Tue Apr 25 21:32:52 2017 -0400
+
+    Made significant formal documentation (should work with Doxygen)
+
+commit 4da1c312a823984d9708f995529563e981935ef0
+Author: Ben Mariano <benmariano@wireless-10-104-238-96.umd.edu>
+Date:   Tue Apr 25 19:24:01 2017 -0400
+
+    added some comments to the more difficult parts of the compiler
+
+commit bc14f22c14a0fdb4192fd8017c10d4348bb34338
+Author: Amber Mirza <ambermirza89@gmail.com>
+Date:   Tue Apr 25 18:42:44 2017 -0400
+
+    adding preview
+
+commit cbeb4fa3efab870d127eee22ec6ae53f786b0007
+Author: jhomble <jhomble7@gmail.com>
+Date:   Tue Apr 25 12:58:45 2017 -0400
+
+    added path to input files
+
+commit ba0b228468a579cde3def8ffb6e7ec94e98c8072
+Author: jhomble <jhomble7@gmail.com>
+Date:   Tue Apr 25 12:54:15 2017 -0400
+
+    made input files work well and display
+
+commit ba7f4145fdd5ce4c189c7e0da766f831c8cbd203
+Merge: 11cb79a ba34e98
+Author: jhomble <jhomble7@gmail.com>
+Date:   Tue Apr 25 12:00:56 2017 -0400
+
+    Merge branch 'master' of https://github.com/jhomble/electron435
+
+commit 11cb79a33835e265844aad4652973d9923f440e9
+Author: jhomble <jhomble7@gmail.com>
+Date:   Tue Apr 25 12:00:22 2017 -0400
+
+    fixes
+
+commit ba34e98c216fa7b1206594b1427ccce43983e75c
+Author: Ben Mariano <benmariano@wireless-10-104-238-96.umd.edu>
+Date:   Tue Apr 25 00:21:20 2017 -0400
+
+    compiler successfully creates facility_domain, needs to be cleaned up
+
+commit a984a3df073460fdf645c0d5c0c26442b144c7a4
+Author: Ben Mariano <benmariano@wireless-10-104-238-96.umd.edu>
+Date:   Tue Apr 25 00:20:48 2017 -0400
+
+    fixed error that came from bad comments in Katz's code
+
+commit 7dbe6244aa5b0c71758096054cff6d56ec4ca481
+Author: jhomble <jhomble7@gmail.com>
+Date:   Mon Apr 24 22:27:33 2017 -0400
+
+    multiple file browser
+
+commit d6389f521ace02b7a337311aac9dc15dc24d676a
+Author: Ben Mariano <benmariano@wireless-10-104-238-96.umd.edu>
+Date:   Mon Apr 24 21:29:17 2017 -0400
+
+    added new imitation compiler skeleton, started support for conditionals in facility compiler
+
+commit f2fc3188362e5a9153d3cf9a0cd2d25de54aa5a9
+Merge: ac652e5 35a47bf
+Author: jhomble <jhomble7@gmail.com>
+Date:   Mon Apr 24 19:32:24 2017 -0400
+
+    Merge branch 'master' of https://github.com/jhomble/electron435
+
+commit ac652e53a1c7b382170f3fe82d83da22bfb33fc9
+Author: jhomble <jhomble7@gmail.com>
+Date:   Mon Apr 24 19:32:21 2017 -0400
+
+    fixed button
+
+commit 361dc9d15af409bb918b0928a46e42c59d8fbdcf
+Author: jhomble <jhomble7@gmail.com>
+Date:   Mon Apr 24 19:27:44 2017 -0400
+
+    stuff for amber
+
+commit 35a47bf09b350cb9671eea08d2caac4287d7a098
+Author: Chris Dear <chris@dear.com>
+Date:   Sun Apr 23 14:50:18 2017 -0400
+
+    Implementing ability to actually write out compiled info to .py scripts
+
+commit 44ec8488735cf5cb9d48d0606d18c0196ff9339e
+Author: Ben Mariano <benmariano13@gmail.com>
+Date:   Thu Apr 20 18:44:56 2017 -0400
+
+    small changes to compiler, beginnings of conditional compilation
+
+commit 7fa9e287bfbd2f9fc180a4a7c2d15aa826a815d8
+Author: Derek Farley <derekfarley23@gmail.com>
+Date:   Thu Apr 20 00:34:36 2017 -0400
+
+    added support for >,>=,<,<= to compiler
+
+commit 838c867518101ad8548df28aa024a335908e3e4f
+Author: Ben Mariano <benmariano13@gmail.com>
+Date:   Tue Apr 18 16:08:16 2017 -0400
+
+    added compiler to main git
+
+commit 0f3fe1cafb8c346ed61fb9473c12121ae4574244
+Author: jhomble <jhomble7@gmail.com>
+Date:   Mon Apr 17 22:24:53 2017 -0400
+
+    added conditional to relationship and dropdown causal fix
+
+commit fb90a7d1120582fc42efa88f04f691acdf16f74e
+Author: jhomble <jhomble7@gmail.com>
+Date:   Mon Apr 17 01:38:34 2017 -0400
+
+    causal parameters fix
+
+commit 15e47212ad8da4762ee8f279bea78ca62ccaa771
+Author: jhomble <jhomble7@gmail.com>
+Date:   Mon Apr 17 00:14:46 2017 -0400
+
+    fixed param page
+
+commit 74458170537930c20fa0a72b6b3f03fcc1594769
+Author: jhomble <jhomble7@gmail.com>
+Date:   Tue Apr 11 22:21:20 2017 -0400
+
+    swapped actions and causes, added remove btn
+
+commit 000d264fa8c8b55ed41e262d02ec86b9e5ad0ded
+Author: jhomble <jhomble7@gmail.com>
+Date:   Tue Apr 11 14:14:30 2017 -0400
+
+    temp change
+
+commit ab1bacb254f70f5df3658dca44ff8b8fb7789d8c
+Author: jhomble <jhomble7@gmail.com>
+Date:   Tue Apr 11 13:40:28 2017 -0400
+
+    spacing and added bootstrap for jumbo
+
+commit 3022bf02b321f643bf149edbda13c832d95cac07
+Author: jhomble <jhomble7@gmail.com>
+Date:   Tue Apr 11 12:08:51 2017 -0400
+
+    added relationship and parameter
+
+commit 33764a3c9d2a8ce4656d485375d63fe69391c7a9
+Author: jhomble <jhomble7@gmail.com>
+Date:   Thu Apr 6 13:16:08 2017 -0400
+
+    cleanup
+
+commit fdbb2eeef6dc51a7ed83b16499391ced994ad326
+Author: jhomble <jhomble7@gmail.com>
+Date:   Thu Apr 6 13:15:12 2017 -0400
+
+    cleaning up knowledge segment
+
+commit 415883cec7b8d38c4867e59e5533b91cb3508c9f
+Author: jhomble <jhomble7@gmail.com>
+Date:   Thu Apr 6 13:08:05 2017 -0400
+
+    added knowledge builder system
+
+commit 8e3e12ffc2af39b34a08cec529c0a72aebf4f7c9
+Author: jhomble <jhomble7@gmail.com>
+Date:   Tue Apr 4 13:32:38 2017 -0400
+
+    semantic dist
+
+commit 8b2959e8906e6c6b4b547eb2aeb113ca32ba4492
+Author: jhomble <jhomble7@gmail.com>
+Date:   Tue Apr 4 12:10:24 2017 -0400
+
+    added next segment, made directives, cleaned names
+
+commit fdc56f58ba6671053ff90bb660ab4db35d67952a
+Author: jhomble <jhomble7@gmail.com>
+Date:   Mon Apr 3 20:39:01 2017 -0400
+
+    icon
+
+commit d52d85fa5cdee479ee1aa62485693b7ee85acce7
+Author: jhomble <jhomble7@gmail.com>
+Date:   Mon Apr 3 20:35:47 2017 -0400
+
+    first commit

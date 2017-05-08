@@ -24,6 +24,9 @@
         ]
     )
 
+        // All .directives are the html segments. 
+        // directives were made so each segment could have its own html
+
         .directive('inputTask', function () {
             return {
                 templateUrl: 'scripts/home/inputTask.html'
@@ -85,8 +88,10 @@
             }
         })
 
+        // Controller for the entire application
         .controller('homeController', ['$scope', '$window', function ($scope, $window) {
             $(document).ready(function () {
+                // these $scope variables are for hiding and showing each segment
                 $scope.inputTask = true;
                 $scope.inputSmile = false;
                 $scope.inputCauses = false;
@@ -99,6 +104,7 @@
                 $scope.finalPage = false;
                 $scope.builderReview = false;
 
+                // these $scope variables are flags or ng-class options
                 $scope.knowledgeAdded = false;
                 $scope.run = false
                 $scope.recordings = []
@@ -108,6 +114,7 @@
                 $scope.showCustom = false;
                 $scope.customClass = "ui grey button"
 
+                // Called when switching directives. Set all directive show flags to false
                 var reset = function () {
                     $scope.inputTask = false;
                     $scope.inputSmile = false;
@@ -122,6 +129,19 @@
                     $scope.finalPage = false;
                     $scope.builderReview = false;
                 }
+
+                // function to eliminate duplicates in an array. (ng-repeat doesnt allow dups)
+                function unique(list) {
+                    var result = [];
+                    $.each(list, function (i, e) {
+                        if ($.inArray(e, result) == -1) result.push(e);
+                    });
+                    return result;
+                }
+
+
+                // All show functions are switching from one directive to another
+                // All show functions reset all flags to false and set its flag to true
                 $scope.showInputTask = function () {
                     reset();
                     $scope.inputTask = true;
@@ -156,7 +176,7 @@
                     reset()
                     $scope.preview = true;
                 }
-
+                // The goClass is a ng-class variable
                 $scope.showReview = function () {
                     reset()
                     $scope.goClass = "ui green button"
@@ -179,11 +199,18 @@
                     $scope.builderReview = true;
                 }
 
-                $scope.startOver = function () {
-                    window.location.reload(false)
-
+                $scope.showCausalParameters = function () {
+                    reset()
+                    $scope.causalParameters = true;
+                    $scope.createParamList();
                 }
 
+                // Resets the application on click - equivalent to refreshing the page
+                $scope.startOver = function () {
+                    window.location.reload(false)
+                }
+
+                // Not used currently, but would open an external web page for a preview
                 $scope.openPreview = function () {
                     const { shell } = require('electron')
                     shell.openExternal('https://ambermirza.github.io/preview/')
@@ -191,14 +218,8 @@
 
                 $scope.inputtedTask = ""
 
-                function unique(list) {
-                    var result = [];
-                    $.each(list, function (i, e) {
-                        if ($.inArray(e, result) == -1) result.push(e);
-                    });
-                    return result;
-                }
-
+                // Given the SMILE text recordings. This function iterates through all, 
+                // and creates a CSV string of the paths and puts them into the pathString variable
                 $scope.buildPathString = function () {
                     $scope.pathString = ""
                     $scope.recordings.forEach(function (x) {
@@ -207,12 +228,7 @@
                     $scope.pathString = $scope.pathString.slice(0, -1);
                 }
 
-                $scope.showCausalParameters = function () {
-                    reset()
-                    $scope.causalParameters = true;
-                    $scope.createParamList();
-                }
-
+                // this functions purpose is to toggle the custom parameter button css
                 $scope.toggleCustom = function(){
                     if($scope.showCustom){
                         $scope.showCustom = false;

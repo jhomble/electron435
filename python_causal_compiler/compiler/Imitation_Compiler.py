@@ -60,6 +60,8 @@ class Imitation_Compiler(NodeVisitor):
 			return 'UNIT', (self.visit(node.e1), ">=", self.visit(node.e2))
 		elif node.op.type == LESSEQUAL :
 			return 'UNIT', (self.visit(node.e1), "<=", self.visit(node.e2))
+		elif node.op.type == NOTEQUAL :
+			return 'UNIT', (self.visit(node.e1), "!=", self.visit(node.e2))
 
 	## Visit Boolean Expression
 	#
@@ -167,37 +169,50 @@ class Imitation_Compiler(NodeVisitor):
 		# Check if method has already been defined
 		if act_name in self.methods_dict:
 			args, conds, rets = self.methods_dict[act_name]
+			hasLiteral = False
+			for arg in intention_Args:
+				if isinstance(arg, (tuple, list)):
+					hasLiteral = True
+			origHasLiteral = False
+			for arg in args:
+				if isinstance(arg, (tuple, list)):
+					origHasLiteral = True
 			# Check if you have to change parameters (add final *)
-			if len(intention_Args) > len(args):
-				prev_arg = ''		
-				# iterate through intention args		
-				for a in range(0, len(intention_Args)):
-					arg = intention_Args[a]
-					# handle CONT keyword
-					if arg[:4] == 'CONT':
-						# Get argument referenced by CONT number
-						index = a - int(arg[4:])
-						prev_arg = args[index]
-						# iterate through intention args coming after the first item
-						# referenced by the CONT
-						for i in range(index, len(intention_Args)-1):
-							prev_arg_2 = intention_Args[i]
-							# check if there's an entry yet for this intention
+			if 'NONE' not in intention_Args and not hasLiteral:
+				if 'NONE' in args or origHasLiteral or len(intention_Args) > len(args):
+					prev_arg = ''		
+					index = -1
+					# iterate through intention args	
+					for a in range(0, len(intention_Args)):
+						arg = intention_Args[a]
+						# handle CONT keyword
+						if arg[:4] == 'CONT':
+							# Get argument referenced by CONT number
+							index = a - int(arg[4:])
+							prev_arg = args[index]
+							# iterate through intention args coming after the first item
+							# referenced by the CONT
+							for i in range(index, len(intention_Args)-1):
+								prev_arg_2 = intention_Args[i]
+								# check if there's an entry yet for this intention
+								if not act_name in self.method_var_equivs:
+									self.method_var_equivs[act_name] = {}
+								new_index = i - index
+								# add in new mapping for each of the args in CONT list
+								self.method_var_equivs[act_name][prev_arg_2] = prev_arg+'['+str(new_index)+']'
 							if not act_name in self.method_var_equivs:
 								self.method_var_equivs[act_name] = {}
-							new_index = i - index
-							# add in new mapping for each of the args in CONT list
-							self.method_var_equivs[act_name][prev_arg_2] = prev_arg+'['+str(new_index)+']'
-						if not act_name in self.method_var_equivs:
-							self.method_var_equivs[act_name] = {}
-						# Map first arg in CONT list
-						self.method_var_equivs[act_name][prev_arg] = prev_arg +'[0]'
-						# Use star notation to indicate that the method arguments needs
-						# star at the end to indicate variable length tuple in Python
-						prev_arg = '*' + prev_arg
-				adjusted_args = args
-				adjusted_args[index] = prev_arg
-				self.methods_dict[act_name] = (adjusted_args, conds, rets)
+							# Map first arg in CONT list
+							self.method_var_equivs[act_name][prev_arg] = prev_arg +'[0]'
+							# Use star notation to indicate that the method arguments needs
+							# star at the end to indicate variable length tuple in Python
+							prev_arg = '*' + prev_arg
+					adjusted_args = args
+					if index > -1:
+						adjusted_args[index] = prev_arg
+					else:
+						adjusted_args = intention_Args
+					self.methods_dict[act_name] = (adjusted_args, conds, rets)
 
 			# Update Methods Dict
 			self.methods_dict[act_name][2].append(ret)
@@ -388,11 +403,14 @@ class Imitation_Compiler(NodeVisitor):
 	#  the type keyword
 	#
 	#  @rtype: String
-	def handle_Type(self, expr, arg_num, if_stmt):
+	def handle_Type(self, expr, arg_num, if_stmt, pos):
 		# Handles arg 1 and 2 slightly differently
 		if arg_num == 1:
 			var_name = '#'+expr
-			if_stmt += 'if state.objs['+var_name+'][0] == '				
+			if pos:
+				if_stmt += 'if state.objs['+var_name+'][0] == '	
+			else:
+				if_stmt += 'if not state.objs['+var_name+'][0] == '								
 		elif arg_num == 2:
 			var_name = '#'+expr
 			if_stmt += 'state.objs['+var_name+'][0]:\n'				
@@ -458,11 +476,11 @@ class Imitation_Compiler(NodeVisitor):
 						self.method_var_equivs[self.intention][arg] = 'all_'+expr1[1]+'['+str(a)+']'
 			# evaluate TYPE keyword
 			elif expr1[0] == 'TYPE':
-				if_stmt = self.handle_Type(expr1[1], 1, if_stmt)
+				if_stmt = self.handle_Type(expr1[1], 1, if_stmt, True)
 				# the second expression is known to be either a literal
 				# or another TYPE expression
 				if expr2[0] == 'TYPE':
-					if_stmt = self.handle_Type(expr2[1], 2, if_stmt)	
+					if_stmt = self.handle_Type(expr2[1], 2, if_stmt, True)	
 				else:
 					if_stmt += '\''+expr2+'\':\n'
 			# Handle variable/literal comparison
@@ -515,15 +533,21 @@ class Imitation_Compiler(NodeVisitor):
 						# The star always refers to the 0 index
 						real_var = var2 + '[0]'
 						temp_var = var1
-					elif var1 in self.method_var_equivs[self.intention]:
-						real_var = self.method_var_equivs[self.intention][var1]
-						temp_var = var2
-					elif var2 in self.method_var_equivs[self.intention]:
-						real_var = self.method_var_equivs[self.intention][var2]
-						temp_var = var1
+					elif self.intention in self.method_var_equivs:
+						if var1 in self.method_var_equivs[self.intention]:
+							real_var = self.method_var_equivs[self.intention][var1]
+							temp_var = var2
+						elif var2 in self.method_var_equivs[self.intention]:
+							real_var = self.method_var_equivs[self.intention][var2]
+							temp_var = var1
+						else:
+							return '',''
 					else:
-						raise Exception('Variables '+var1+','+var2+' were not found!')
+						return '',''
+						# raise Exception('Variables '+var1+','+var2+' were not found!')
 
+					if not self.intention in self.method_var_equivs:
+						self.method_var_equivs[self.intention] = {}
 					self.method_var_equivs[self.intention][temp_var] = real_var
 				# one variable is literal, one isn't
 				else:
@@ -538,6 +562,123 @@ class Imitation_Compiler(NodeVisitor):
 						lit_var = var2
 						real_var = var1
 
+					if not self.intention in self.method_var_equivs:
+						self.method_var_equivs[self.intention] = {}
+					self.method_var_equivs[self.intention][real_var] = lit_var
+		elif comp == '!=':
+			# Evaluate All Keyword
+			if expr1[0] == 'ALL':
+				'TODO: ALL NOTEQUALS DOESNT MAKE SENSE'
+				# define body statement
+				obj_id = expr1[1]+'_id'
+				body += 'all_'+expr1[1]+' = ['+obj_id+' for '
+				body += obj_id+' in state.objs if state.objs['+obj_id
+				body += '][0]==\''+expr1[1]+'\']\n'
+				# add this if statement to preserve appropriate tabbing
+				if_stmt += 'if True:\n'
+				# items in second expression list
+				#   NOTE: expr2 must be a list
+				for a in range(0, len(expr2)):
+					arg = expr2[a]
+					# Handle CONT keyword
+					if arg[:4] == 'CONT':
+						cont_offset = int(arg[4:])
+						prev_arg = expr2[a-cont_offset]
+						# alter arg name to avoid namespace collision
+						arg = arg + '-' + prev_arg
+						self.method_var_equivs[self.intention][arg] = ')+tuple(all_'+expr1[1]+'['+str(a-cont_offset)+':]'
+					else:
+						self.method_var_equivs[self.intention][arg] = 'all_'+expr1[1]+'['+str(a)+']'
+			# evaluate TYPE keyword
+			elif expr1[0] == 'TYPE':
+				if_stmt = self.handle_Type(expr1[1], 1, if_stmt, False)
+				# the second expression is known to be either a literal
+				# or another TYPE expression
+				if expr2[0] == 'TYPE':
+					if_stmt = self.handle_Type(expr2[1], 2, if_stmt, False)	
+				else:
+					if_stmt += '\''+expr2+'\':\n'
+			# Handle variable/literal comparison
+			else:
+				if_stmt += 'if True:\n'				
+				# var1 and var2 could be either variables or literals
+				var1 = ''
+				var2 = ''
+				isVar1Lit = False
+				isVar2Lit = False
+
+				# Add quotes around literals and determine which vars
+				# are literals
+				if expr1[0] == 'LITERAL':
+					var1 = '\''+str(expr1[1])+'\''
+					isVar1Lit = True
+				else:
+					var1 = expr1
+				if expr2[0] == 'LITERAL':
+					var2 = '\''+str(expr2[1])+'\''
+					isVar2Lit = True
+				else:
+					var2 = expr2
+
+				if isVar1Lit and isVar2Lit:
+					raise Exception('Comparing '+var1+' and '+var2+' which are both String literals!')
+				# They are both variables
+				elif not isVar1Lit and not isVar2Lit:
+					var1_star = '*'+var1
+					var2_star = '*'+var2
+					real_var = ''
+					temp_var = ''
+
+					# The 'real_var' is the one present in the intention, i.e.
+					# the method args. References to the 'temp_var' should 
+					# be replaced with the 'real_var'. Make sure to also check
+					# for the starred variables and check for equivalents in the
+					# method_var_equivs dictionary.
+					if var1 in intention_Args:
+						real_var = var1
+						temp_var = var2
+					elif var1_star in intention_Args:
+						# The star always refers to the 0 index
+						real_var = var1 + '[0]'
+						temp_var = var2						
+					elif var2 in intention_Args:
+						real_var = var2
+						temp_var = var1											
+					elif var2_star in intention_Args:
+						# The star always refers to the 0 index
+						real_var = var2 + '[0]'
+						temp_var = var1
+					elif self.intention in self.method_var_equivs:
+						if var1 in self.method_var_equivs[self.intention]:
+							real_var = self.method_var_equivs[self.intention][var1]
+							temp_var = var2
+						elif var2 in self.method_var_equivs[self.intention]:
+							real_var = self.method_var_equivs[self.intention][var2]
+							temp_var = var1
+						else:
+							return '',''
+					else:
+						return '',''						
+						# raise Exception('Variables '+var1+','+var2+' were not found!')
+
+					if not self.intention in self.method_var_equivs:
+						self.method_var_equivs[self.intention] = {}
+					self.method_var_equivs[self.intention][temp_var] = real_var
+				# one variable is literal, one isn't
+				else:
+					lit_var = ''
+					real_var = ''
+					# determine which is the literal and assign locals
+					# appropriately
+					if isVar1Lit:
+						lit_var = var1
+						real_var = var2
+					else:
+						lit_var = var2
+						real_var = var1
+
+					if not self.intention in self.method_var_equivs:
+						self.method_var_equivs[self.intention] = {}
 					self.method_var_equivs[self.intention][real_var] = lit_var
 
 		else:
@@ -612,10 +753,11 @@ class Imitation_Compiler(NodeVisitor):
 			for c in range(0, len(conds)):
 				cond = conds[c]
 				# Replace all variables with dictionary equivalent if it exists
-				if intention in self.method_var_equivs:
-					for var in self.method_var_equivs[intention]:
+				if cond:
+					if intention in self.method_var_equivs:
+						for var in self.method_var_equivs[intention]:
 
-						cond = cond.replace('#'+var, self.method_var_equivs[intention][var])
+							cond = cond.replace('#'+var, self.method_var_equivs[intention][var])
 				# Remove remaining unnecessary hashtags
 				if cond:
 					cond = cond.replace('#', '')
@@ -664,6 +806,10 @@ class Imitation_Compiler(NodeVisitor):
 			objs_conv = ''
 			# Iterate through method args and print
 			for arg in args:
+				if isinstance(arg, (list, tuple)):
+					raise Exception('Must define intention at least once without literal argument \''+str(arg[1])+'\'')				
+				if arg == 'NONE':
+					raise Exception('No full argument list for intention '+str(intention) + ' defined')
 				method_dec += ', '+arg
 				# identify the presence of the * in the args
 				# if it's there define the flatten call which will
@@ -733,6 +879,19 @@ class Imitation_Compiler(NodeVisitor):
 	# @rtype: String
 	def visit_Var(self, node):
 		return str(node.value)
+
+	## Visit State
+	#
+	#  Return a string representing the variable corresponding
+	#  to the State keyword
+	def visit_State(self, node):
+		return 'state_var'
+
+	## Visit Python
+	#
+	#  Return a string representing the Python code to be inlined
+	def visit_Python(self, node):
+		return 'INLINE'
 
 	## Visit Digit
 	#

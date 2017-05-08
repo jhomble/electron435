@@ -19,13 +19,22 @@ import copct
 def lookup_type(object_id, state):
     return [obj_type for (obj_id,obj_type,_,_,_,_) in state if obj_id == object_id][0]
 
+def get_state(*args):
+    ret = None
+    if len(args > 0):
+        ret = dict(state[0])[args[0]]
+    for a in range(1, len(args)):
+        arg = args[a]
+        ret = ret[arg]
+    return ret
+
 def causes(v):
     # v[i] = the i^th (state, action, arguments)
     # returns g, a set of possible causes of v
     states, actions, arguments = zip(*v)
     g = set()
 
-	# INSERT CAUSES HERE
+    # INSERT CAUSES HERE
 
     return g
 

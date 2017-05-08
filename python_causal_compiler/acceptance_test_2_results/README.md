@@ -17,7 +17,7 @@ The results should be in comparison.txt once the script is run. They list the te
 
 The causal knowledge base for these tests is defined in electron435/python_causal_compiler/compiler/input/acceptance_causes.txt and looks like this:
 
-'''
+```
 RULES {
 	if ((TYPE(obj) != DockCase && TYPE(obj) != DockDrawer)&&arm=1):
 		move_unobstructed_object(obj, 'left', NONE, NONE) := move_arm_and_grasp(arm, obj);
@@ -46,4 +46,4 @@ RULES {
 		close_dock_drawer(obj) := move_arm_and_grasp(arm0, obj), move_grasped_object(arm1, dest, dM, dt), release(arm2)	
 
 }
-'''
+```

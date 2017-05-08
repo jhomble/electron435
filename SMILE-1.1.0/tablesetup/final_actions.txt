@@ -1,0 +1,12 @@
+grasp forklift
+release forklift room -1.810012753187657 2.140227686876492 -0.2499187 -90.25827603
+grasp crate3
+release crate3 room 1.6451408281366398 1.5652856760651985 -0.25009897 -67.030035
+grasp crate4
+release crate4 room -2.178291258535357 -1.4614542067667537 -0.25046612 -65.36602
+grasp crate1
+release crate1 crate4 0 0 0.5 0
+grasp crate3
+release crate3 crate1 0 0 0.5 0
+grasp crate2
+release crate2 crate3 0 0 0.5 0

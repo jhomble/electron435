@@ -90,14 +90,14 @@ def release(state, obj, dest, dx, dy, dz, da):
     return new_state
 ops = pyhop.declare_operators(grasp, release)
 
-def moveTo(state, obj, dest, dx, dy, dz, da):
+def move_to(state, obj, dest, dx, dy, dz, da):
     __ret_val = [('grasp',obj),('release',obj,dest,dx,dy,dz,da)]
     return __ret_val
-pyhop.declare_methods('moveTo',moveTo)
+pyhop.declare_methods('move-to',move_to)
 def stack(state, dest, dx, dy, dz, da, *obj):
     obj = flatten(obj)
     if state.objs[obj[0]][0] == 'block':
-        __ret_val = [('moveTo',obj[0],dest,dx,dy,dz,da)]
+        __ret_val = [('move-to',obj[0],dest,dx,dy,dz,da)]
         __all_args = []
         for __action in __ret_val:
             for __arg in __action:
@@ -108,7 +108,7 @@ def stack(state, dest, dx, dy, dz, da, *obj):
         if set(__all_intention_args).issubset(set(__all_args)):
             return __ret_val
     if (state.objs[obj[0]][0] == 'block' and True):
-        __ret_val = [('moveTo',obj[0],dest,dx,dy,dz,da),('stack',obj[0],0,0,.5,0,)+tuple(obj[1:])]
+        __ret_val = [('move-to',obj[0],dest,dx,dy,dz,da),('stack',obj[0],0,0,.5,0,)+tuple(obj[1:])]
         __all_args = []
         for __action in __ret_val:
             for __arg in __action:
@@ -119,12 +119,12 @@ def stack(state, dest, dx, dy, dz, da, *obj):
         if set(__all_intention_args).issubset(set(__all_args)):
             return __ret_val
 pyhop.declare_methods('stack',stack)
-def stackAll(state, dx, dy, dz, da):
+def stack_all(state, dx, dy, dz, da):
     all_block = [block_id for block_id in state.objs if state.objs[block_id][0]=='block']
     if (True and True):
         __ret_val = [('stack','room',dx,dy,dz,da,)+tuple(all_block[0:])]
         return __ret_val
-pyhop.declare_methods('stackAll',stackAll)
+pyhop.declare_methods('stack-all',stack_all)
 
 
 def XML_to_pyhop(xml_file_path) :

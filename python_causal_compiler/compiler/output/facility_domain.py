@@ -19,6 +19,15 @@ import copct
 def lookup_type(object_id, state):
     return [obj_type for (obj_id,obj_type,_,_,_,_) in state if obj_id == object_id][0]
 
+def get_state(*args):
+    ret = None
+    if len(args > 0):
+        ret = dict(state[0])[args[0]]
+    for a in range(1, len(args)):
+        arg = args[a]
+        ret = ret[arg]
+    return ret
+
 def causes(v):
     # v[i] = the i^th (state, action, arguments)
     # returns g, a set of possible causes of v
@@ -26,19 +35,23 @@ def causes(v):
     g = set()
 
     if actions == ('grasp','release',):
-        g.add((states[0],'moveTo',(arguments[1][0], )+(arguments[1][1], )+(arguments[1][2], )+(arguments[1][3], )+(arguments[1][4], )+(arguments[1][5], )))
-    if actions == ('moveTo',):
+        print('move-to')
+        g.add((states[0],'move-to',(arguments[1][0], )+(arguments[1][1], )+(arguments[1][2], )+(arguments[1][3], )+(arguments[1][4], )+(arguments[1][5], )))
+    if actions == ('move-to',):
         obj_type = lookup_type(arguments[0][0], states[0])
         if obj_type == 'block':
+            print('stack')
             g.add((states[0],'stack',(arguments[0][1], )+(arguments[0][2], )+(arguments[0][3], )+(arguments[0][4], )+(arguments[0][5], )+(arguments[0][0], )))
-    if actions == ('moveTo','stack',):
+    if actions == ('move-to','stack',):
         obj1_type = lookup_type(arguments[1][0], states[0])
         if (obj1_type == 'block' and arguments[0][0] == arguments[1][0]):
-            g.add((states[0],'stack',(arguments[0][1], )+(arguments[0][2], )+(arguments[0][3], )+(arguments[0][4], )+(arguments[0][5], )+(arguments[1][0], )+arguments[1][5:]))
+            print('stack')
+            g.add((states[0],'stack',(arguments[0][1], )+(arguments[0][2], )+(arguments[0][3], )+(arguments[0][4], )+(arguments[0][5], )+(arguments[1][0], )+(arguments[1][5], )+arguments[1][6:]))
     if actions == ('stack',):
         all_block = [obj_id for (obj_id, obj_type,_,_,_,_) in states[0] if obj_type == 'block']
         if (set(all_block) == set(arguments[0][5:]) and arguments[0][0] == 'room'):
-            g.add((states[0],'stackAll',(arguments[0][1], )+(arguments[0][2], )+(arguments[0][3], )+(arguments[0][4], )))
+            print('stack-all')
+            g.add((states[0],'stack-all',(arguments[0][1], )+(arguments[0][2], )+(arguments[0][3], )+(arguments[0][4], )))
 
 
     return g

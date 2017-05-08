@@ -10,9 +10,9 @@ def lexer_print_tokens(lexer):
 def test(textname, resultsname, testname0, keyname0, testname1, keyname1):
 	text = open(textname, 'r').read()
 
-	testresults = open(resultsname, 'w')
+	testresults = open(resultsname, 'a')
 
-	testresults.write("TESTING:\n\n")
+	testresults.write("TESTING %s:\n" % textname)
 	makeFacility = True;
 	makeImitation = True;
 
@@ -77,8 +77,9 @@ def test(textname, resultsname, testname0, keyname0, testname1, keyname1):
 			testresults.write("--------- PASSED ---------\n\n")	
 
 def main():
-
+	testresults = open('testfiles/RESULTS.txt', 'w')
 	test('causes.txt', 'testfiles/RESULTS.txt', 'testfiles/facility_compiler_test.txt', 'testfiles/facility_compiler_key.txt', 'testfiles/imitation_compiler_test.txt','testfiles/imitation_compiler_key.txt')
+	test('testfiles/test_conditionals.txt', 'testfiles/RESULTS.txt', 'testfiles/cond_fac_test.txt', 'testfiles/cond_fac_key.txt', 'testfiles/cond_imit_test.txt', 'testfiles/cond_imit_key.txt')
 
 
 if __name__ == '__main__':

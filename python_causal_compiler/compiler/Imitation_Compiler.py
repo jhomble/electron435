@@ -3,6 +3,8 @@
 # Library Imports
 import operator
 import functools
+import string
+import random
 
 # Local Imports
 import Token
@@ -62,6 +64,8 @@ class Imitation_Compiler(NodeVisitor):
 			return 'UNIT', (self.visit(node.e1), "<=", self.visit(node.e2))
 		elif node.op.type == NOTEQUAL :
 			return 'UNIT', (self.visit(node.e1), "!=", self.visit(node.e2))
+		elif node.op.type == PYTHON :
+			return 'UNIT', (self.visit(node.e1), "PYTHON", None)
 
 	## Visit Boolean Expression
 	#
@@ -299,6 +303,8 @@ class Imitation_Compiler(NodeVisitor):
 
 		tab = '    '
 
+		print('COND: '+str(cond))
+
 		# if cond[1] in comps:
 		if cond[0] == 'UNIT':
 			body, if_stmt = self.compile_bool(cond[1])
@@ -330,8 +336,9 @@ class Imitation_Compiler(NodeVisitor):
 					# space for the previous if statement. Replace the 'if'
 					# from the new if statement with the appropriate operand
 					# (either 'and' or 'or'). Doing this allows us to have 
-					# the whole conditional on one line, avoiding tabbing issues 
-					if_stmt = if_stmt.replace(':\n',' ')+if_stmt2.replace('if', op)
+					# the whole conditional on one line, avoiding tabbing issues
+					if if_stmt2 != '': 
+						if_stmt = if_stmt.replace(':\n',' ')+if_stmt2.replace('if', op)
 
 
 		return body, if_stmt
@@ -362,9 +369,13 @@ class Imitation_Compiler(NodeVisitor):
 
 		bools_listified = self.listify_BoolExpr(boolean)
 
+		print('Bool_Listified: '+str(bools_listified))
+
 		bool_list = []
 		for and_expr in bools_listified:
 			bool_list.append(self.develop_and_expr(and_expr))
+
+		print('Bool_List: '+str(bool_list))
 
 		# Comparative Operators in Custom Language
 		comps = ['==', '<', '>', '<=', '>=']
@@ -380,6 +391,7 @@ class Imitation_Compiler(NodeVisitor):
 		paren = ''
 
 		copy_ret = ''
+
 		# Evaluate each bool from bool_list and add it to the methods_dict
 		# along with a copy of the appropriate ret_val
 		if len(bool_list) > 0:
@@ -388,7 +400,9 @@ class Imitation_Compiler(NodeVisitor):
 				self.methods_dict[self.intention][2].pop()
 
 			for bool2 in bool_list:
+				print('Pre-Traversed Bool: '+str(bool2))
 				body, if_stmt = self.traverse_BoolExpr(bool2)
+				print('Traversed Bool:' + str(if_stmt))
 				result = body + if_stmt
 				self.methods_dict[self.intention][1].append(result)			
 				self.methods_dict[self.intention][2].append(copy_ret)
@@ -491,24 +505,44 @@ class Imitation_Compiler(NodeVisitor):
 				var2 = ''
 				isVar1Lit = False
 				isVar2Lit = False
+				isVar1Flt = False
+				isVar2Flt = False				
+
+				try:
+					float(expr1)
+					var1 = str(expr1)
+					isVar1Flt = True
+				except:
+					pass
+
+				try:
+					float(expr2)
+					var2 = str(expr2)
+					isVar2Flt = True
+				except:
+					pass
 
 				# Add quotes around literals and determine which vars
 				# are literals
-				if expr1[0] == 'LITERAL':
-					var1 = '\''+str(expr1[1])+'\''
-					isVar1Lit = True
-				else:
-					var1 = expr1
-				if expr2[0] == 'LITERAL':
-					var2 = '\''+str(expr2[1])+'\''
-					isVar2Lit = True
-				else:
-					var2 = expr2
+				if not isVar1Flt:
+					if expr1[0] == 'LITERAL':
+						var1 = '\''+str(expr1[1])+'\''
+						isVar1Lit = True
+					else:
+						var1 = expr1
+				if not isVar2Flt:
+					if expr2[0] == 'LITERAL':
+						var2 = '\''+str(expr2[1])+'\''
+						isVar2Lit = True
+					else:
+						var2 = expr2
 
 				if isVar1Lit and isVar2Lit:
 					raise Exception('Comparing '+var1+' and '+var2+' which are both String literals!')
 				# They are both variables
-				elif not isVar1Lit and not isVar2Lit:
+				elif isVar1Flt and isVar2Flt:
+					raise Exception('Comparing '+var1+' and '+var2+' which are both Floats!')					
+				elif not isVar1Lit and not isVar2Lit and not isVar1Flt and not isVar2Flt:
 					var1_star = '*'+var1
 					var2_star = '*'+var2
 					real_var = ''
@@ -551,11 +585,12 @@ class Imitation_Compiler(NodeVisitor):
 					self.method_var_equivs[self.intention][temp_var] = real_var
 				# one variable is literal, one isn't
 				else:
+					'TODO'
 					lit_var = ''
 					real_var = ''
 					# determine which is the literal and assign locals
 					# appropriately
-					if isVar1Lit:
+					if isVar1Lit or isVar1Flt:
 						lit_var = var1
 						real_var = var2
 					else:
@@ -606,6 +641,12 @@ class Imitation_Compiler(NodeVisitor):
 				var2 = ''
 				isVar1Lit = False
 				isVar2Lit = False
+
+				# try:
+				# 	float(expr1[1])
+				# 	var1 = expr1[1]
+				# except:
+
 
 				# Add quotes around literals and determine which vars
 				# are literals
@@ -680,7 +721,8 @@ class Imitation_Compiler(NodeVisitor):
 					if not self.intention in self.method_var_equivs:
 						self.method_var_equivs[self.intention] = {}
 					self.method_var_equivs[self.intention][real_var] = lit_var
-
+		elif comp == 'PYTHON':
+			pass
 		else:
 			raise Exception('\''+str(comp)+'\' comparator currently not supported')
 
@@ -797,6 +839,9 @@ class Imitation_Compiler(NodeVisitor):
 			args = self.methods_dict[intention][0]
 			conds = self.methods_dict[intention][1]
 			rets = self.methods_dict[intention][2]
+			print('ARGS: '+str(args))
+			print('CONDS: '+str(conds))
+			print('RETS: '+str(rets))						
 			# Build method declaration string
 			method_dec = 'def '
 			# python functions cannot have hyphens :(
@@ -807,7 +852,10 @@ class Imitation_Compiler(NodeVisitor):
 			# Iterate through method args and print
 			for arg in args:
 				if isinstance(arg, (list, tuple)):
-					raise Exception('Must define intention at least once without literal argument \''+str(arg[1])+'\'')				
+					if arg[0] == 'PYTHON':
+						arg = arg[1]	
+					else:
+						raise Exception('Must define intention at least once without literal argument \''+str(arg[1])+'\'')				
 				if arg == 'NONE':
 					raise Exception('No full argument list for intention '+str(intention) + ' defined')
 				method_dec += ', '+arg
@@ -864,7 +912,6 @@ class Imitation_Compiler(NodeVisitor):
 					result += tab + cond.replace('\n', '\n'+tab, num_newlines-1)
 				ret_lines = ret.split('\n')
 				# add actual returns, split in case there are two possible returns
-				'TODO: HANDLE MORE THAN TWO RETURNS?'
 				result += ret1_temp + ret_lines[0] + '\n'
 				result += red_check
 				result += ret2_temp + ret_lines[1] + '\n'
@@ -880,18 +927,27 @@ class Imitation_Compiler(NodeVisitor):
 	def visit_Var(self, node):
 		return str(node.value)
 
+	## ID Generator
+	#
+	#  Randomly generates a variable id. Developed from:
+	#     https://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits-in-python
+	#
+	#  @rtype: String
+	def id_generator(self, size=10, chars=string.ascii_uppercase):
+	    return ''.join(random.choice(chars) for _ in range(size))
+
 	## Visit State
 	#
 	#  Return a string representing the variable corresponding
 	#  to the State keyword
 	def visit_State(self, node):
-		return 'state_var'
+		return self.id_generator()
 
 	## Visit Python
 	#
 	#  Return a string representing the Python code to be inlined
 	def visit_Python(self, node):
-		return 'INLINE'
+		return 'PYTHON', node.code
 
 	## Visit Digit
 	#

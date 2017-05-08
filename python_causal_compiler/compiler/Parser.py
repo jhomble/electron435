@@ -273,6 +273,7 @@ class Parser(object):
 	#  Advance to next token if there is a next token
 	def eat(self, token_type):
 		if self.current_token.type == token_type:
+			print('TOKEN: '+str(self.current_token))
 			self.current_token = self.lexer.get_next_token()
 		else:
 			self.error(token_type)

@@ -21,7 +21,7 @@ def make_facility_domain(interpreter):
 	# This block should just be all the text requisite for the file not including cause stuff
 	# TODO: Make sure the template is right
 	print('Opening Facility Domain Template')
-	path = os.path.normpath("./python_causal_compiler/compiler/templates/acceptance_template.txt")
+	path = os.path.normpath("../compiler/templates/acceptance_template.txt")
 	template = open(path, "r").read()
 	# Actually compile input
 	print('Running Facility Domain Compiler')

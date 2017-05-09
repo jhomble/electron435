@@ -431,8 +431,8 @@
                     //var process1 = spawn('python',["final_imitation.py",$scope.pathString,$scope.inputXML,test]);
 
                     var process1 = spawn1('python', ["./python_causal_compiler/compiler/run.py", $scope.knowledgeFile.path, "Dummy"])
-                    process1.stderr.on('data', function (chunk) { //debugging info, prints out stuff python puts in stdout
-
+                    process1.stdout.on('data', function (chunk) { //debugging info, prints out stuff python puts in stdout
+                        console.log("asd")
                         $scope.error1 = chunk.toString('utf8');// buffer to string
                         console.log($scope.error1.length)
                         console.log($scope.error1);
@@ -440,9 +440,10 @@
                     });
 
                     setTimeout(function () {
+                        console.log("asdasdasd")
                         var process = spawn1('python', ["./python_causal_compiler/compiler/output/imitation.py", $scope.pathString, $scope.inputXML]);
-                        process.stderr.on('data', function (chunk) { //debugging info, prints out stuff python puts in stdout
-
+                        process.stdout.on('data', function (chunk) { //debugging info, prints out stuff python puts in stdout
+                            console.log("123")
                             $scope.error2 = chunk.toString('utf8');// buffer to string
                             console.log($scope.error2.length)
                             console.log($scope.error2);

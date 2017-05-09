@@ -78,7 +78,7 @@ if __name__=='__main__':
     for word in x:
        y.append(os.path.normpath(word))
     demo = load_demo(y)
-    for d in demo:
-        print(d[1:])
+    #for d in demo:
+    #    print(d[1:])
     #with open("test.txt",'w') as xml:
      #   xml.write(z)

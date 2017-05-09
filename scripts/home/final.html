@@ -17,16 +17,14 @@
                                 generated Imitation python files </h3>
                         </div>
                     </div>
-                    <div ng-hide="error1.length === 0" style="text-align: center">
-                        <div ng-hide="error2.length === 0">
-                            <h2 style="color: red">Error!</h2>
-                            <h3>Error message from run.py:</h3>
-                            <h4 ng-bind="error1"></h4>
-                            <h3>Error message from imitation.py:</h3>
-                            <h4 ng-bind="error2"></h4>
-                            <br>
-                            <h3>Log of the errors can be found here: electron435/python_causal_compiler/compiler/logs</h3>
-                        </div>
+                    <div ng-hide="error1.length === 0 && error2.length === 0" style="text-align: center">
+                        <h2 style="color: red">Error!</h2>
+                        <h3>Error message from run.py:</h3>
+                        <h4 ng-bind="error1"></h4>
+                        <h3>Error message from imitation.py:</h3>
+                        <h4 ng-bind="error2"></h4>
+                        <br>
+                        <h3>Log of the errors can be found here: electron435/python_causal_compiler/compiler/logs</h3>
                     </div>
                 </div>
                 <div class="row">

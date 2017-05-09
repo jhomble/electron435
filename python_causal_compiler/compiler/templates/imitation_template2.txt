@@ -447,6 +447,7 @@ if __name__ == '__main__':
         # Infer intentions from demo
         demo = load_demo(recording_array)
     except Exception as e:
+        print('Failed: Check logs at electron435/python_causal_compiler/compiler/logs/imitation')
         log.write("Failed in load_demo.py converting input xmls to python objects!\n\n")    
         error_log.write("Failed in load_demo.py converting input xmls to python objects!\n")    
         error_log.write("\tError: %s\n" % e)
@@ -459,6 +460,7 @@ if __name__ == '__main__':
     try:
         _, tlcovs, _ = copct.explain(causes, demo, M=M)
     except Exception as e:
+        print('Failed: Check logs at electron435/python_causal_compiler/compiler/logs/imitation')
         log.write('Failed in call to copct!\n\n')
         error_log.write('Failed in call to copct!\n')        
         error_log.write("\tError: %s\n" % e)
@@ -482,6 +484,7 @@ if __name__ == '__main__':
     try:
         state.objs, filepaths, tabletop_specs, xmlinfo, varinfo = XML_to_pyhop(input_file)
     except Exception as e:
+        print('Failed: Check logs at electron435/python_causal_compiler/compiler/logs/imitation')
         log.write('Failed in conversion of input XML to pyhop state!\n\n')
         error_log.write('Failed in conversion of input XML to pyhop state!\n')        
         error_log.write("\tError: %s\n" % e)
@@ -514,6 +517,7 @@ if __name__ == '__main__':
     try:
         new_actions = pyhop.pyhop(state, tasks,verbose=0)
     except Exception as e:
+        print('Failed: Check logs at electron435/python_causal_compiler/compiler/logs/imitation')
         log.write('Failed in call to pyhop!\n\n')
         error_log.write('Failed in call to pyhop!\n')        
         error_log.write("\tError: %s\n" % e)
@@ -529,6 +533,7 @@ if __name__ == '__main__':
     try:
         f = open('./SMILE-1.1.0/tablesetup/final_actions.txt', 'w')
     except Exception as e:
+        print('Failed: Check logs at electron435/python_causal_compiler/compiler/logs/imitation')
         log.write('Failed to open final_actions.txt!\n\n')
         error_log.write('Failed to open final_actions.txt!\n')        
         error_log.write("\tError: %s\n" % e)
@@ -543,6 +548,7 @@ if __name__ == '__main__':
             strs=" ".join(str(x) for x in action)
             f.write(strs + '\n')  # python will convert \n to os.linesep
     except Exception as e:
+        print('Failed: Check logs at electron435/python_causal_compiler/compiler/logs/imitation')
         log.write('Failed to writing to final_actions.txt!\n\n')
         error_log.write('Failed writing to final_actions.txt!\n')        
         error_log.write("\tError: %s\n" % e)
@@ -568,6 +574,7 @@ if __name__ == '__main__':
             i += 1
             toXML(state.objs, './SMILE-1.1.0/tablesetup/imitation_XMLs/'+state_xml_name, filepaths, tabletop_specs, xmlinfo, varinfo)
     except Exception as e:
+        print('Failed: Check logs at electron435/python_causal_compiler/compiler/logs/imitation')
         log.write('Failed converting intermediate steps to XML!\n\n')
         error_log.write('Failed converting intermediate steps to XML!\n')        
         error_log.write("\tError: %s\n" % e)
@@ -585,12 +592,22 @@ if __name__ == '__main__':
      #   print(obj, state.objs[obj])
     #print state.objs
     log.write('Converting final state to XML and writing to file...\n')
-    if len(sys.argv) == 4 :
-        # if output file provided
-        toXML(state.objs, sys.argv[3], filepaths, tabletop_specs, xmlinfo, varinfo)
-    else :
-        # otherwise default to provided file
-        toXML(state.objs, './SMILE-1.1.0/tablesetup/final_xml.xml', filepaths, tabletop_specs, xmlinfo, varinfo)
+
+    try:
+        if len(sys.argv) == 4 :
+            # if output file provided
+            toXML(state.objs, sys.argv[3], filepaths, tabletop_specs, xmlinfo, varinfo)
+        else :
+            # otherwise default to provided file
+            toXML(state.objs, './SMILE-1.1.0/tablesetup/final_xml.xml', filepaths, tabletop_specs, xmlinfo, varinfo)
+    except Exception as e:
+        print('Failed: Check logs at electron435/python_causal_compiler/compiler/logs/imitation')
+        log.write('Failed converting final pyhop state to XML!\n\n')
+        error_log.write('Failed converting final pyhop state to XML!\n')        
+        error_log.write("\tError: %s\n" % e)
+        log.write('Unsucessfully imitated :(\n')
+        exit()
+
     log.write('Converted and wrote final state!\n\n')
 
     log.write('Successfully imitated!\n')

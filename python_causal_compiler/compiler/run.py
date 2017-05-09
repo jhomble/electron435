@@ -124,14 +124,17 @@ def main():
 		try: 
 			text = open(input_path, 'r').read()
 			log.write('Input was successfully read in!\n\n')
-		except:
+		except Exception as e:
+			print('Failed: Check logs at electron435/python_causal_compiler/compiler/logs/compiler')	
 			log.write('Failed reading in input file!\n\n')
 			error_log.write('Failed reading in input file!\n')
+			error_log.write("\tError: %s\n" % e)
 			completed = 'Unsuccessfully completed running run.py :(\n'
 
 	try:
 		run_facility_domain(text, log)
 	except Exception as e:
+		print('Failed: Check logs at electron435/python_causal_compiler/compiler/logs/compiler')	
 		log.write('Failed in Compilation of Run Facility Domain\n\n')		
 		error_log.write('Failed in Compilation of Run Facility Domain\n')
 		error_log.write("\tError: %s\n" % e)
@@ -140,6 +143,7 @@ def main():
 	try:
 		run_imitation(text, log)
 	except Exception as e:
+		print('Failed: Check logs at electron435/python_causal_compiler/compiler/logs/compiler')	
 		log.write('Failed in Compilation of Run Imitation\n\n')				
 		error_log.write('Failed in Compilation of Run Imitation\n')
 		error_log.write("\tError: %s\n" % e)

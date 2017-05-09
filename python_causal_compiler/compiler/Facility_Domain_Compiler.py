@@ -1,4 +1,8 @@
 ## Facility Domain Compiler
+#
+#  @filename NodeVisitor.py
+#  @author Ben Mariano
+#  @date 5/9/2017
 
 # Library Imports
 import operator
@@ -14,12 +18,14 @@ from NodeVisitor import NodeVisitor
 
 ## Facility Domain Compiler
 #
-#  Compiles the first of the two required python scripts. This 
+#  @brief Compiles the first of the two required python scripts. This 
 #  script builds the CO-PCT knowledge base by applying the rules
 #  to the input SMILE data.
 class Facility_Domain_Compiler(NodeVisitor):
 
 	## Constructor
+	#
+	# @param parser Parser that will provide the AST to be compiled
 	def __init__(self, parser):
 		## @var parser
 		#  Converts input into AST
@@ -31,20 +37,24 @@ class Facility_Domain_Compiler(NodeVisitor):
 
 	## Visit Literal
 	#
-	# Returns a tuple of the string 'LITERAL' and the literal
+	# @brief Returns a tuple of the string 'LITERAL' and the literal
 	# value
 	#
-	# @rtype: (String, String)
+	# @param node AST instance to be evaluated
+	#
+	# @retval (String, String) of the form 'String', string_val
 	def visit_Literal(self, node):
 		return 'LITERAL', str(self.visit(node.name))
 
 	## Visit Boolean
 	#
-	# Returns a four-tuple of the form 'UNIT', e1, comp, e2 where
+	# @brief Returns a four-tuple of the form 'UNIT', e1, comp, e2 where
 	# e1 and e2 are tuples representing eithing literals, variables
-	# or keyword phrases
+	# or keyword phrases	
 	#
-	# @rtype: (String, Tuple, String, Tuple)
+	# @param node AST instance to be evaluated
+	#
+	# @retval: (String, Tuple, String, Tuple) of the form 'UNIT', e1, op, e2
 	def visit_Boolean(self, node):
 		if node.op.type == EQUALS :
 			return 'UNIT', (self.visit(node.e1), "==", self.visit(node.e2))
@@ -63,9 +73,11 @@ class Facility_Domain_Compiler(NodeVisitor):
 
 	## Visit Boolean Expression
 	#
-	# Returns a three tuple of the form b_left, op, b_right
+	# @brief Returns a three tuple of the form b_left, op, b_right
 	#
-	# @rtype: (Tuple, String, Tuple)
+	# @param node AST instance to be evaluated
+	#
+	# @retval (Tuple, String, Tuple) of the form BooleanExpr, op, BooleanExpr
 	def visit_BoolExpr(self, node):
 		if node.op:
 			if node.op.type == AND:
@@ -77,9 +89,11 @@ class Facility_Domain_Compiler(NodeVisitor):
 
 	## Visit Arguments
 	#
-	# Returns a list of strings representing the arguments
+	# @brief Returns a list of strings representing the arguments
 	#
-	# @rtype: String List
+	# @param node AST instance to be evaluated
+	#
+	# @retval String List list of args
 	def visit_Args(self, node):
 		args = []
 		for child in node.children:
@@ -89,17 +103,21 @@ class Facility_Domain_Compiler(NodeVisitor):
 
 	## Visit Action
 	#
-	# Returns a tuple of the action_name, action_args
+	# @brief Returns a tuple of the action_name, action_args
 	#
-	# @rtype: (String, String List)
+	# @param node AST instance to be evaluated
+	#
+	# @retval: (String, String List) of the form action_name, action_args
 	def visit_Act(self, node):
 		return (self.visit(node.var), self.visit(node.args))
 
 	## Visit Actions
 	#
-	# Returns a list of strings representing the actions
+	# @brief Returns a list of strings representing the actions
 	#
-	# @rtype: (String, String List) List
+	# @param node AST instance to be evaluated
+	#
+	# @retval: ((String, String List) List) list of action tuples
 	def visit_Acts(self, node):
 		acts = []
 		for child in node.children:
@@ -112,11 +130,13 @@ class Facility_Domain_Compiler(NodeVisitor):
 
 	## Create Action Argument Index Reference Dictionary
 	#
-	#  Returns a dictionary where the keys are arguments to the 
+	#  @brief Returns a dictionary where the keys are arguments to the 
 	#  actions in a given causal statement and the values are
 	#  the associated indices i,j in the 2d arguments array
 	#
-	# @rtype: {String, (String, String)}
+	# @param node AST instance to be evaluated
+	#
+	# @retval {String, (String, String)} dictionary of indices in the 2d arguments array
 	def create_Action_Arg_Index_Reference_Dict(self, acts):
 		arg_index_dict = {}
 
@@ -130,10 +150,12 @@ class Facility_Domain_Compiler(NodeVisitor):
 
 	## Visit Caus
 	#
-	# Returns a three tuple of the form if statement, g.add statement,
+	# @brief Returns a three tuple of the form if statement, g.add statement,
 	# argument indices dictionary.
 	#
-	# @rtype: (String, String, {String, (String, String)})
+	# @param node AST instance to be evaluated
+	#
+	# @retval (String, String, {String, (String, String)}) tuple of various return strings and index reference dictionary
 	def visit_Caus(self, node):
 		# acts = the right-side of the causal statement. Represent
 		#		 the actions that cause the 'intention' 
@@ -208,32 +230,46 @@ class Facility_Domain_Compiler(NodeVisitor):
 
 	## Visit No Conditional
 	#
-	# Return None when there is no conditional
+	# @brief Return None when there is no conditional
+	#
+	# @param node AST instance to be evaluated
+	#
+	# @retval none
 	def visit_NoCond(self,node):
 		return None
 
 	## Visit Conditional
 	#
-	#  Return the result of evaluating the boolean expression
+	#  @brief Return the result of evaluating the boolean expression
+	#
+	# @param node AST instance to be evaluated
+	#
+	# @retval Tuple representing a BooleanExpr
 	def visit_Cond(self, node):
 		return self.visit(node.boolean)
 
 	## ID Generator
 	#
-	#  Randomly generates a variable id. Developed from:
+	#  @brief Randomly generates a variable id. Developed from:
 	#     https://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits-in-python
 	#
-	#  @rtype: String
+	# @param size length of string to be generated
+	# @param chars character set used in generation
+	#
+	#  @retval String a random sequence of size characters from chars
 	def id_generator(self, size=10, chars=string.ascii_uppercase):
 	    return ''.join(random.choice(chars) for _ in range(size))
 
 	## Compile Boolean Statement
 	#
-	# Returns a tuple (body, if statement) that represents the 
+	# @brief Returns a tuple (body, if statement) that represents the 
 	# required additions to the output to succesffuly match the 
 	# conditional.
 	#
-	# @rtype: (String, String)
+	# @param cond Tuple of the form (expression1, comparator, expression2)
+	# @param arg_indices Dictionary with expression keys and i,j values where i and j are indices in the arguments 2d array
+	#
+	# @retval (String, String) representing two return strings for conditionals
 	def compile_bool(self, cond, arg_indices):
 		# body     = Additional things added to the body of if_stmt.
 		#			 This could include calls to lookup_type or
@@ -414,9 +450,12 @@ class Facility_Domain_Compiler(NodeVisitor):
 
 	## Traverse Boolean Expression
 	#
-	#  Recursively descend Boolean Expression and appropriately print it out
+	#  @brief Recursively descend Boolean Expression and appropriately print it out
 	#
-	#  @rtype: (String, String)
+	# @param cond AST Tuple representation of boolean (expression, op, BooleanExpr)
+	# @param arg_indices Dictionary with expression keys and i,j values where i and j are indices in the arguments 2d array
+	#
+	# @retval (String, String) two strings representing entire BooleExpr
 	def traverse_BoolExpr(self, cond, arg_indices):
 		# if cond[1] is one of the comparative operators than we
 		# know there is only one boolean statement (no && or ||)
@@ -466,11 +505,13 @@ class Facility_Domain_Compiler(NodeVisitor):
 
 	## Visit Statement
 	#
-	# Returns a String representing a properly compiled full statement,
+	# @brief Returns a String representing a properly compiled full statement,
 	# including both a conditional and causal relation. Output is also 
 	# appropriately tabbed.
 	#
-	# @rtype: String
+	# @param node AST instance to be evaluated
+	#
+	# @retval: String a single string that is close to valid Python
 	def visit_Stmt(self, node):
 		# if_stmt 	  = initial if statement string that differentiates
 		#				which rule is being applied
@@ -518,17 +559,19 @@ class Facility_Domain_Compiler(NodeVisitor):
 			gadd_tabs = 2*tab
 
 		# DEBUGGING
-		debug_print = 'print(\''+intention+'\')\n'
+		debug_print = gadd_tabs + 'print(\''+intention+'\')\n'
 
 		# Return appropriately tabbed string of single if statement block
 		# from the causes() function in facility_domain.py
-		return tab + if_stmt + body + if_stmt2_tabs + if_stmt2 + gadd_tabs + debug_print + gadd_tabs + gadd
+		return tab + if_stmt + body + if_stmt2_tabs + if_stmt2 + gadd_tabs + gadd
 
 	## Visit Statements
 	#
-	# Compile all statements and concatenate results
+	# @brief Compile all statements and concatenate results
 	#
-	# @rtype: String
+	# @param node AST instance to be evaluated
+	#
+	# @retval: String valid python code
 	def visit_Stmts(self, node):
 		result = ''
 		for child in node.children:
@@ -538,9 +581,11 @@ class Facility_Domain_Compiler(NodeVisitor):
 
 	## Visit Variable
 	#
-	# Return a string representing the variable value/name
-	# 
-	# @rtype: String
+	# @brief Return a string representing the variable value/name
+	#
+	# @param node AST instance to be evaluated
+	#
+	# @retval: String string representation of variable
 	def visit_Var(self, node):
 		return str(node.value)
 
@@ -548,16 +593,18 @@ class Facility_Domain_Compiler(NodeVisitor):
 	#
 	# Returns a string representing a digit
 	#
-	# @rtype: String
+	# @rtype: String string representation of digit
 	def visit_Digit(self, node):
 		return str(node.value)
 
 	## Visit Integer
 	#
-	# Returns a string representing a full integer, which is a 
+	# @brief Returns a string representing a full integer, which is a 
 	# string of concatenated digits
 	#
-	# @rtype: String
+	# @param node AST instance to be evaluated
+	#
+	# @retval String string representation of integer
 	def visit_Int(self, node):
 		result = ''
 
@@ -568,9 +615,11 @@ class Facility_Domain_Compiler(NodeVisitor):
 
 	## Visit State
 	#
-	#  Returns a tuple of ('STATE', state_args)
+	#  @brief Returns a tuple of ('STATE', state_args)
 	#
-	#  @rtype: (String, String list)
+	# @param node AST instance to be evaluated
+	#
+	# @retval (String, String list) tuple of the form 'STATE', state_args
 	def visit_State(self, node):
 		args = self.visit(node.args)	
 		arg_str = ''
@@ -589,53 +638,63 @@ class Facility_Domain_Compiler(NodeVisitor):
 
 	## Visit Python
 	#
-	# Returns a tuple of ('PYTHON', code_str) where the code_str
+	# @brief Returns a tuple of ('PYTHON', code_str) where the code_str
 	# is the Python code to be inlined
 	#
-	# @rtype: (String, String)
+	# @param node AST instance to be evaluated
+	#
+	# @retval (String, String) tuple of the form 'PYTHON', code_string
 	def visit_Python(self, node):
 		return 'PYTHON', node.code
 
 
 	## Visit Float
 	#
-	# Returns a float string which is two integers separated by
+	# @brief Returns a float string which is two integers separated by
 	# a dot
 	#
-	# @rtype: String
+	# @param node AST instance to be evaluated
+	#
+	# @retval String string representation of float
 	def visit_Flt(self, node):
 		return self.visit(node.left) + '.' + self.visit(node.right)
 
 	## Visit ALL
 	#
-	# Returns a tuple of the form ('All', argument)
+	# @brief Returns a tuple of the form ('All', argument)
 	#
-	# @rtype: (String, String)
+	# @param node AST instance to be evaluated
+	#
+	# @retval (String, String) tuple of the form 'ALL', arguments to ALL keyword
 	def visit_All(self, node):
 		return ALL, self.visit(node.arg)
 
 	## Visit Type
 	#
-	# Returns a tuple of the form ('TYPE', argument)
+	# @brief Returns a tuple of the form ('TYPE', argument)
 	#
-	# @rtype: (String, String)
+	# @param node AST instance to be evaluated
+	#
+	# @retval (String, String) tuple of the for 'TYPE', argument to TYPE keyword
 	def visit_Type(self, node):
 		return TYPE, self.visit(node.arg)		
 
 	## Visit NoOp
 	#
-	# Returns the empty string
+	# @brief Returns the empty string
 	#
-	# @rtype: String
+	# @param node AST instance to be evaluated
+	#
+	# @retval String empty string
 	def visit_NoOp(self, node):
 		return ''
 
 	## Interpret
 	#
-	# Actually compile the statement. Returns a tuple of the string 
+	# @brief Actually compile the statement. Returns a tuple of the string 
 	# representing the compiled program as well as the value of M
 	#
-	# @rtype: (String, String)
+	# @retval (String, String) tuple of the form output code, output value of M 
 	def interpret(self):
 		tree = self.parser.parse()
 		return self.visit(tree), str(self.M)

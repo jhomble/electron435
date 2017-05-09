@@ -146,7 +146,7 @@
                     reset();
                     $scope.inputTask = true;
                 }
-                
+
                 $scope.showInputSmile = function () {
                     reset();
                     $scope.inputSmile = true;
@@ -194,7 +194,7 @@
                     $scope.finalPage = true;
                 }
 
-                $scope.showBuilderReview = function(){
+                $scope.showBuilderReview = function () {
                     reset()
                     $scope.builderReview = true;
                 }
@@ -229,17 +229,20 @@
                 }
 
                 // this functions purpose is to toggle the custom parameter button css
-                $scope.toggleCustom = function(){
-                    if($scope.showCustom){
+                $scope.toggleCustom = function () {
+                    if ($scope.showCustom) {
                         $scope.showCustom = false;
                         $scope.customClass = "ui grey button"
-                    }else{
+                    } else {
                         $scope.showCustom = true;
                         $scope.customClass = "ui green button"
                     }
                 }
 
-                $scope.createParamList = function(){
+                // This function generates an array for each cause.
+                // the array will contain all parameters its actions had as well as the custom parameter list
+                // the paramList variable will be used to make the drop down boxes for the causalParameter page
+                $scope.createParamList = function () {
                     $scope.paramList = [];
                     var temp = [];
                     $scope.causalParameters = true;
@@ -250,7 +253,7 @@
                                 temp.push(param.value)
                             })
                         })
-                        $scope.customParams.forEach(function(param) {
+                        $scope.customParams.forEach(function (param) {
                             temp.push(param.value)
                         });
                         temp = unique(temp)
@@ -258,8 +261,8 @@
                     });
                 }
 
-                // For Actions / Causes
-
+                // knowledge is a variable containing the knowledge base of the new task
+                // it is whats being update with new actions/causes/parameters/relationships
                 $scope.knowledge = [
                     {
                         cause: "",
@@ -272,7 +275,7 @@
                     }
                 ]
 
-
+                // adds a new cause to knowledge
                 $scope.addCause = function () {
                     var item = {
                         cause: "",
@@ -283,21 +286,56 @@
                     $scope.knowledge.push(item);
                 }
 
+                // removes a cause from knowledge
                 $scope.removeCause = function () {
                     $scope.knowledge.pop();
                 }
 
+                // adds a new action to the associated cause at index
                 $scope.addAction = function (index) {
                     $scope.knowledge[index].actions.push({ action: "", params: [] })
                 }
 
+                // removes a action to the associates cause at index
                 $scope.removeAction = function (index) {
                     $scope.knowledge[index].actions.pop()
                 }
 
+                // adds a new causal parameter at the associated cause at index
                 $scope.addCausalParameter = function (index) {
                     $scope.knowledge[index].parameters.push({ action: "", param: "" })
                 }
+
+                // removes a causal parameter at the associated cause at index
+                $scope.removeCausalParameter = function (index) {
+                    $scope.knowledge[index].parameters.pop()
+                }
+
+                // adds a new action parameter at the cause at parentIndex and action at index
+                $scope.addActionParameter = function (parentIndex, index) {
+                    $scope.knowledge[parentIndex].actions[index].params.push({ type: "", value: "" })
+                }
+
+                // removes a action parameter at the cause at parentIndex and action at index
+                $scope.removeActionParameter = function (parentIndex, index) {
+                    $scope.knowledge[parentIndex].actions[index].params.pop()
+                }
+
+                // variable holding all custom parameters
+                $scope.customParams = []
+
+                // adds a new custom parameter 
+                $scope.addCustomParam = function () {
+                    $scope.customParams.push({ value: "" })
+                }
+
+                // removes a custom parameter
+                $scope.removeCustomParam = function () {
+                    $scope.customParams.pop()
+                }
+
+                // This function parses through the knowledge variable and returns
+                // the string that is formatted to our language
                 $scope.buildString = function () {
                     var final = "RULES { "
                     $scope.knowledge.forEach(function (cause) {
@@ -327,49 +365,18 @@
                     return final;
                 }
 
-                $scope.downloadContent = function() {
+                // This function calls buildString to create the text
+                // it then opens a browser for the user to save the string in a text file
+                $scope.downloadContent = function () {
                     var atag = document.createElement("a");
                     var content = $scope.buildString();
-                    var file = new Blob([content], {type: 'text/plain'});
+                    var file = new Blob([content], { type: 'text/plain' });
                     atag.href = URL.createObjectURL(file);
                     atag.download = $scope.inputtedTask + "_knowledge.txt";
                     atag.click();
                 }
 
-                $scope.removeCausalParameter = function (index) {
-                    $scope.knowledge[index].parameters.pop()
-                }
-
-                $scope.addActionParameter = function (parentIndex, index) {
-                    $scope.knowledge[parentIndex].actions[index].params.push({ type: "", value: "" })
-                }
-
-                $scope.removeActionParameter = function (parentIndex, index) {
-                    $scope.knowledge[parentIndex].actions[index].params.pop()
-                }
-
-                $scope.customParams = []
-
-                $scope.addCustomParam = function(){
-                    $scope.customParams.push({value: ""})
-                }
-
-                $scope.removeCustomParam = function(){
-                    $scope.customParams.pop()
-                }
-
-                $scope.defaultActions = ['release', 'grab', 'move']
-
-                $scope.setParams = function (parentIndex, item) {
-                    var actions = []
-                    $scope.knowledge[parentIndex].actions.forEach(function (x) {
-                        actions.push(x.action);
-                    });
-                    var index = actions.indexOf(item);
-                    $scope.causalParamList = $scope.knowledge[parentIndex].actions[index].params
-                }
-
-
+                // Opens a file browser for input of smile recordings
                 $scope.smileRecordings = function (element) {
                     $scope.recordings = []
                     var myFiles = element.files
@@ -382,102 +389,90 @@
 
                 }
 
+                // Opens a browser for the user to load the knowledge base file
                 $scope.addKnowledge = function (element) {
                     $scope.knowledgeAdded = true
                     var file = element.files[0]
                     console.log(file)
                     $scope.knowledgeFile = { name: file.name, path: file.path }
-					
                     $scope.$apply()
                 }
 
-                $scope.setParams = function (parentIndex, item) {
-                    var actions = []
-                    $scope.knowledge[parentIndex].actions.forEach(function (x) {
-                        actions.push(x.action);
+                // Opens a browser for the user to load the initial XML state 
+                $scope.XMLInput = function (element) {
+                    var file = element.files[0]
+                    console.log(file)
+                    $scope.inputXML = ""
+                    $scope.inputXML = file.path
+                    $scope.xml = { name: file.name, path: file.path }
+                    $scope.run = true
+                    $scope.$apply()
+                }
+
+                // this function takes all inputs and runs the python scripts to compile the 
+                // knowledge base, parse the smile recordings, and run the imitiation algorithm
+                $scope.go = function () {
+                    // Initial ng-class and error checking
+                    $scope.goClass = "ui green button"
+                    $scope.error = ""
+                    if ($scope.recordings.length == 0) {
+                        $scope.goClass = "ui red button"
+                        $scope.error = "No SMILE Recordings"
+                        return;
+                    }
+                    $scope.buildPathString();
+                    $scope.error1 = ""
+                    $scope.error2 = ""
+                    //console.log($scope.pathString)
+                    //console.log($scope.inputXML)
+                    // Run python scripts
+                    var util = require("util");
+                    var spawn1 = require("child_process").spawn;
+                    //var process1 = spawn('python',["final_imitation.py",$scope.pathString,$scope.inputXML,test]);
+
+                    var process1 = spawn1('python', ["./python_causal_compiler/compiler/run.py", $scope.knowledgeFile.path, "Dummy"])
+                    process1.stderr.on('data', function (chunk) { //debugging info, prints out stuff python puts in stdout
+
+                        $scope.error1 = chunk.toString('utf8');// buffer to string
+                        console.log($scope.error1.length)
+                        console.log($scope.error1);
+                        $scope.$apply()
                     });
-                    var index = actions.indexOf(item);
-                    $scope.causalParamList = $scope.knowledge[parentIndex].actions[index].params
+
+                    setTimeout(function () {
+                        var process = spawn1('python', ["./python_causal_compiler/compiler/output/imitation.py", $scope.pathString, $scope.inputXML]);
+                        process.stderr.on('data', function (chunk) { //debugging info, prints out stuff python puts in stdout
+
+                            $scope.error2 = chunk.toString('utf8');// buffer to string
+                            console.log($scope.error2.length)
+                            console.log($scope.error2);
+                            $scope.$apply()
+                        });
+
+                    }, 5000);
+                    $scope.showFinal();
+                    //var spawn = require("child_process").spawn;
+                    //var test = "test.xml"
+
+                }
+
+                // Opens a file browser for user to load in XML text file
+                $scope.createXmlFile = function (element) {
+                    var file = element.files[0]
+                    $scope.createdXML = ""
+                    $scope.createdXML = file.path
+                    $scope.createXML = { name: file.name, path: file.path }
+                    $scope.$apply()
+                }
+
+                // Takes the file chosen in createXmlFile and generates the xml
+                $scope.generateXML = function () {
+                    var util = require("util");
+                    var spawn = require("child_process").spawn;
+                    var process = spawn('python', ["./userinputToXML/createUserInputXML.py", $scope.createXML.path]);
+
+                    $scope.createXML = ""
                 }
             })
-
-            $scope.smileRecordings = function (element) {
-                $scope.recordings = []
-                var myFiles = element.files
-                console.log(myFiles)
-                var i = 0;
-                for (i; i < myFiles.length; i++) {
-                    $scope.recordings.push({ name: myFiles[i].name, path: myFiles[i].path })
-                }
-                $scope.$apply()
-
-            }
-
-            $scope.XMLInput = function (element) {
-                var file = element.files[0]
-                console.log(file)
-                $scope.inputXML = ""
-                $scope.inputXML = file.path
-                $scope.xml = { name: file.name, path: file.path }
-                $scope.run = true
-                $scope.$apply()
-            }
-
-            $scope.go = function () {
-                $scope.goClass = "ui green button"
-                $scope.error = ""
-                if ($scope.recordings.length == 0) {
-                    $scope.goClass = "ui red button"
-                    $scope.error = "No SMILE Recordings"
-                    return;
-                }
-                $scope.buildPathString();
-                console.log($scope.pathString)
-                console.log($scope.inputXML)
-                var util = require("util");
-                var spawn1 = require("child_process").spawn;
-                //var process1 = spawn('python',["final_imitation.py",$scope.pathString,$scope.inputXML,test]);
-                
-                console.log("I am calling run.py");
-                var process1 = spawn1('python', ["./python_causal_compiler/compiler/run.py",$scope.knowledgeFile.path, "Dummy"])
-                process1.stderr.on('data',function(chunk){ //debugging info, prints out stuff python puts in stdout
-
-                    var textChunk = chunk.toString('utf8');// buffer to string
-
-                    util.log(textChunk);
-                });
-                
-                setTimeout(function () {
-					console.log("Calling imitation")
-                    var process = spawn1('python', ["./python_causal_compiler/compiler/output/imitation.py", $scope.pathString, $scope.inputXML]);
-					process.stderr.on('data',function(chunk){ //debugging info, prints out stuff python puts in stdout
-
-						var textChunk = chunk.toString('utf8');// buffer to string
-
-						util.log(textChunk);
-					});
-                    
-                }, 5000);
-				$scope.showFinal();
-                //var spawn = require("child_process").spawn;
-                //var test = "test.xml"
-
-            }
-
-            $scope.createXmlFile = function (element) {
-                var file = element.files[0]
-                $scope.createdXML = ""
-                $scope.createdXML = file.path
-                $scope.createXML = { name: file.name, path: file.path }
-                $scope.$apply()
-            }
-
-            $scope.generateXML = function () {
-                var util = require("util");
-                var spawn = require("child_process").spawn;
-                var process = spawn('python', ["./userinputToXML/createUserInputXML.py", $scope.createXML.path]);
-
-                $scope.createXML = ""
-            }
         }]);
 })();

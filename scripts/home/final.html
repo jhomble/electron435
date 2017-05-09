@@ -5,12 +5,28 @@
                 <div class="row">
                     <div style="text-align: center">
                         <h2>Task Completed!</h2>
+                        <h4>Please give the system time to finish running...</h4>
                     </div>
                 </div>
                 <div class="row">
-                    <div style="text-align: center">
-                        <h3>Go to SMILE-1.1.0\tablesetup\final_xml.xml  to find generated Final State XML file</h3>
-						<h3>Go to python_causal_compiler\compiler\output to find imitation.py and facility_domain.py, the generated Imitation python files </h3>
+                    <div ng-show="error1.length === 0" style="text-align: center">
+                        <div ng-show="error2.length === 0">
+                            <h2 style="color: green">Success!</h2>
+                            <h3>Go to SMILE-1.1.0\tablesetup\final_xml.xml to find generated Final State XML file</h3>
+                            <h3>Go to python_causal_compiler\compiler\output to find imitation.py and facility_domain.py, the
+                                generated Imitation python files </h3>
+                        </div>
+                    </div>
+                    <div ng-hide="error1.length === 0" style="text-align: center">
+                        <div ng-hide="error2.length === 0">
+                            <h2 style="color: red">Error!</h2>
+                            <h3>Error message from run.py:</h3>
+                            <h4 ng-bind="error1"></h4>
+                            <h3>Error message from imitation.py:</h3>
+                            <h4 ng-bind="error2"></h4>
+                            <br>
+                            <h3>Log of the errors can be found here: electron435/python_causal_compiler/compiler/logs</h3>
+                        </div>
                     </div>
                 </div>
                 <div class="row">

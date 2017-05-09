@@ -1,6 +1,6 @@
 ## Imitation Compiler
 #
-#  @filename Facility_Domain_Compiler.py
+#  @filename Imitation_Compiler.py
 #  @author Ben Mariano
 #  @date 5/9/2017
 

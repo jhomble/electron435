@@ -187,9 +187,13 @@ class Imitation_Compiler(NodeVisitor):
 			for arg in args:
 				if isinstance(arg, (tuple, list)):
 					origHasLiteral = True
+
+			added_star = False
+
 			# Check if you have to change parameters (add final *)
 			if 'NONE' not in intention_Args and not hasLiteral:
 				if 'NONE' in args or origHasLiteral or len(intention_Args) > len(args):
+					added_star = True
 					prev_arg = ''		
 					index = -1
 					# iterate through intention args	
@@ -211,7 +215,8 @@ class Imitation_Compiler(NodeVisitor):
 								tmp_dict[prev_arg_2] = prev_arg+'['+str(new_index)+']'
 							# Map first arg in CONT list
 							tmp_dict[prev_arg] = prev_arg +'[0]'
-							self.method_var_equivs[act_name][length-1].update(tmp_dict)
+							for i in range(0, length):
+								self.method_var_equivs[act_name][i].update(tmp_dict)
 							# Use star notation to indicate that the method arguments needs
 							# star at the end to indicate variable length tuple in Python
 							prev_arg = '*' + prev_arg
@@ -221,6 +226,32 @@ class Imitation_Compiler(NodeVisitor):
 					else:
 						adjusted_args = intention_Args
 					self.methods_dict[act_name] = (adjusted_args, conds, rets)
+			if not added_star:
+				prev_arg = ''		
+				index = -1
+				# iterate through intention args	
+				for a in range(0, len(args)):
+					arg = args[a]
+					# handle CONT keyword
+					if arg[:4] == 'CONT':
+						# Get argument referenced by CONT number
+						index = a - int(arg[4:])
+						prev_arg = args[index]
+						# iterate through intention args coming after the first item
+						# referenced by the CONT
+						tmp_dict = {}							
+						for i in range(index, len(args)-1):
+							prev_arg_2 = args[i]
+							# check if there's an entry yet for this intention
+							new_index = i - index
+							# add in new mapping for each of the args in CONT list
+							tmp_dict[prev_arg_2] = prev_arg+'['+str(new_index)+']'
+						# Map first arg in CONT list
+						tmp_dict[prev_arg] = prev_arg +'[0]'
+						self.method_var_equivs[act_name][length-1].update(tmp_dict)
+						# Use star notation to indicate that the method arguments needs
+						# star at the end to indicate variable length tuple in Python
+						prev_arg = '*' + prev_arg
 
 			# Update Methods Dict
 			self.methods_dict[act_name][2].append(ret)
@@ -415,6 +446,9 @@ class Imitation_Compiler(NodeVisitor):
 	#  @rtype: String
 	def handle_Type(self, expr, arg_num, if_stmt, pos):
 		# Handles arg 1 and 2 slightly differently
+		if isinstance(expr, (list, tuple)):	
+			return if_stmt
+
 		if arg_num == 1:
 			var_name = '#'+expr
 			if pos:
@@ -478,21 +512,29 @@ class Imitation_Compiler(NodeVisitor):
 				for a in range(0, len(expr2)):
 					arg = expr2[a]
 					# Handle CONT keyword
-					if arg[:4] == 'CONT':
-						cont_offset = int(arg[4:])
-						prev_arg = expr2[a-cont_offset]
-						# alter arg name to avoid namespace collision
-						arg = arg + '-' + prev_arg
-						self.method_var_equivs[self.intention][length-1][arg] = ')+tuple(all_'+expr1[1]+'['+str(a-cont_offset)+':]'
+					if isinstance(arg, (list, tuple)):	
+						pass
 					else:
-						self.method_var_equivs[self.intention][length-1][arg] = 'all_'+expr1[1]+'['+str(a)+']'
+						if arg[:4] == 'CONT':
+							cont_offset = int(arg[4:])
+							prev_arg = expr2[a-cont_offset]
+							# alter arg name to avoid namespace collision
+							arg = arg + '-' + prev_arg
+							self.method_var_equivs[self.intention][length-1][arg] = ')+tuple(all_'+expr1[1]+'['+str(a-cont_offset)+':]'
+						else:
+							self.method_var_equivs[self.intention][length-1][arg] = 'all_'+expr1[1]+'['+str(a)+']'
 			# evaluate TYPE keyword
 			elif expr1[0] == 'TYPE':
 				if_stmt = self.handle_Type(expr1[1], 1, if_stmt, True)
 				# the second expression is known to be either a literal
 				# or another TYPE expression
+				if if_stmt == '':
+					return body, 'if True:\n'
 				if expr2[0] == 'TYPE':
+					if_stmt_hold = if_stmt;
 					if_stmt = self.handle_Type(expr2[1], 2, if_stmt, True)	
+					if if_stmt == if_stmt_hold:
+						return body, 'if True:\n'
 				else:
 					if_stmt += '\''+expr2+'\':\n'
 			# Handle variable/literal comparison
@@ -606,8 +648,13 @@ class Imitation_Compiler(NodeVisitor):
 				if_stmt = self.handle_Type(expr1[1], 1, if_stmt, False)
 				# the second expression is known to be either a literal
 				# or another TYPE expression
+				if if_stmt == '':
+					return body, 'if True:\n'
 				if expr2[0] == 'TYPE':
+					if_stmt_hold = if_stmt;
 					if_stmt = self.handle_Type(expr2[1], 2, if_stmt, False)	
+					if if_stmt == if_stmt_hold:
+						return body, 'if True:\n'
 				else:
 					if_stmt += '\''+expr2+'\':\n'
 			# Handle variable/literal comparison
@@ -832,7 +879,7 @@ class Imitation_Compiler(NodeVisitor):
 	#  Return a string representing the variable corresponding
 	#  to the State keyword
 	def visit_State(self, node):
-		return self.id_generator()
+		return 'STATE', self.id_generator()
 
 	## Visit Python
 	#

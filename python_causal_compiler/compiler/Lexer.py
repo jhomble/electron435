@@ -1,6 +1,10 @@
 ## Lexer
 #
-#  Custom language lexer/tokenizer.
+#  @filename Lexer.py
+#  @author Ben Mariano
+#  @date 5/9/2017
+#
+#  @brief Custom language lexer/tokenizer.
 from Token import Token
 
 # Token Types
@@ -26,10 +30,12 @@ RESERVED_KEYWORDS = {
 
 ## Custom Lexer
 #
-#  The Lexer transforms the raw input text from the custom
+#  @brief The Lexer transforms the raw input text from the custom
 #  language into a list of tokens
 class Lexer(object):
 	## Constructor
+	#
+	#  @param text input causal knowledge text
 	def __init__(self, text):
 		## @var text
 		# Raw input code in custom language
@@ -43,7 +49,9 @@ class Lexer(object):
 
 	## Lexer Error
 	#
-	#  Notifies user of use of invalid/unrecognized character
+	#  @brief Notifies user of use of invalid/unrecognized character
+	#
+	#  @retval none
 	def error(self):
 		raise Exception('Invalid character: {c}'.format(
 			c = self.current_char
@@ -51,9 +59,11 @@ class Lexer(object):
 
 	## Advance
 	#
-	#  Changes current position and adjusts current character 
+	#  @brief Changes current position and adjusts current character 
 	#  appropriately. Current character is equal to None if the
 	#  position is at the end of the input text
+	#
+	#  @retval none
 	def advance(self):
 		self.pos += 1
 		if self.pos > len(self.text) - 1:
@@ -63,14 +73,18 @@ class Lexer(object):
 
 	## Skip Whitespace
 	#
-	#  Ignores whitespace. Input can have arbitrary spacing.
+	#  @brief Ignores whitespace. Input can have arbitrary spacing.
+	#
+	#  @retval none
 	def skip_whitespace(self):
 		while self.current_char is not None and self.current_char.isspace():
 			self.advance()
 
 	## Integer
 	#
-	#  Identifies digits/strings of digits and returns them as integers
+	#  @brief Identifies digits/strings of digits and returns them as integers
+	#
+	#  @retval Integer integer representation of the character sequence
 	def integer(self):
 		result = ''
 		while self.current_char is not None and self.current_char.isdigit():
@@ -80,8 +94,10 @@ class Lexer(object):
 
 	## Peek
 	#
-	#  Returns the next character without actually moving the current
+	#  @brief Returns the next character without actually moving the current
 	#  position. This is needed for certain Lexing decisions.
+	#
+	#  @retval char next character after current_char
 	def peek(self):
 		peek_pos = self.pos + 1
 		if peek_pos > len(self.text) - 1:
@@ -91,8 +107,11 @@ class Lexer(object):
 
 	## ID
 	#
-	#  Look in keywords for the given ID and return the corresponding
+	#  @brief Look in keywords for the given ID and return the corresponding
 	#  token
+	#
+	#
+	#  @retval Token token representing an id	
 	def _id(self):
 		result = ''
 		while self.current_char is not None and (self.current_char.isalnum() or self.current_char == '-' or self.current_char == '_'):
@@ -120,6 +139,9 @@ class Lexer(object):
 	## Get Next Token
 	#
 	#  Tokenizes the entire input
+	#
+	#
+	#  @retval Token the next token
 	def get_next_token(self):
 
 		while self.current_char is not None:

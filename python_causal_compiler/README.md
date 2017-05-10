@@ -46,4 +46,4 @@ RULES {
 
 The code segment above describes two causal relationships, one direct and one conditional: 
 - The first statement can be taken to mean that if the program observes a grasp of "obj" and then a release of "obj" at a given location "dest," the inferred intention behind this action is a move-to of the "obj" to "dest."
-- The second statement means that if the program observes a move-to of "obj" to "dest," it can be inferred that the intention was to create a stack with "obj" at "dest." However, this causal relationship is only valid if the type of "obj" is block or "specialCupcake."
+- The second statement means that if the program observes a move-to of "obj" to "dest," it can be inferred that the intention was to create a stack with "obj" at "dest." However, this causal relationship is only valid if the type of "obj" is block or specialCupcake.

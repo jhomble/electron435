@@ -1,24 +1,12 @@
 # Python Causal Compiler
 
-## Example
-
-'''
-RULES {
-	move-to(obj, dest, dx, dy, dz, da) := grasp(obj), release(obj, dest, dx, dy, dz, da);
-	if (TYPE(obj)=block || TYPE(obj)=specialCupcake): 
-		stack(dest, dx, dy, dz, da, obj) := move-to(obj, dest, dx, dy, dz, da)
-}
-'''
-
-The code segment above describes two causal relationships, one direct and one conditional: 
-- The first statement can be taken to mean that if the program observes a grasp of "obj" and then a release of "obj" at a given location "dest," the inferred intention behind this action is a move-to of the "obj" to "dest."
-- The second statement means that if the program observes a move-to of "obj" to "dest," it can be inferred that the intention was to create a stack with "obj" at "dest." However, this causal relationship is only valid if the type of "obj" is block or "specialCupcake."
-
 ## Lexer
 
 The lexer converts the raw input text into a token stream fed to the parser. Look in Lexer.py for more info. 
 
 ## Parser
+
+The parser converts the token stream from the lexer into an Abstract Syntax Tree (AST) which is described below:
 
 Stmts() : [] of Stmt
 Stmt(Cond, Caus)
@@ -41,3 +29,17 @@ Down the other path of the tree, Caus objects break down into Act and Acts objec
 For the sake of space in the diagram, some of the tree’s child nodes have been replaced with a dotted line, but these nodes would normally decompose into the same structure as their siblings.
 
 ## Compiler
+
+## Example
+
+```
+RULES {
+	move-to(obj, dest, dx, dy, dz, da) := grasp(obj), release(obj, dest, dx, dy, dz, da);
+	if (TYPE(obj)=block || TYPE(obj)=specialCupcake): 
+		stack(dest, dx, dy, dz, da, obj) := move-to(obj, dest, dx, dy, dz, da)
+}
+```
+
+The code segment above describes two causal relationships, one direct and one conditional: 
+- The first statement can be taken to mean that if the program observes a grasp of "obj" and then a release of "obj" at a given location "dest," the inferred intention behind this action is a move-to of the "obj" to "dest."
+- The second statement means that if the program observes a move-to of "obj" to "dest," it can be inferred that the intention was to create a stack with "obj" at "dest." However, this causal relationship is only valid if the type of "obj" is block or "specialCupcake."

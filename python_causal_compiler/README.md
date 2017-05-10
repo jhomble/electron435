@@ -8,17 +8,17 @@ The lexer converts the raw input text into a token stream fed to the parser. Loo
 
 The parser converts the token stream from the lexer into an Abstract Syntax Tree (AST) which is described below:
 
-Stmts() : [] of Stmt
-Stmt(Cond, Caus)
-Cond(BoolExp)
-BoolExp(Boolean, Op, Boolean)
-- Op = Token of AND or OR
-Boolean(e1, Op, e2) 
-- Exp : one of (ALL, TYPE, LITERAL, Boolean, Var, or Args)
+- Stmts = list of Stmt
+- Stmt = (Cond, Caus)
+- Cond = (BoolExp)
+- BoolExp = (Boolean, Op, Boolean)
+- Op = AND or OR
+- Boolean = (e1, Op, e2) 
+- Exp = one of (ALL, TYPE, LITERAL, STATE, PYTHON, Boolean, Var, or Args)
 - Op = Token of >,<,>=,<=, or =
-Caus(Act, Acts)
-Act(Var, Args)
-Acts() : [] of Act
+- Caus = (Act, Acts)
+- Act = (Var, Args)
+- Acts = list of Act
 
 The diagram provided (causaltree.jpg) breaks down the structure/code of the abstract syntax tree constructed by and traversed using the causal compiler. The root element (Stmts) is composed of a list of Stmt objects. These Stmt objects are in turn composed of a Cond (conditional) and Caus (cause) object, representing the conditions needed to be met (Cond) for a causal action (Caus) to occur.
 
@@ -28,7 +28,11 @@ Down the other path of the tree, Caus objects break down into Act and Acts objec
 
 For the sake of space in the diagram, some of the tree’s child nodes have been replaced with a dotted line, but these nodes would normally decompose into the same structure as their siblings.
 
-## Compiler
+## Compilers
+
+There are two compilers: the Facility Domain Compiler and the Imitation compiler.
+- The Facility Domain Compiler traverses the AST produced by the parser and outputs the text of the causes function, which is used by CO-PCT to determine the intentions of given input recording from SMILE.
+- The Imitation Compiler traverses the same AST produced by the parser and outputs the text of the methods used by Pyhop to traverse back down the causal tree to produce an imitation.
 
 ## Example
 

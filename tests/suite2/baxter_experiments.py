@@ -20,41 +20,43 @@ def causes(v):
 
     # print('ACTS: '+str(tasks))
 
+    print(str(tasks))
+
     if len(v) == 1:
         if tasks == ("move arm and grasp",):
             arm, object_id = args[0]
             dest_id = arm_ids[int(arm)-1]
             asm_type = dict(states[0])[object_id]
             if asm_type not in ("DockCase","DockDrawer"):
-                print('move unobstructed object')                
+                # print('move unobstructed object')                
                 g.add((states[0], "move unobstructed object",(object_id, dest_id, (), ())))
         if tasks == ("put down grasped object",):
             arm, dest_id, dM, dt = args[0]
             object_id = dict(states[0])["gripping"][int(arm)-1]
-            print('move unobstructed object')                            
+            # print('move unobstructed object')                            
             g.add((states[0], "move unobstructed object", (object_id, dest_id, dM, dt)))
         if tasks == ("move unobstructed object",):
             object_id, dest_id, dM, dt = args[0]
             if dest_id in arm_ids:
-                print('move object')                
+                # print('move object')                
                 g.add((states[0], "move object", args[0]))
             else:
                 asm_type = dict(states[0])[dest_id]
                 if (asm_type=="DockCase") or (dest_id in clear_ids):
-                    print('move unobstructed object to free spot')                
+                    # print('move unobstructed object to free spot')                
                     g.add((states[0],"move unobstructed object to free spot", (object_id, dest_id)))
-                print('move object')
+                # print('move object')
                 g.add((states[0],"move object", args[0]))
         if tasks == ("move object",):
             object_id, dest_id, dM, dt = args[0]
             if dest_id not in arm_ids:
                 if (dest_id=="dock-case_6") or (dest_id in clear_ids):
-                    print('move object to free spot')                
+                    # print('move object to free spot')                
                     g.add((states[0],"move object to free spot", (object_id, dest_id)))
         if tasks == ("move object to free spot",):
             object_id, dest_id = args[0]
             if dest_id=="discard-bin":
-                print('discard object')                                
+                # print('discard object')                                
                 g.add((states[0],"discard object",(object_id,)))
     if len(v)==2:
         if tasks == ("move grasped object","release"):
@@ -62,14 +64,14 @@ def causes(v):
             object_id = dict(states[0])["gripping"][int(arm)-1]
             asm_type = dict(states[0])[object_id]
             if asm_type not in ("DockCase","DockDrawer"):
-                print('put down grasped object')                
+                # print('put down grasped object')                
                 g.add((states[0], "put down grasped object", args[0]))
         if tasks == ("move arm and grasp","put down grasped object"):
             arm_0, object_id = args[0]
             arm_1, dest_id, dM, dt = args[1]
             asm_type = dict(states[0])[object_id]
             if (arm_0==arm_1) and not (asm_type=="DockDrawer"):
-                print('move unobstructed object')                
+                # print('move unobstructed object')                
                 g.add((states[0],"move unobstructed object",(object_id, dest_id, dM, dt)))
     if len(v)==3:
         if tasks == ("move arm and grasp","move grasped object","release"):
@@ -80,10 +82,10 @@ def causes(v):
             if (arm_0==arm_1) and (arm_1==arm_2) and (asm_type=="DockDrawer"):
                 distance = sum([x**2 for (x,) in dt])**0.5
                 if distance > 1:
-                    print('open dock drawer')                
+                    # print('open dock drawer')                
                     g.add((states[0],"open dock drawer",(object_id, states[2])))
                 else:
-                    print('close dock drawer')                
+                    # print('close dock drawer')                
                     g.add((states[0],"close dock drawer",(object_id,)))
     return g
 

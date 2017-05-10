@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Creating acceptance.py..."
-python ../compiler/run_acceptance.py ../compiler/input/acceptance_causes.txt _
+python ../../python_causal_compiler/compiler/run_acceptance.py ../../python_causal_compiler/compiler/input/acceptance_causes.txt _
 echo "Completed!"
 echo "Running acceptance.py..."
 (echo "n" | python acceptance.py) > acceptance_out.txt

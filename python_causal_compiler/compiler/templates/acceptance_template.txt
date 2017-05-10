@@ -27,6 +27,8 @@ def causes(v):
     states, actions, arguments = zip(*v)
     g = set()
 
+    print(str(actions))
+
     # INSERT CAUSES HERE
 
     return g

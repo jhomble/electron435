@@ -1,25 +1,19 @@
-# Electron + AngularJS + Angular Material
+# Imitation Project
+### Spring 2017 
+### CMSC435
+### Learn More at our [website](http://viceroy.cs.umd.edu/) 
+Team:
+Julien Homble,
+Ben Mariano,
+Kyle Urban,
+Derek Farley,
+Chris Dear,
+Susmitha Yenugula,
+David Schlegel,
+Amber Mirza
 
-_For a TypeScript Version of the Boilerplate see the `typescript` branch_
-
-**Clone and run for a quick way to get started with Electron + AngularJS + AngularMaterial.**
-
-A basic Electron application needs just these files:
-
-- `index.html` - A web page to render.
-- `main.js` - Starts the app and creates a browser window to render HTML.
-- `package.json` - Points to the app's main file and lists its details and dependencies.
-
-You can learn more about each of these components within the [Quick Start Guide](http://electron.atom.io/docs/latest/tutorial/quick-start).
-
-The Angular App is located in the `scripts/` folder.
-This boilerplate includes:
-
-- `AngularJS` - For running the AngularJS App
-- `Angular-Material`, `Angular-Aria` and `Angular-Animate` - For a sexy look, for everyone
-- `Angular-route` - For a better life
-
-You can learn more about AngularJS on the [AngularJS Website](https://angularjs.org/).
+## Purpose
+The goal of our project is to design a robust, modular API for rapid configuration of imitation-based simulation experiments using Reggia and Katz’s software in other domains. This will be done by delivering an Electron desltop application that allows the user to input a demonstration of a task they would like to replicate. Our API would then output the various “imitation” situations that the system infers from that task and a start situation. The application includes the capability of creating custom “causal intention relations” from a GUI. These relations are crucial to the imitation algorithm which will now be built for new tasks, rather than the ones Reggia and Katz have been using for their specific block stacking example. From this, we intend to provide an intuitive, visual layout design for configuring new imitation causal intention relations, and remove the need for the user to have to create the corresponding code base for every unique experiment from scratch.  
 
 ## Requirements
 
@@ -44,17 +38,4 @@ $ npm install && npm start
 
 Learn more about Electron and its API in the [documentation](http://electron.atom.io/docs/latest).
 
-## To build
 
-To fully use this boilerplate you will need grunt (`npm install grunt-cli`),
-from there you can use `grunt build` to package your Electron app using Electron Packager
-which will:
-
-- Clean any previous build
-- Prepare a minimal App in the `/build` folder (configurable in Gruntfile.js)
-- Find node_modules dependencies in your `index.html` and add them accordingly to the `build` folder
-- Uglify the JS files in the `build` folder
-- Package the App using `ASAR` (configurable)
-- Create distribution package for all platforms (configurable) in the `dist` folder
-
-#### License [MIT](LICENSE.md)

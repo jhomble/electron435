@@ -1,6 +1,15 @@
+# @mainpage Python Causal Compiler!!!
+"""
+@mainpage Python Causal Compiler
+"""
+
 ## Compiler Runner
 #
-#  This file creates the Lexer and Parser and runs the two
+#  @filename Facility_Domain_Compiler.py
+#  @author Ben Mariano
+#  @date 5/9/2017
+#
+#  @brief This file creates the Lexer and Parser and runs the two
 #  compilers.
 
 from Lexer import Lexer
@@ -12,7 +21,12 @@ import sys
 
 ## Make Facility Domain
 #
-#  Outputs the first python file that defines CO-PCT tree
+#  @brief Outputs the first python file that defines CO-PCT tree
+#
+#  @param interpreter facility domain compiler that will output Python code to be inserted
+#  @param log log to keep track of what's going on
+#
+#  @retval String output of the facility domain compiler
 def make_facility_domain(interpreter, log):
 	log.write('Opening output file facility_domain.py...\n')
 	out_file = os.path.normpath("./python_causal_compiler/compiler/output/facility_domain.py")
@@ -45,8 +59,13 @@ def make_facility_domain(interpreter, log):
 
 ## Make Imitation
 #
-# Outputs the second python file that uses pyhop to traverse the
+# @brief Outputs the second python file that uses pyhop to traverse the
 # CO-PCT tree
+#
+#  @param interpreter facility domain compiler that will output Python code to be inserted
+#  @param log log to keep track of what's going on
+#
+#  @retval String output of the imitation compiler
 def make_imitation(interpreter, log):
 	log.write('Opening output file imitation.py...\n')	
 	out_file = os.path.normpath("./python_causal_compiler/compiler/output/imitation.py")
@@ -80,7 +99,12 @@ def make_imitation(interpreter, log):
 
 ## Run Facility Domain
 #
-#  Runs the Facility Domain Compiler
+#  @brief Runs the Facility Domain Compiler
+#
+#  @param text string representation of the causal input language text
+#  @param log log to keep track of what's going on
+#
+#  @retval none
 def run_facility_domain(text, log):
 	log.write('Making Lexer...\n')
 	lexer = Lexer(text)
@@ -95,7 +119,12 @@ def run_facility_domain(text, log):
 
 ## Run Imitation
 #
-#  Runs the Imitation Compiler
+#  @brief Runs the Imitation Compiler
+#
+#  @param text string representation of the causal input language text
+#  @param log log to keep track of what's going on
+#
+#  @retval none
 def run_imitation(text, log):
 	log.write('Making Lexer...\n')
 	lexer = Lexer(text)
@@ -125,29 +154,44 @@ def main():
 			text = open(input_path, 'r').read()
 			log.write('Input was successfully read in!\n\n')
 		except Exception as e:
-			print('Failed: Check logs at electron435/python_causal_compiler/compiler/logs/compiler')	
+			print('Compiler Failed!')
+			print("Error: %s\n" % e)
 			log.write('Failed reading in input file!\n\n')
 			error_log.write('Failed reading in input file!\n')
 			error_log.write("\tError: %s\n" % e)
 			completed = 'Unsuccessfully completed running run.py :(\n'
+			log.write(completed)
+			log.close()
+			error_log.close()
+			exit()
 
 	try:
 		run_facility_domain(text, log)
 	except Exception as e:
-		print('Failed: Check logs at electron435/python_causal_compiler/compiler/logs/compiler')	
+		print('Compiler Failed!')
+		print("Error: %s\n" % e)
 		log.write('Failed in Compilation of Run Facility Domain\n\n')		
 		error_log.write('Failed in Compilation of Run Facility Domain\n')
 		error_log.write("\tError: %s\n" % e)
 		completed = 'Unsuccessfully completed running run.py :(\n'		
+		log.write(completed)
+		log.close()
+		error_log.close()
+		exit()
 
 	try:
 		run_imitation(text, log)
 	except Exception as e:
-		print('Failed: Check logs at electron435/python_causal_compiler/compiler/logs/compiler')	
+		print('Compiler Failed!')
+		print("Error: %s\n" % e)
 		log.write('Failed in Compilation of Run Imitation\n\n')				
 		error_log.write('Failed in Compilation of Run Imitation\n')
 		error_log.write("\tError: %s\n" % e)
 		completed = 'Unsuccessfully completed running run.py :(\n'
+		log.write(completed)
+		log.close()
+		error_log.close()
+		exit()
 
 	log.write(completed)
 

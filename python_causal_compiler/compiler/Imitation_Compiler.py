@@ -1,4 +1,8 @@
 ## Imitation Compiler
+#
+#  @filename Imitation_Compiler.py
+#  @author Ben Mariano
+#  @date 5/9/2017
 
 # Library Imports
 import operator
@@ -14,11 +18,13 @@ from NodeVisitor import NodeVisitor
 
 ## Imitation Compiler
 #
-#  Compiles the second of the two required python scripts. This 
+#  @brief Compiles the second of the two required python scripts. This 
 #  script traverses the CO-PCT tree in reverse using PyHop.
 class Imitation_Compiler(NodeVisitor):
 
 	## Constructor
+	#
+	# @param parser Parser that will provide the AST to be compiled
 	def __init__(self, parser):
 		## @var parser
 		#  Converts input into AST
@@ -37,20 +43,24 @@ class Imitation_Compiler(NodeVisitor):
 
 	## Visit Literal
 	#
-	# Returns a tuple of the string 'LITERAL' and the literal
+	# @brief Returns a tuple of the string 'LITERAL' and the literal
 	# value
 	#
-	# @rtype: (String, String)
+	# @param node AST instance to be evaluated
+	#
+	# @retval (String, String) tuple of the form 'LITERAL', literal_value
 	def visit_Literal(self, node):
 		return 'LITERAL', str(self.visit(node.name))
 
 	## Visit Boolean
 	#
-	# Returns a four-tuple of the form 'UNIT', e1, comp, e2 where
+	# @brief Returns a four-tuple of the form 'UNIT', e1, comp, e2 where
 	# e1 and e2 are tuples representing eithing literals, variables
 	# or keyword phrases
 	#
-	# @rtype: (String, Tuple, String, Tuple)
+	# @param node AST instance to be evaluated
+	#
+	# @retval (String, Tuple, String, Tuple) tuple of the form 'UNIT', expr1, op, expr2
 	def visit_Boolean(self, node):
 		if node.op.type == EQUALS :
 			return 'UNIT', (self.visit(node.e1), "==", self.visit(node.e2))
@@ -69,9 +79,11 @@ class Imitation_Compiler(NodeVisitor):
 
 	## Visit Boolean Expression
 	#
-	# Returns a three tuple of the form b_left, op, b_right
+	# @brief Returns a three tuple of the form b_left, op, b_right
 	#
-	# @rtype: (Tuple, String, Tuple)
+	# @param node AST instance to be evaluated
+	#
+	# @retval (Tuple, String, Tuple) tuple of the form BooleanExpr, op, BooleanExpr
 	def visit_BoolExpr(self, node):
 		if node.op:
 			if node.op.type == AND:
@@ -83,9 +95,11 @@ class Imitation_Compiler(NodeVisitor):
 
 	## Visit Arguments
 	#
-	# Returns a list of strings representing the arguments
+	# @brief Returns a list of strings representing the arguments
 	#
-	# @rtype: String List
+	# @param node AST instance to be evaluated
+	#
+	# @retval String List list of the arguments as strings
 	def visit_Args(self, node):
 		args = []
 		for child in node.children:
@@ -95,17 +109,21 @@ class Imitation_Compiler(NodeVisitor):
 
 	## Visit Action
 	#
-	# Returns a tuple of the action_name, action_args
+	# @brief Returns a tuple of the action_name, action_args
 	#
-	# @rtype: (String, String List)
+	# @param node AST instance to be evaluated
+	#
+	# @retval (String, String List) tuple of the form action_name, action_args
 	def visit_Act(self, node):
 		return (self.visit(node.var), self.visit(node.args))
 
 	## Visit Actions
 	#
-	# Returns a list of strings representing the actions
+	# @brief Returns a list of strings representing the actions
 	#
-	# @rtype: (String, String List) List
+	# @param node AST instance to be evaluated
+	#
+	# @retval (String, String List) List list of action tuples with action_name, action_args
 	def visit_Acts(self, node):
 		acts = []
 		for child in node.children:
@@ -115,9 +133,11 @@ class Imitation_Compiler(NodeVisitor):
 
 	## Visit Caus
 	#
-	# Returns the name of the intention
+	# @brief Returns the name of the intention
 	#
-	# @rtype: String
+	# @param node AST instance to be evaluated
+	#
+	# @retval String string representing the intention
 	def visit_Caus(self, node):
 		# acts = the right-side of the causal statement. Represent
 		#		 the actions that cause the 'intention' 
@@ -262,20 +282,26 @@ class Imitation_Compiler(NodeVisitor):
 
 	## Visit No Conditional
 	#
-	# Return None when there is no conditional
+	# @brief Return None when there is no conditional
+	#
+	# @param node AST instance to be evaluated
+	#
+	# @retval none
 	def visit_NoCond(self,node):
 		self.methods_dict[self.intention][1].append(None)
 		return None
 
 	## Listify Boolean Expression
 	#
-	#  Converts a boolean expression in the tuplized form (see 
+	#  @brief Converts a boolean expression in the tuplized form (see 
 	#  visit_BoolExpr return) into a list of the form [a,b,c,...]
 	#  where a,b,c,... are conjunctions. The commas represent disjunctions.
 	#  Parsing the boolean expressions in this matter allows us to 
 	#  properly evaluate 'or' expressions.
 	#
-	#  @rtype: (Tuple List) List
+	# @param cond post evaluated condition to be redistributed
+	#
+	# @retval (Tuple List) List list of boolean AND expressions, where the members of the list of assumed to be ORED together
 	def listify_BoolExpr(self, cond):
 		new_conds = []
 
@@ -323,9 +349,11 @@ class Imitation_Compiler(NodeVisitor):
 
 	## Traverse Boolean Expression
 	#
-	#  Recursively descend Boolean Expression and appropriately print it out
+	#  @brief Recursively descend Boolean Expression and appropriately print it out
 	#
-	#  @rtype: (String, String)
+	# @param node post evaluated and listified conditions to be compiled
+	#
+	#  @rtype: (String, String) return an if statment and body in Python representing a conditional
 	def traverse_BoolExpr(self, cond):
 		# if cond[1] is one of the comparative operators than we
 		# know there is only one boolean statement (no && or ||)
@@ -375,11 +403,13 @@ class Imitation_Compiler(NodeVisitor):
 
 	## Develop And Expression
 	#
-	#  Takes in a list of boolean expressions and returns the 'AND'
+	#  @brief Takes in a list of boolean expressions and returns the 'AND'
 	#  tuple of each element. The input is the same form as the output 
 	#  of the listify_BoolExpr function.
 	#
-	#  @rtype: Tuple
+	# @param exprList list of python conditions to be anded
+	#
+	#  @retval Tuple Tuple of the same form as visit_BoolExpr to be compiled by compile_boolean
 	def develop_and_expr(self, exprList):
 		if len(exprList) == 0:
 			return None
@@ -390,7 +420,11 @@ class Imitation_Compiler(NodeVisitor):
 
 	## Visit Conditional
 	#
-	#  Return the result of evaluating the boolean expression
+	#  @brief Return the result of evaluating the boolean expression
+	#
+	# @param node AST instance to be evaluated
+	#
+	# @retval String Python code that represents the conditionals
 	def visit_Cond(self, node):
 		result = ''
 
@@ -440,10 +474,15 @@ class Imitation_Compiler(NodeVisitor):
 
 	## Handle Type Keyword
 	#
-	#  Returns a string representing the updated if statement for
+	#  @brief Returns a string representing the updated if statement for
 	#  the type keyword
 	#
-	#  @rtype: String
+	# @param expr that is the name of the argument to TYPE
+	# @param arg_num integer that tells if the TYPE keyword is left or right of equals comparator
+	# @param if_stmt previous code from if statement that must be added to and returned
+	# @param pos boolean representing whether the comparator was '=' or '!='
+	#
+	#  @retval String if statement representing the TYPE conditional
 	def handle_Type(self, expr, arg_num, if_stmt, pos):
 		# Handles arg 1 and 2 slightly differently
 		if isinstance(expr, (list, tuple)):	
@@ -465,11 +504,13 @@ class Imitation_Compiler(NodeVisitor):
 
 	## Compile Boolean Statement
 	#
-	# Returns a tuple (body, if statement) that represents the 
+	# @brief Returns a tuple (body, if statement) that represents the 
 	# required additions to the output to succesffuly match the 
 	# conditional.
 	#
-	# @rtype: (String, String)
+	# @param cond post-evaluated conditional in Tuple form to be compiled
+	#
+	# @retval (String, String) if statement and body in Python that represent a conditional
 	def compile_bool(self, cond):
 		# body     = Additional things added to the body of if_stmt.
 		#			 This could include calls to lookup_type or
@@ -669,9 +710,11 @@ class Imitation_Compiler(NodeVisitor):
 
 	## Visit Statement
 	#
-	# Evalulates a causal relation and a conditional. Returns None.
+	# @brief Evalulates a causal relation and a conditional. Returns None.
 	#
-	# @rtype: None
+	# @param node AST instance to be evaluated
+	#
+	# @retval none
 	def visit_Stmt(self, node):
 		# if_stmt 	  = initial if statement string that differentiates
 		#				which rule is being applied
@@ -695,9 +738,11 @@ class Imitation_Compiler(NodeVisitor):
 
 	## Visit Statements
 	#
-	# Compile all statements and concatenate results
+	# @brief Compile all statements and concatenate results
 	#
-	# @rtype: String
+	# @param node AST instance to be evaluated
+	#
+	# @retval String valid Python code output fo the program
 	def visit_Stmts(self, node):
 		result = ''
 		for child in node.children:
@@ -859,48 +904,64 @@ class Imitation_Compiler(NodeVisitor):
 
 	## Visit Variable
 	#
-	# Return a string representing the variable value/name
-	# 
-	# @rtype: String
+	# @brief Return a string representing the variable value/name
+	#
+	# @param node AST instance to be evaluated
+	#
+	# @retval String string representation of the variable value
 	def visit_Var(self, node):
 		return str(node.value)
 
 	## ID Generator
 	#
-	#  Randomly generates a variable id. Developed from:
+	#  @brief Randomly generates a variable id. Developed from:
 	#     https://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits-in-python
 	#
-	#  @rtype: String
+	# @param node AST instance to be evaluated
+	#
+	#  @retval String random string of length 'size' made of characters 'chars'
 	def id_generator(self, size=10, chars=string.ascii_uppercase):
 	    return ''.join(random.choice(chars) for _ in range(size))
 
 	## Visit State
 	#
-	#  Return a string representing the variable corresponding
+	#  @brief Return a string representing the variable corresponding
 	#  to the State keyword
+	#
+	# @param node AST instance to be evaluated
+	#
+	# @retval (String, String) tuple of form 'STATE', state_arg
 	def visit_State(self, node):
 		return 'STATE', self.id_generator()
 
 	## Visit Python
 	#
-	#  Return a string representing the Python code to be inlined
+	#  @brief Return a string representing the Python code to be inlined
+	#
+	# @param node AST instance to be evaluated
+	#
+	# @retval (String, String) tuple of the form 'PYTHON', python_arg
 	def visit_Python(self, node):
 		return 'PYTHON', node.code
 
 	## Visit Digit
 	#
-	# Returns a string representing a digit
+	# @brief Returns a string representing a digit
 	#
-	# @rtype: String
+	# @param node AST instance to be evaluated
+	#
+	# @retval String string representation of a digit
 	def visit_Digit(self, node):
 		return str(node.value)
 
 	## Visit Integer
 	#
-	# Returns a string representing a full integer, which is a 
+	# @brief Returns a string representing a full integer, which is a 
 	# string of concatenated digits
 	#
-	# @rtype: String
+	# @param node AST instance to be evaluated
+	#
+	# @retval String string representation of an integer
 	def visit_Int(self, node):
 		result = ''
 
@@ -911,44 +972,52 @@ class Imitation_Compiler(NodeVisitor):
 
 	## Visit Float
 	#
-	# Returns a float string which is two integers separated by
+	# @brief Returns a float string which is two integers separated by
 	# a dot
 	#
-	# @rtype: String
+	# @param node AST instance to be evaluated
+	#
+	# @retval String string representation of a float
 	def visit_Flt(self, node):
 		flt = self.visit(node.left) + '.' + self.visit(node.right)
 		return flt
 
 	## Visit ALL
 	#
-	# Returns a tuple of the form ('All', argument)
+	# @brief Returns a tuple of the form ('All', argument)
 	#
-	# @rtype: (String, String)
+	# @param node AST instance to be evaluated
+	#
+	# @retval (String, String) tuple of the form 'ALL', all_args
 	def visit_All(self, node):
 		return ALL, self.visit(node.arg)
 
 	## Visit Type
 	#
-	# Returns a tuple of the form ('TYPE', argument)
+	# @brief Returns a tuple of the form ('TYPE', argument)
 	#
-	# @rtype: (String, String)
+	# @param node AST instance to be evaluated
+	#
+	# @retval (String, String) tuple of the form 'TYPE', type_arg
 	def visit_Type(self, node):
 		return TYPE, self.visit(node.arg)		
 
 	## Visit NoOp
 	#
-	# Returns the empty string
+	# @brief Returns the empty string
 	#
-	# @rtype: String
+	# @param node AST instance to be evaluated
+	#
+	# @retval String empty string
 	def visit_NoOp(self, node):
 		return ''
 
 	## Interpret
 	#
-	# Actually compile the statement. Returns a tuple of the string 
-	# representing the compiled program as well as the value of M
+	# @brief Actually compile the statement. Returns a string of the final
+	# program code to be written to file
 	#
-	# @rtype: (String, String)
+	# @retval String final python code to be added to template files 
 	def interpret(self):
 		tree = self.parser.parse()
 		return self.visit(tree)

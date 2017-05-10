@@ -10,11 +10,11 @@ from Token import Token
 # Token Types
 (LPAREN, RPAREN, COMMA, LBRACK, RBRACK, LCURLY, RCURLY, SEMI,
 	EQUALS, LESSTHAN, GREATERTHAN, LESSEQUAL, GREATEREQUAL, AND, OR, COLON, ID, INTEGER, CAUSES, DOT, QUOTE, 
-	RULES, TYPE, ALL, CONT, IF, NOTEQUAL, STATE, PYTHON, EOF) = (
+	RULES, TYPE, ALL, CONT, IF, NOTEQUAL, STATE, PYTHON, DASH, EOF) = (
 	'LPAREN', 'RPAREN', 'COMMA', 'LBRACK', 'RBRACK', 'LCURLY',
 	'RCURLY', 'SEMI', 'EQUALS', 'LESSTHAN','GREATERTHAN', 'LESSEQUAL', 'GREATEREQUAL', 'AND', 'OR', 'COLON', 'ID', 
 	'INTEGER', 'CAUSES', 'DOT', 'QUOTE', 'RULES', 'TYPE', 
-	'ALL', 'CONT', 'IF', 'NOTEQUAL', 'STATE', 'PYTHON', 'EOF'
+	'ALL', 'CONT', 'IF', 'NOTEQUAL', 'STATE', 'PYTHON', 'DASH', 'EOF'
 )
 
 # Automatically tokenizes certain reserved keywords
@@ -164,6 +164,10 @@ class Lexer(object):
 			if self.current_char == ';':
 				self.advance()
 				return Token(SEMI, ';')									
+
+			if self.current_char == '-':
+				self.advance()
+				return Token(DASH, '-')									
 
 			if self.current_char == '(':
 				self.advance()

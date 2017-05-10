@@ -68,23 +68,25 @@ class Digit(AST):
 #  An integer which is represented as a list of digits
 class Int(AST):
 	## Constructor
-	def __init__(self):
+	def __init__(self, sign):
 		## @var digits
 		#  List of digits that comprise the integer (left-to-right)
 		self.digits = []
+		self.sign = sign
 
 ## Float
 #
 #  Represented as an two integers (separated by a dot syntactically)
 class Flt(AST):
 	## Constructor
-	def __init__(self, left, right):
+	def __init__(self, left, right, sign):
 		## @var left
 		#  The integer to the left of the dot
 		self.left = left
 		## @var right
 		#  The integer to the right of the dot
 		self.right = right
+		self.sign = sign
 
 ## Literal
 #
@@ -535,19 +537,24 @@ class Parser(object):
 	#		      | STATE LPAREN args RPAREN
 	#			  | PYTHON	
 	def var(self):
+		ispos = True
+		if self.current_token.type == DASH:
+			self.eat(DASH)
+			ispos = False
 		if self.current_token.type == INTEGER:
 			node1 = self.integer()
 			if self.current_token.type == DOT:
 				self.eat(DOT)
 				node2 = self.integer()
-				node = Flt(left=node1, right=node2)
+				node = Flt(left=node1, right=node2, sign=ispos)
 			else:
 				node = node1
+				node.sign = ispos
 		elif self.current_token.type == DOT:
-			node1 = Int()
+			node1 = Int(sign=True)
 			self.eat(DOT)
 			node2 = self.integer()
-			node = Flt(left=node1, right=node2)
+			node = Flt(left=node1, right=node2, sign = ispos)
 		elif self.current_token.type == STATE:		
 			self.eat(STATE)
 			self.eat(LPAREN)
@@ -567,7 +574,7 @@ class Parser(object):
 	# integer ->   INTEGER integer
 	#            | INTEGER
 	def integer(self):
-		root = Int()
+		root = Int(sign=True)
 
 		while self.current_token.type == INTEGER:
 			root.digits.append(Digit(self.current_token.value))

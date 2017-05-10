@@ -608,6 +608,10 @@ class Facility_Domain_Compiler(NodeVisitor):
 	def visit_Int(self, node):
 		result = ''
 
+		# is it a negative integer
+		if not node.sign:
+			result += '-'
+
 		for digit in node.digits:
 			result += self.visit(digit)
 
@@ -657,7 +661,14 @@ class Facility_Domain_Compiler(NodeVisitor):
 	#
 	# @retval String string representation of float
 	def visit_Flt(self, node):
-		return self.visit(node.left) + '.' + self.visit(node.right)
+		result = ''
+		# is it a negative integer
+		if not node.sign:
+			result += '-'
+
+		result += self.visit(node.left) + '.' + self.visit(node.right)
+
+		return result
 
 	## Visit ALL
 	#

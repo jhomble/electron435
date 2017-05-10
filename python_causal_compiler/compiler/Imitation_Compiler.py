@@ -965,6 +965,10 @@ class Imitation_Compiler(NodeVisitor):
 	def visit_Int(self, node):
 		result = ''
 
+		# is int negative
+		if not node.sign:
+			result += '-'
+
 		for digit in node.digits:
 			result += self.visit(digit)
 
@@ -979,8 +983,15 @@ class Imitation_Compiler(NodeVisitor):
 	#
 	# @retval String string representation of a float
 	def visit_Flt(self, node):
-		flt = self.visit(node.left) + '.' + self.visit(node.right)
-		return flt
+		result = ''
+
+		# is float negative
+		if not node.sign:
+			result += '-'
+
+		result += self.visit(node.left) + '.' + self.visit(node.right)
+
+		return result
 
 	## Visit ALL
 	#

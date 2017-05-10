@@ -1,0 +1,4 @@
+Failed in Compilation of Run Facility Domain
+	Error: Invalid syntax: RCURLY was expected, not Token(IF, 'IF')
+Failed in Compilation of Run Imitation
+	Error: Invalid syntax: RCURLY was expected, not Token(IF, 'IF')

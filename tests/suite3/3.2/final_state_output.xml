@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tabletop xmlns="http://synapse.cs.umd.edu/tabletop-xml" xspan="20" yspan="12">
+	<include file="tablesetup/def-room.xml"/>
+	<include file="tablesetup/def-forklift.xml"/>
+	<block id="crate2" location="(-0.9452732233189196, 0.02534296508211605, 0.24983856)" rotation="(0,0,-3.22358102965)" yspan=".5" xspan=".5" zspan=".5"/>
+	<block id="crate1" location="(-0.9452732233189196, 0.02534296508211605, 0.7498385599999999)" rotation="(0,0,-3.22358102965)" yspan=".5" xspan=".5" zspan=".5"/>
+	<instance def="room">
+		<var name="id" value="room"/>
+		<var name="location" value="(0,0,0.5)"/>
+		<var name="rotation" value="(0,0,0)"/>
+		<var name="wallThickness" value="0.2"/>
+		<var name="xspan" value="6"/>
+		<var name="yspan" value="6"/>
+		<var name="wallColor" value="darkgray"/>
+		<var name="mass" value="2"/>
+		<var name="zspan" value="1"/>
+	</instance>
+	<block id="crate3" location="(-0.9452732233189196, 0.02534296508211605, 1.24983856)" rotation="(0,0,-3.22358102965)" yspan=".5" xspan=".5" zspan=".5"/>
+</tabletop>

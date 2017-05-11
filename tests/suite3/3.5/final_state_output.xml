@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tabletop xmlns="http://synapse.cs.umd.edu/tabletop-xml" xspan="20" yspan="12">
+	<include file="tablesetup/def-room.xml"/>
+	<include file="tablesetup/def-forklift.xml"/>
+	<block id="crate4" location="(-0.36714023678034546, 1.8638606141755225, 0.7498868399999999)" rotation="(0,0,319.992912)" yspan=".5" xspan=".5" zspan=".5"/>
+	<block id="crate2" location="(-0.36714023678034546, 1.8638606141755225, 0.24988683999999994)" rotation="(0,0,319.992912)" yspan=".5" xspan=".5" zspan=".5"/>
+	<instance def="forklift">
+		<var name="id" value="forklift"/>
+		<var name="location" value="(-0.04881423510615246,-1.805353630678543,0.2499146)"/>
+		<var name="rotation" value="(0,0,363.1919757)"/>
+		<var name="mass" value="2"/>
+		<var name="yspan" value=".75"/>
+		<var name="xspan" value="1"/>
+		<var name="color" value="darkgray"/>
+		<var name="zspan" value=".5"/>
+	</instance>
+	<instance def="room">
+		<var name="id" value="room"/>
+		<var name="location" value="(0,0,0.5)"/>
+		<var name="rotation" value="(0,0,270)"/>
+		<var name="mass" value="2"/>
+		<var name="wallColor" value="darkgray"/>
+		<var name="yspan" value="6"/>
+		<var name="xspan" value="6"/>
+		<var name="wallThickness" value="0.2"/>
+		<var name="zspan" value="1"/>
+	</instance>
+	<block id="crate3" location="(1.776566251390311, 0.9369239164492097, 0.2520628)" rotation="(0,0,377.81062099999997)" yspan=".5" xspan=".5" zspan=".5"/>
+	<block id="crate1" location="(1.7657868888956396, 1.8766194014096615, 0.25042953999999995)" rotation="(0,0,353.1636096)" yspan=".5" xspan=".5" zspan=".5"/>
+</tabletop>

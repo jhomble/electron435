@@ -15,8 +15,19 @@ def stack(state, dest, dx, dy, dz, da, *obj):
         __all_args = flatten(__all_args)
         if set(__all_intention_args).issubset(set(__all_args)):
             return __ret_val
+    if state.objs[obj[0]][0] == 'specialCupcake':
+        __ret_val = [('move-to',obj[0],dest,dx,dy,dz,da)]
+        __all_args = []
+        for __action in __ret_val:
+            for __arg in __action:
+                __all_args.append(__arg)
+        __all_intention_args = [[dest],[dx],[dy],[dz],[da],[__obj for __obj in obj]]
+        __all_intention_args = flatten(__all_intention_args)
+        __all_args = flatten(__all_args)
+        if set(__all_intention_args).issubset(set(__all_args)):
+            return __ret_val
     if (state.objs[obj[0]][0] == 'block' and True):
-        __ret_val = [('move-to',obj[0],dest,dx,dy,dz,da),('stack',obj[0],0,0,.5,0,)+tuple(obj[1:])]
+        __ret_val = [('move-to',obj[0],dest,dx,dy,dz,da),('stack',obj[0],0,0,0.5,0,)+tuple(obj[1:])]
         __all_args = []
         for __action in __ret_val:
             for __arg in __action:
